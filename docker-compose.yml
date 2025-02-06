@@ -1,0 +1,6 @@
+﻿services:
+  mrstw.api:
+    image: mrstw.api
+    build:
+      context: .
+      dockerfile: MRSTW.Api/Dockerfile
