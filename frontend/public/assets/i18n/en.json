@@ -1,0 +1,13 @@
+{
+  "NAVBAR": {
+    "AUTHENTICATION_BUTTON": "Authenticate",
+    "MY_PROFILE": "Profile"
+  },
+  "ACTION_BAR": {
+    "CATEGORIES": "Categories",
+    "SEARCH_IN_DEALS": "Search in deals",
+    "CREATE_DEAL": "Create deal"
+  },
+  "FOOTER": {
+  }
+}
