@@ -6,6 +6,7 @@ namespace MRSTW.Infrastructure.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
+    // TODO: trebuie de scos Categories & Subcategories din acest microservice si de pus in altul Admin.Microservice
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Subcategory> Subcategories => Set<Subcategory>();
     public DbSet<Deal> Deals => Set<Deal>();
