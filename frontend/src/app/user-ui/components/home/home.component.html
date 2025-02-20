@@ -1,7 +1,18 @@
-<p>AJSDKAJHSDKAJHSDKJASH!</p>
+<main class="layout">
+  <aside class="sidebar">
+    <app-sidebar-categories></app-sidebar-categories>
+  </aside>
+  <section class="content">
+    <p>Welcome to the Home Component!</p>
+    <p>This is the content section, where the main page information will be displayed.</p>
 
-<aside>
-  <app-sidebar-categories/>
-</aside>
+    <h2>Sample Articles</h2>
+    <ul>
+      <li>Article 1: Understanding Flexbox</li>
+      <li>Article 2: Getting Started with Angular</li>
+      <li>Article 3: Building Responsive Layouts</li>
+    </ul>
 
-<router-outlet/>
+    <p>This content should appear to the right of the sidebar, confirming that everything is aligned horizontally!</p>
+  </section>
+</main>
