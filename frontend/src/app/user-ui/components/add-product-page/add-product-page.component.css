@@ -1,0 +1,108 @@
+/* create-deal.component.css */
+.create-deal-container {
+  width: 900px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.create-deal-title {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+textarea.form-control {
+  height: 120px;
+  resize: none;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background-color: #009688;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #00796b;
+}
+
+/* Upload button styles */
+.upload-button {
+  display: none; /* Hide the default file input */
+}
+
+.upload-button-label {
+  display: inline-block;
+  background-color: #009688;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.upload-button-label:hover {
+  background-color: #00796b;
+  transform: scale(1.05);
+}
+
+.upload-button-label:active {
+  background-color: #004d40;
+}
+
+/* Image Previews */
+.image-previews {
+  margin-top: 20px;
+}
+
+.preview-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.preview-img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+@media (max-width: 768px) {
+  .create-deal-container {
+    padding: 20px; /* Slightly reduce padding for smaller screens */
+  }
+}
