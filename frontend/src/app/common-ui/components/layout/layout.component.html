@@ -1,5 +1,11 @@
 <app-navbar/>
+<app-action-bar/>
 <div class="container">
-  <router-outlet></router-outlet>
+  <aside class="sidebar">
+    <app-sidebar-categories/>
+  </aside>
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
 </div>
 <app-footer/>

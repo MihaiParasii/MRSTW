@@ -1,5 +1,5 @@
-using MRSTW.Application;
-using MRSTW.Infrastructure;
+using MRSTW.BusinessLogicLayer;
+using MRSTW.DataAccessLayer;
 
 namespace MRSTW.Api;
 
