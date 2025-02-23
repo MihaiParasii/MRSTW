@@ -1,6 +1,6 @@
 using AutoMapper;
+using Domain.Models;
 using MRSTW.Api.Contracts.Deal;
-using MRSTW.Domain.Models;
 
 namespace MRSTW.Api.Mappings;
 

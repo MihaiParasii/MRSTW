@@ -1,5 +1,5 @@
 export class DealResponse {
-  public Id!: number;
-  public Name!: string;
-  public Description!: string;
+  Id!:number;
+  Name!: string;
+  Description!: string;
 }
