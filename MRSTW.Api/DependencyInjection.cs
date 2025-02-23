@@ -1,7 +1,5 @@
 using Microsoft.OpenApi.Models;
 using MRSTW.Api.Mappings;
-using MRSTW.Application;
-using MRSTW.Infrastructure;
 
 namespace MRSTW.Api;
 

@@ -18,7 +18,7 @@ export class SearchComponent {
 
   public onSubmit() {
     if (this.query.trim()) {
-      // this.router.navigateByUrl(`/search/${this.query}`);
+      this.router.navigateByUrl(`/search/${this.query}`);
     } else {
     }
     this.query = "";

@@ -1,7 +1,5 @@
-<p>AJSDKAJHSDKAJHSDKJASH!</p>
-
-<aside>
-  <app-sidebar-categories/>
-</aside>
-
-<router-outlet/>
+<main class="layout">
+  @for(deal of deals; track deal.Id){
+    <app-deal-card [deal]="deal"></app-deal-card>
+  }
+</main>

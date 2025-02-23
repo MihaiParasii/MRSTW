@@ -1,0 +1,63 @@
+<div class="create-deal-container">
+  <h2 class="create-deal-title">Creare Anunț</h2>
+
+  <form (submit)="onSubmit()">
+    <div class="form-group">
+      <label for="category">Categorie</label>
+      <select id="category" class="form-control" [(ngModel)]="createDealRequest.CategoryId"
+              (change)="onCategoryChange()"
+              [ngModelOptions]="{standalone: true}">
+        <option disabled selected>Select category:</option>
+        <option *ngFor="let category of categories" [value]="category.Id">{{ category.Name }}</option>
+      </select>
+    </div>
+
+    <div class="form-group" *ngIf="createDealRequest.CategoryId">
+      <label for="subcategory">Subcategorie</label>
+      <select id="subcategory" class="form-control" [(ngModel)]="createDealRequest.SubcategoryId"
+              [ngModelOptions]="{standalone: true}">
+        <option disabled selected>Select subcategory:</option>
+        <option *ngFor="let subcategory of subcategories" [value]="subcategory.Id">{{ subcategory.Name }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="title">Titlu</label>
+      <input id="title" type="text" class="form-control" [(ngModel)]="createDealRequest.Title"
+             [ngModelOptions]="{standalone: true}"
+             required>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Descriere</label>
+      <textarea id="description" class="form-control" [(ngModel)]="createDealRequest.Description"
+                [ngModelOptions]="{standalone: true}"
+                required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="region">Regiune</label>
+      <select id="region" class="form-control" [(ngModel)]="createDealRequest.RegionId"
+              [ngModelOptions]="{standalone: true}">
+        <option disabled selected>Select region:</option>
+        <option *ngFor="let region of regions" [value]="region.Id">{{ region.Name }}</option>
+      </select>
+    </div>
+
+
+    <div class="form-group">
+      <label for="photos" class="upload-button-label">Upload photos</label>
+      <input type="file" id="photos" class="upload-button" (change)="onFileSelect($event)" multiple>
+    </div>
+
+    <div class="image-previews" *ngIf="photoPreviews.length > 0">
+      <h5>Fotografiile încărcate:</h5>
+      <div class="preview-images">
+        <img *ngFor="let preview of photoPreviews" [src]="preview" class="preview-img" />
+      </div>
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Creează Anunț</button>
+  </form>
+</div>

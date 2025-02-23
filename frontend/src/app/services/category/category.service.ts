@@ -16,13 +16,13 @@ export class CategoryService {
 
 
   private categories:Array<CategoryResponse> = [
-    {Id: 1, Name: "Category 1"},
-    {Id: 2, Name: "Category 2"},
-    {Id: 3, Name: "Category 3"},
-    {Id: 4, Name: "Category 4"},
-    {Id: 5, Name: "Category 5"},
-    {Id: 6, Name: "Category 6"},
-    {Id: 7, Name: "Category 7"},
+    {Id: 1, UrlId: "category-1", Name: "Category 1"},
+    {Id: 2, UrlId: "category-2", Name: "Category 2"},
+    {Id: 3, UrlId: "category-3", Name: "Category 3"},
+    {Id: 4, UrlId: "category-4", Name: "Category 4"},
+    {Id: 5, UrlId: "category-5", Name: "Category 5"},
+    {Id: 6, UrlId: "category-6", Name: "Category 6"},
+    {Id: 7, UrlId: "category-7", Name: "Category 7"},
   ]
 
   get() : Observable<Array<CategoryResponse>> {

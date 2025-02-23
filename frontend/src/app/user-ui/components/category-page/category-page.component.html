@@ -1,1 +1,5 @@
-<p>category-page works!</p>
+<div class="category-container">
+  @for (subcategory of subcategories; track subcategory.Id) {
+    <a routerLink="/{{categoryUrlId}}/{{ subcategory.UrlId }}">{{ subcategory.Name }}</a><br><br>
+  }
+</div>

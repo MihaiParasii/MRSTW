@@ -7,23 +7,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MRSTW.Domain", "MRSTW.Domain\MRSTW.Domain.csproj", "{5746E2B5-4E81-40CB-B699-9AD46E86DB25}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MRSTW.BusinessLogicLayer", "MRSTW.BusinessLogicLayer\MRSTW.BusinessLogicLayer.csproj", "{FCF93B51-ACC8-45CF-8A16-AE2BAFA3B9FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MRSTW.Application", "MRSTW.Application\MRSTW.Application.csproj", "{FCF93B51-ACC8-45CF-8A16-AE2BAFA3B9FF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MRSTW.Infrastructure", "MRSTW.Infrastructure\MRSTW.Infrastructure.csproj", "{6E4AA3E5-7454-4DC0-A4BF-702F4EDDFDD2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MRSTW.DataAccessLayer", "MRSTW.DataAccessLayer\MRSTW.DataAccessLayer.csproj", "{6E4AA3E5-7454-4DC0-A4BF-702F4EDDFDD2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.MRSTW.Service", "Test.MRSTW.Service\Test.MRSTW.Service.csproj", "{9A1CCD6F-8757-487F-A966-71F337304B23}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Api", "Auth.Api\Auth.Api.csproj", "{8C5BF092-92F8-4C1B-8643-113D663ABFA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Domain", "Auth.Domain\Auth.Domain.csproj", "{21F5ABA3-E0D0-4DD8-AF3D-76378C63B306}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.BusinessLogicLayer", "Auth.BusinessLogicLayer\Auth.BusinessLogicLayer.csproj", "{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Application", "Auth.Application\Auth.Application.csproj", "{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Infrastructure", "Auth.Infrastructure\Auth.Infrastructure.csproj", "{8188D3F9-3B18-495A-8BC0-F7235ABF7190}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.DataAccessLayer", "Auth.DataAccessLayer\Auth.DataAccessLayer.csproj", "{8188D3F9-3B18-495A-8BC0-F7235ABF7190}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Auth.Service", "Test.Auth.Service\Test.Auth.Service.csproj", "{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Api", "Notification.Api\Notification.Api.csproj", "{C0976FFA-055B-4BCB-9AA9-360631F95C4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Notification.Service", "Test.Notification.Service\Test.Notification.Service.csproj", "{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{F1822CDA-2965-4F2F-87CE-666E75B9E78C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +37,6 @@ Global
 		{4CFA424D-4CA5-47C9-8A49-15DEA75276FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CFA424D-4CA5-47C9-8A49-15DEA75276FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CFA424D-4CA5-47C9-8A49-15DEA75276FC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5746E2B5-4E81-40CB-B699-9AD46E86DB25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5746E2B5-4E81-40CB-B699-9AD46E86DB25}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5746E2B5-4E81-40CB-B699-9AD46E86DB25}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5746E2B5-4E81-40CB-B699-9AD46E86DB25}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FCF93B51-ACC8-45CF-8A16-AE2BAFA3B9FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FCF93B51-ACC8-45CF-8A16-AE2BAFA3B9FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCF93B51-ACC8-45CF-8A16-AE2BAFA3B9FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -55,10 +53,6 @@ Global
 		{8C5BF092-92F8-4C1B-8643-113D663ABFA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C5BF092-92F8-4C1B-8643-113D663ABFA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C5BF092-92F8-4C1B-8643-113D663ABFA8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{21F5ABA3-E0D0-4DD8-AF3D-76378C63B306}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{21F5ABA3-E0D0-4DD8-AF3D-76378C63B306}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{21F5ABA3-E0D0-4DD8-AF3D-76378C63B306}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{21F5ABA3-E0D0-4DD8-AF3D-76378C63B306}.Release|Any CPU.Build.0 = Release|Any CPU
 		{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -71,5 +65,17 @@ Global
 		{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0976FFA-055B-4BCB-9AA9-360631F95C4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0976FFA-055B-4BCB-9AA9-360631F95C4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0976FFA-055B-4BCB-9AA9-360631F95C4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0976FFA-055B-4BCB-9AA9-360631F95C4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1822CDA-2965-4F2F-87CE-666E75B9E78C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1822CDA-2965-4F2F-87CE-666E75B9E78C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1822CDA-2965-4F2F-87CE-666E75B9E78C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1822CDA-2965-4F2F-87CE-666E75B9E78C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

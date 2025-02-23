@@ -1,5 +1,7 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 <form class="d-flex" method="get" (ngSubmit)="onSubmit()">
   <input class="form-control me-2" type="text" name="query" [(ngModel)]="query"
          placeholder="{{ 'ACTION_BAR.SEARCH_IN_DEALS' | translate}}" required="required">
-  <button class="btn btn-outline-primary" type="submit">SEARCH IMG</button>
+  <button class="btn btn-outline-primary" type="submit"><i class="fas fa-search"></i></button>
 </form>
