@@ -77,7 +77,7 @@ export class AddProductPageComponent {
     console.log('Create Deal Request: CategoryId', this.createDealRequest.CategoryId);
     console.log('Create Deal Request: SubcategoryId', this.createDealRequest.SubcategoryId);
     console.log('Create Deal Request: RegionId', this.createDealRequest.RegionId);
-
+    //
     this.photos.forEach(photo => {
       console.log(`Create Deal Request: Photo ${photo.name}`);
     })

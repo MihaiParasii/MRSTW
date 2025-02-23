@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {DealResponse} from '../../../models/deal/deal-response';
 import {RouterLink} from '@angular/router';
 
@@ -12,11 +12,5 @@ import {RouterLink} from '@angular/router';
   styleUrl: './deal-card.component.css'
 })
 export class DealCardComponent {
-  protected deal = new DealResponse();
-
-  constructor() {
-    this.deal.Id = 1;
-    this.deal.Name = "Test name";
-    this.deal.Description = "Test description";
-  }
+  @Input() public deal = new DealResponse();
 }

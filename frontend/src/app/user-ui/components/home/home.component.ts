@@ -1,10 +1,11 @@
 import {Component} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
-import {DealResponse} from '../../../models/deal/deal-response';
 import {DealCardComponent} from '../deal-card/deal-card.component';
 import {
   SidebarCategoriesComponent
 } from '../../../common-ui/components/sidebar-categories/sidebar-categories.component';
+import {DealResponse} from '../../../models/deal/deal-response';
+import {DealService} from '../../../services/deal/deal.service';
 
 @Component({
   selector: 'app-home',
@@ -20,18 +21,9 @@ import {
 export class HomeComponent {
   protected deals: Array<DealResponse> = [];
 
-  constructor() {
-    // init with 9 deals
-    let deal = new DealResponse();
-
-    this.deals.push(deal);
-    this.deals.push(deal);
-    this.deals.push(deal);
-    this.deals.push(deal);
-    this.deals.push(deal);
-    this.deals.push(deal);
-    this.deals.push(deal);
-    this.deals.push(deal);
-    this.deals.push(deal);
+  constructor(private dealService: DealService) {
+    this.dealService.getTop9().subscribe(deals => {
+      this.deals = deals;
+    })
   }
 }
