@@ -1,8 +1,10 @@
 import {Component} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
-import {SidebarCategoriesComponent} from '../sidebar-categories/sidebar-categories.component';
 import {DealResponse} from '../../../models/deal/deal-response';
 import {DealCardComponent} from '../deal-card/deal-card.component';
+import {
+  SidebarCategoriesComponent
+} from '../../../common-ui/components/sidebar-categories/sidebar-categories.component';
 
 @Component({
   selector: 'app-home',
