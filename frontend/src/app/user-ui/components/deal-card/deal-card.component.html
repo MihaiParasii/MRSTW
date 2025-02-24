@@ -1,1 +1,7 @@
-<p>deal-card works!</p>
+<div class="deal-card" routerLink="{{deal.Id}}">
+  <img src="deal-image.jpg" alt="Deal Image" class="deal-image" />
+  <div class="deal-info">
+    <h3 class="deal-title">{{ deal.Name }}</h3>
+    <p class="deal-description">{{deal.Description}}</p>
+  </div>
+</div>
