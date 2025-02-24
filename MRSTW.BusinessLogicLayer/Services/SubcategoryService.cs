@@ -42,7 +42,7 @@ public class SubcategoryService(ISubcategoryRepository subcategoryRepository, IM
 
         if (subcategory == null)
         {
-            throw new InvalidOperationException("Subcategory not found.");
+            throw new ArgumentException("Subcategory not found.");
         }
 
         await subcategoryRepository.DeleteAsync(subcategory);
@@ -54,7 +54,7 @@ public class SubcategoryService(ISubcategoryRepository subcategoryRepository, IM
 
         if (subcategory == null)
         {
-            throw new InvalidOperationException("Subcategory not found.");
+            throw new ArgumentException("Subcategory not found.");
         }
 
         return mapper.Map<SubcategoryResponse>(subcategory);

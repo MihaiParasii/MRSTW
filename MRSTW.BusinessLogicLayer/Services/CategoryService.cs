@@ -29,7 +29,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IMapper map
         // Perform any necessary validation here
         // if (!IsValid(request.Deal))
         // {
-        //     throw new ArgumentException("Invalid deal data.");
+        // throw new ArgumentException("Invalid deal data.");
         // }
 
 
@@ -42,7 +42,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IMapper map
 
         if (category == null)
         {
-            throw new InvalidOperationException("Category not found.");
+            throw new ArgumentException("Category not found.");
         }
 
         await categoryRepository.DeleteAsync(category);
@@ -54,7 +54,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IMapper map
 
         if (category == null)
         {
-            throw new InvalidOperationException("Category not found.");
+            throw new ArgumentException("Category not found.");
         }
 
         return mapper.Map<CategoryResponse>(category);

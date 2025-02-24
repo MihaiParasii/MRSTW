@@ -4,7 +4,6 @@ using MRSTW.BusinessLogicLayer.Services;
 
 namespace MRSTW.Api.Controllers;
 
-
 [ApiController]
 [Route("api/v1/[controller]")]
 public class SubcategoryController(SubcategoryService subcategoryService) : ControllerBase
@@ -19,33 +18,76 @@ public class SubcategoryController(SubcategoryService subcategoryService) : Cont
     [HttpGet("{id:int}")]
     public async Task<ActionResult<SubcategoryResponse>> Get(int id)
     {
-        var result = await subcategoryService.GetByIdAsync(id);
-        return Ok(result);
+        if (id < 0)
+        {
+            return BadRequest("The id can't be negative");
+        }
+
+        try
+        {
+            var result = await subcategoryService.GetByIdAsync(id);
+            return Ok(result);
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
     }
 
     [HttpPost]
     public async Task<ActionResult<SubcategoryResponse>> Post([FromBody] CreateSubcategoryRequest request)
     {
-        await subcategoryService.CreateAsync(request);
-        return Created();
+        try
+        {
+            await subcategoryService.CreateAsync(request);
+            return Created();
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPut("{id:int}")]
     public async Task<ActionResult> Put(int id, [FromBody] UpdateSubcategoryRequest request)
     {
-        if (id != request.Id)
+        if (id < 0)
         {
-            return BadRequest();
+            return BadRequest("The id can't be negative");
         }
 
-        await subcategoryService.UpdateAsync(request);
-        return NoContent();
+        if (id != request.Id)
+        {
+            return BadRequest("The id can't be negative");
+        }
+
+        try
+        {
+            await subcategoryService.UpdateAsync(request);
+            return NoContent();
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
     }
 
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> Delete(int id)
     {
-        await subcategoryService.DeleteAsync(id);
-        return NoContent();
+        if (id < 0)
+        {
+            return BadRequest("The id can't be negative");
+        }
+
+        try
+        {
+            await subcategoryService.DeleteAsync(id);
+            return NoContent();
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
     }
 }

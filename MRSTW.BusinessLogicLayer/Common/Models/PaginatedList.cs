@@ -1,9 +1,8 @@
-using System.Collections;
 using Microsoft.EntityFrameworkCore;
 
 namespace MRSTW.BusinessLogicLayer.Common.Models;
 
-public class PaginatedList<T>(IReadOnlyCollection<T> items, int count, int pageNumber, int pageSize) : IEnumerable<T>
+public class PaginatedList<T>(IReadOnlyCollection<T> items, int count, int pageNumber, int pageSize)
 {
     public IReadOnlyCollection<T> Items { get; } = items;
     public int TotalCount { get; } = count;
@@ -22,15 +21,5 @@ public class PaginatedList<T>(IReadOnlyCollection<T> items, int count, int pageN
             .ToListAsync();
 
         return new PaginatedList<T>(items, count, pageNumber, pageSize);
-    }
-
-    public IEnumerator<T> GetEnumerator()
-    {
-        return Items.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
     }
 }

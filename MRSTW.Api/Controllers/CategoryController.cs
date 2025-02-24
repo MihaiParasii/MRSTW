@@ -18,33 +18,76 @@ public class CategoryController(CategoryService categoryService) : ControllerBas
     [HttpGet("{id:int}")]
     public async Task<ActionResult<CategoryResponse>> Get(int id)
     {
-        var result = await categoryService.GetByIdAsync(id);
-        return Ok(result);
+        if (id < 0)
+        {
+            return BadRequest("The id can't be negative");
+        }
+
+        try
+        {
+            var result = await categoryService.GetByIdAsync(id);
+            return Ok(result);
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
     }
 
     [HttpPost]
     public async Task<ActionResult<CategoryResponse>> Post([FromBody] CreateCategoryRequest request)
     {
-        await categoryService.CreateAsync(request);
-        return Created();
+        try
+        {
+            await categoryService.CreateAsync(request);
+            return Created();
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPut("{id:int}")]
     public async Task<ActionResult> Put(int id, [FromBody] UpdateCategoryRequest request)
     {
-        if (id != request.Id)
+        if (id < 0)
         {
-            return BadRequest();
+            return BadRequest("The id can't be negative");
         }
 
-        await categoryService.UpdateAsync(request);
-        return NoContent();
+        if (id != request.Id)
+        {
+            return BadRequest("The id can't be negative");
+        }
+
+        try
+        {
+            await categoryService.UpdateAsync(request);
+            return NoContent();
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> Delete(int id)
     {
-        await categoryService.DeleteAsync(id);
-        return NoContent();
+        if (id < 0)
+        {
+            return BadRequest("The id can't be negative");
+        }
+
+        try
+        {
+            await categoryService.DeleteAsync(id);
+            return NoContent();
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
     }
 }

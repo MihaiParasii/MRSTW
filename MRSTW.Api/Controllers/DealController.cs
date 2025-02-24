@@ -5,12 +5,22 @@ using MRSTW.BusinessLogicLayer.Services;
 namespace MRSTW.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]/v1")]
 public class DealController(DealService dealService) : ControllerBase
 {
     [HttpGet("{pageSize:int},{pageCount:int}")]
     public async Task<ActionResult<List<DealResponse>>> Get(int pageSize, int pageCount)
     {
+        if (pageCount <= 0)
+        {
+            return BadRequest("Page count must be a positive integer.");
+        }
+        
+        if (pageSize <= 0)
+        {
+            return BadRequest("Page size must be a positive integer.");
+        }
+        
         var result = await dealService.GetPaginatedListAsync(pageSize, pageCount);
         return Ok(result);
     }
@@ -18,33 +28,76 @@ public class DealController(DealService dealService) : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<DealResponse>> Get(int id)
     {
-        var result = await dealService.GetByIdAsync(id);
-        return Ok(result);
+        if (id < 0)
+        {
+            return BadRequest("The id can't be negative");
+        }
+
+        try
+        {
+            var result = await dealService.GetByIdAsync(id);
+            return Ok(result);
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
     }
 
     [HttpPost]
     public async Task<ActionResult<DealResponse>> Post([FromBody] CreateDealRequest request)
     {
-        await dealService.CreateAsync(request);
-        return Created();
+        try
+        {
+            await dealService.CreateAsync(request);
+            return Created();
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPut("{id:int}")]
     public async Task<ActionResult> Put(int id, [FromBody] UpdateDealRequest request)
     {
-        if (id != request.Id)
+        if (id < 0)
         {
-            return BadRequest();
+            return BadRequest("The id can't be negative");
         }
 
-        await dealService.UpdateAsync(request);
-        return NoContent();
+        if (id != request.Id)
+        {
+            return BadRequest("The id can't be negative");
+        }
+
+        try
+        {
+            await dealService.UpdateAsync(request);
+            return NoContent();
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> Delete(int id)
     {
-        await dealService.DeleteAsync(id);
-        return NoContent();
+        if (id < 0)
+        {
+            return BadRequest("The id can't be negative");
+        }
+
+        try
+        {
+            await dealService.DeleteAsync(id);
+            return NoContent();
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
     }
 }

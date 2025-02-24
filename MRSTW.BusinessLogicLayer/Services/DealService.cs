@@ -42,7 +42,7 @@ public class DealService(IDealRepository dealRepository, IMapper mapper)
 
         if (deal == null)
         {
-            throw new InvalidOperationException("Deal not found.");
+            throw new ArgumentException("Deal not found.");
         }
 
         await dealRepository.DeleteAsync(deal);
@@ -61,7 +61,7 @@ public class DealService(IDealRepository dealRepository, IMapper mapper)
 
         if (deal == null)
         {
-            throw new InvalidOperationException("Deal not found.");
+            throw new ArgumentException("Deal not found.");
         }
 
         return mapper.Map<DealResponse>(deal);
