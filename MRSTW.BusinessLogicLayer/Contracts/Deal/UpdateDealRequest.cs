@@ -1,4 +1,4 @@
-namespace MRSTW.Api.Contracts.Deal;
+namespace MRSTW.BusinessLogicLayer.Contracts.Deal;
 
 public record UpdateDealRequest(
     string Id,

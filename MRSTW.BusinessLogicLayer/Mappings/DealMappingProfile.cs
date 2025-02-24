@@ -1,8 +1,8 @@
 using AutoMapper;
 using Domain.Models;
-using MRSTW.Api.Contracts.Deal;
+using MRSTW.BusinessLogicLayer.Contracts.Deal;
 
-namespace MRSTW.Api.Mappings;
+namespace MRSTW.BusinessLogicLayer.Mappings;
 
 public class DealMappingProfile : Profile
 {

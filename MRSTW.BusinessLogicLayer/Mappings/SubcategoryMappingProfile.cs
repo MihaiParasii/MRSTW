@@ -1,8 +1,8 @@
 using AutoMapper;
 using Domain.Models;
-using MRSTW.Api.Contracts.Subcategory;
+using MRSTW.BusinessLogicLayer.Contracts.Subcategory;
 
-namespace MRSTW.Api.Mappings;
+namespace MRSTW.BusinessLogicLayer.Mappings;
 
 public class SubcategoryMappingProfile : Profile
 {
