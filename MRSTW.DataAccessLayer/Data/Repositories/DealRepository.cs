@@ -1,6 +1,8 @@
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using MRSTW.BusinessLogicLayer.Common.Interfaces;
+using MRSTW.BusinessLogicLayer.Common.Mappings;
+using MRSTW.BusinessLogicLayer.Common.Models;
 
 namespace MRSTW.DataAccessLayer.Data.Repositories;
 
@@ -15,5 +17,10 @@ public class DealRepository(AppDbContext dbContext) : GenericRepository<Deal>(db
                 .SetProperty(e => e.Description, entity.Description)
                 .SetProperty(e => e.SubcategoryId, entity.SubcategoryId)
             );
+    }
+    
+    public async Task<PaginatedList<Deal>> GetPaginatedListAsync(int pageSize, int pageNumber)
+    {
+        return await DbSet.ToPaginatedListAsync(pageNumber, pageSize);
     }
 }

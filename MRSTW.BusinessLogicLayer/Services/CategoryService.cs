@@ -23,7 +23,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IMapper map
         await categoryRepository.AddAsync(category);
     }
 
-    public void UpdateAsync(UpdateCategoryRequest request)
+    public async Task UpdateAsync(UpdateCategoryRequest request)
     {
         var category = mapper.Map<Category>(request);
         // Perform any necessary validation here
@@ -33,7 +33,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IMapper map
         // }
 
 
-        categoryRepository.UpdateAsync(category);
+        await categoryRepository.UpdateAsync(category);
     }
 
     public async Task DeleteAsync(int id)
@@ -48,13 +48,6 @@ public class CategoryService(ICategoryRepository categoryRepository, IMapper map
         await categoryRepository.DeleteAsync(category);
     }
 
-    public async Task<PaginatedList<CategoryResponse>> GetPaginatedListAsync(int pageSize, int pageCount)
-    {
-        var categories = await categoryRepository.GetPaginatedListAsync(pageSize, pageCount);
-
-        return mapper.Map<PaginatedList<CategoryResponse>>(categories);
-    }
-
     public async Task<CategoryResponse> GetByIdAsync(int id)
     {
         var category = await categoryRepository.GetByIdAsync(id);
@@ -65,5 +58,14 @@ public class CategoryService(ICategoryRepository categoryRepository, IMapper map
         }
 
         return mapper.Map<CategoryResponse>(category);
+    }
+
+    public async Task<List<CategoryResponse>> GetAllAsync()
+    {
+        var categories = await categoryRepository.GetAllAsync();
+        
+        var result = mapper.Map<List<CategoryResponse>>(categories);
+
+        return result;
     }
 }

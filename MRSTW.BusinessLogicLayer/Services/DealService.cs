@@ -23,7 +23,7 @@ public class DealService(IDealRepository dealRepository, IMapper mapper)
         await dealRepository.AddAsync(deal);
     }
 
-    public void UpdateAsync(UpdateDealRequest request)
+    public async Task UpdateAsync(UpdateDealRequest request)
     {
         var deal = mapper.Map<Deal>(request);
         // Perform any necessary validation here
@@ -33,7 +33,7 @@ public class DealService(IDealRepository dealRepository, IMapper mapper)
         // }
 
 
-        dealRepository.UpdateAsync(deal);
+        await dealRepository.UpdateAsync(deal);
     }
 
     public async Task DeleteAsync(int id)

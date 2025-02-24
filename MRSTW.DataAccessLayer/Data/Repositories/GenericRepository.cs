@@ -15,11 +15,6 @@ public abstract class GenericRepository<T>(AppDbContext dbContext) : IGenericRep
         return await DbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<PaginatedList<T>> GetPaginatedListAsync(int pageSize, int pageNumber)
-    {
-        return await DbSet.ToPaginatedListAsync(pageNumber, pageSize);
-    }
-
     public async Task<List<T>> GetAllAsync()
     {
         return await DbSet.AsNoTracking().ToListAsync();

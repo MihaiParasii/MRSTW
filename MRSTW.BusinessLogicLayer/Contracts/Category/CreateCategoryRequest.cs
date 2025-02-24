@@ -1,3 +1,3 @@
 namespace MRSTW.BusinessLogicLayer.Contracts.Category;
 
-public record CreateCategoryRequest();
+public record CreateCategoryRequest(string Name);

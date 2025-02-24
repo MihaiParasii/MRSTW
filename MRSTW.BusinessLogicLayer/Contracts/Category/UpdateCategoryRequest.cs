@@ -1,3 +1,3 @@
 namespace MRSTW.BusinessLogicLayer.Contracts.Category;
 
-public record UpdateCategoryRequest();
+public record UpdateCategoryRequest(int Id, string NewName);

@@ -1,7 +1,7 @@
 namespace MRSTW.BusinessLogicLayer.Contracts.Deal;
 
 public record UpdateDealRequest(
-    string Id,
+    int Id,
     string Title,
     string Description,
     string[] PhotoPaths);

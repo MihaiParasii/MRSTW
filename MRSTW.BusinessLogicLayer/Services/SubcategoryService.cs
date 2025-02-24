@@ -23,7 +23,7 @@ public class SubcategoryService(ISubcategoryRepository subcategoryRepository, IM
         await subcategoryRepository.AddAsync(deal);
     }
 
-    public void UpdateAsync(UpdateSubcategoryRequest request)
+    public async Task UpdateAsync(UpdateSubcategoryRequest request)
     {
         var subcategory = mapper.Map<Subcategory>(request);
         // Perform any necessary validation here
@@ -33,7 +33,7 @@ public class SubcategoryService(ISubcategoryRepository subcategoryRepository, IM
         // }
 
 
-        subcategoryRepository.UpdateAsync(subcategory);
+        await subcategoryRepository.UpdateAsync(subcategory);
     }
 
     public async Task DeleteAsync(int id)
@@ -48,13 +48,6 @@ public class SubcategoryService(ISubcategoryRepository subcategoryRepository, IM
         await subcategoryRepository.DeleteAsync(subcategory);
     }
 
-    public async Task<PaginatedList<SubcategoryResponse>> GetPaginatedListAsync(int pageSize, int pageCount)
-    {
-        var subcategories = await subcategoryRepository.GetPaginatedListAsync(pageSize, pageCount);
-
-        return mapper.Map<PaginatedList<SubcategoryResponse>>(subcategories);
-    }
-
     public async Task<SubcategoryResponse> GetByIdAsync(int id)
     {
         var subcategory = await subcategoryRepository.GetByIdAsync(id);
@@ -65,5 +58,11 @@ public class SubcategoryService(ISubcategoryRepository subcategoryRepository, IM
         }
 
         return mapper.Map<SubcategoryResponse>(subcategory);
+    }
+
+    public async Task<List<SubcategoryResponse>> GetAllAsync()
+    {
+        var subcategories = await subcategoryRepository.GetAllAsync();
+        return mapper.Map<List<SubcategoryResponse>>(subcategories);
     }
 }
