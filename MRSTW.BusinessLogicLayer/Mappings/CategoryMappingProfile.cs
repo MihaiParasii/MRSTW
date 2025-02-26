@@ -1,5 +1,6 @@
 using AutoMapper;
 using Domain.Models;
+using Domain.Models.Main;
 using MRSTW.BusinessLogicLayer.Contracts.Category;
 
 namespace MRSTW.BusinessLogicLayer.Mappings;

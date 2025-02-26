@@ -1,6 +1,6 @@
 using Domain.Common;
 
-namespace Domain.Models;
+namespace Domain.Models.Main;
 
 public class Deal : BaseEntity
 {

@@ -1,4 +1,4 @@
-namespace MRSTW.BusinessLogicLayer.Common.Models;
+namespace Notification.Api.Models;
 
 public class SendEmailRequest
 {

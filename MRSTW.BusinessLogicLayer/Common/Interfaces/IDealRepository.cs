@@ -1,4 +1,5 @@
 using Domain.Models;
+using Domain.Models.Main;
 using MRSTW.BusinessLogicLayer.Common.Models;
 
 namespace MRSTW.BusinessLogicLayer.Common.Interfaces;

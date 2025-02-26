@@ -1,5 +1,6 @@
 using AutoMapper;
 using Domain.Models;
+using Domain.Models.Main;
 using MRSTW.BusinessLogicLayer.Common.Interfaces;
 using MRSTW.BusinessLogicLayer.Common.Models;
 using MRSTW.BusinessLogicLayer.Contracts.Deal;

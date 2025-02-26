@@ -4,7 +4,7 @@ namespace Notification.Api.Services;
 
 public class EmailService(IConfiguration configuration) : IEmailService
 {
-    public async Task SendEmailAsync(Email email)
+    public async Task SendEmailAsync(SendEmailRequest request)
     {
         string? sendgridApiKey = configuration["SendGridSettings:ApiKey"];
         string? senderEmail = configuration["SendGridSettings:FromEmail"];

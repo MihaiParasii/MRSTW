@@ -1,4 +1,5 @@
 using Domain.Models;
+using Domain.Models.Auth;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auth.DataAccessLayer.Data;
