@@ -1,7 +1,6 @@
 using Domain.Models.Main;
 using FluentValidation;
 using MRSTW.BusinessLogicLayer.Common.Interfaces;
-using MRSTW.BusinessLogicLayer.Contracts.Subcategory;
 
 namespace MRSTW.BusinessLogicLayer.Validators;
 

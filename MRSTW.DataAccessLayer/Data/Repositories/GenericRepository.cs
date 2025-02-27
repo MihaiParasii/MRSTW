@@ -1,8 +1,6 @@
 using Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using MRSTW.BusinessLogicLayer.Common.Interfaces;
-using MRSTW.BusinessLogicLayer.Common.Mappings;
-using MRSTW.BusinessLogicLayer.Common.Models;
 
 namespace MRSTW.DataAccessLayer.Data.Repositories;
 

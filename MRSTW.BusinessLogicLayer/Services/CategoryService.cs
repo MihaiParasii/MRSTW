@@ -1,25 +1,26 @@
 using AutoMapper;
-using Domain.Models;
 using Domain.Models.Main;
+using FluentValidation;
 using MRSTW.BusinessLogicLayer.Common.Interfaces;
-using MRSTW.BusinessLogicLayer.Common.Models;
 using MRSTW.BusinessLogicLayer.Contracts.Category;
 
 namespace MRSTW.BusinessLogicLayer.Services;
 
-public class CategoryService(ICategoryRepository categoryRepository, IMapper mapper)
+public class CategoryService(
+    ICategoryRepository categoryRepository,
+    IMapper mapper,
+    IValidator<Category> categoryValidator)
 {
     public async Task CreateAsync(CreateCategoryRequest request)
     {
         var category = mapper.Map<Category>(request);
 
+        var validationResult = await categoryValidator.ValidateAsync(category);
 
-        // Perform any necessary validation here
-        // if (!IsValid(deal))
-        // {
-        //     throw new ArgumentException("Invalid deal data.");
-        // }
-
+        if (!validationResult.IsValid)
+        {
+            throw new ArgumentException("Invalid category data.");
+        }
 
         await categoryRepository.AddAsync(category);
     }
@@ -27,18 +28,24 @@ public class CategoryService(ICategoryRepository categoryRepository, IMapper map
     public async Task UpdateAsync(UpdateCategoryRequest request)
     {
         var category = mapper.Map<Category>(request);
-        // Perform any necessary validation here
-        // if (!IsValid(request.Deal))
-        // {
-        // throw new ArgumentException("Invalid deal data.");
-        // }
 
+        var validationResult = await categoryValidator.ValidateAsync(category);
+
+        if (!validationResult.IsValid)
+        {
+            throw new ArgumentException("Invalid category data.");
+        }
 
         await categoryRepository.UpdateAsync(category);
     }
 
     public async Task DeleteAsync(int id)
     {
+        if (id < 0)
+        {
+            throw new ArgumentException("Invalid category ID.");
+        }
+        
         var category = await categoryRepository.GetByIdAsync(id);
 
         if (category == null)
@@ -64,7 +71,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IMapper map
     public async Task<List<CategoryResponse>> GetAllAsync()
     {
         var categories = await categoryRepository.GetAllAsync();
-        
+
         var result = mapper.Map<List<CategoryResponse>>(categories);
 
         return result;

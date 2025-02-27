@@ -1,25 +1,24 @@
 using AutoMapper;
-using Domain.Models;
 using Domain.Models.Main;
+using FluentValidation;
 using MRSTW.BusinessLogicLayer.Common.Interfaces;
 using MRSTW.BusinessLogicLayer.Common.Models;
 using MRSTW.BusinessLogicLayer.Contracts.Deal;
 
 namespace MRSTW.BusinessLogicLayer.Services;
 
-public class DealService(IDealRepository dealRepository, IMapper mapper)
+public class DealService(IDealRepository dealRepository, IMapper mapper, IValidator<Deal> dealValidator)
 {
     public async Task CreateAsync(CreateDealRequest request)
     {
         var deal = mapper.Map<Deal>(request);
 
+        var validationResult = await dealValidator.ValidateAsync(deal);
 
-        // Perform any necessary validation here
-        // if (!IsValid(deal))
-        // {
-        //     throw new ArgumentException("Invalid deal data.");
-        // }
-
+        if (!validationResult.IsValid)
+        {
+            throw new ArgumentException("Invalid deal data.");
+        }
 
         await dealRepository.AddAsync(deal);
     }
@@ -27,12 +26,13 @@ public class DealService(IDealRepository dealRepository, IMapper mapper)
     public async Task UpdateAsync(UpdateDealRequest request)
     {
         var deal = mapper.Map<Deal>(request);
-        // Perform any necessary validation here
-        // if (!IsValid(request.Deal))
-        // {
-        //     throw new ArgumentException("Invalid deal data.");
-        // }
 
+        var validationResult = await dealValidator.ValidateAsync(deal);
+
+        if (!validationResult.IsValid)
+        {
+            throw new ArgumentException("Invalid deal data.");
+        }
 
         await dealRepository.UpdateAsync(deal);
     }

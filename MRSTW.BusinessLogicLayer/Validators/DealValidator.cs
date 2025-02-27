@@ -1,4 +1,3 @@
-using System.Data;
 using Domain.Models.Main;
 using FluentValidation;
 

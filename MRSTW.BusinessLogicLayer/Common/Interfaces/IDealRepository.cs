@@ -1,4 +1,3 @@
-using Domain.Models;
 using Domain.Models.Main;
 using MRSTW.BusinessLogicLayer.Common.Models;
 
