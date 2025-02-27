@@ -1,0 +1,60 @@
+{
+  "NAVBAR": {
+    "AUTHENTICATION_BUTTON": "Авторизоваться",
+    "MY_PROFILE": "Мой профиль"
+  },
+  "ACTION_BAR": {
+    "CATEGORIES": "Категории",
+    "SEARCH_IN_DEALS": "Искать в объявлених",
+    "CREATE_DEAL": "Создать объявление"
+  },
+  "FOOTER": {
+    "COMPANY": {
+      "MAIN": "Компания",
+      "ABOUT_US": "О нас",
+      "OUR_SERVICES": "Наши услуги",
+      "PRIVACY_POLICY": "Правила использования",
+      "AFFILIATE_PROGRAM": "Партнерская программа"
+    },
+    "GET_HELP": {
+      "MAIN": "Получить помощь",
+      "FAQ": "Часто задаваемые вопросы",
+      "SHIPPING": "Доставка",
+      "RETURNS": "Возврат",
+      "ORDER_STATUS": "Статус заказа"
+    },
+    "CATEGORIES": {
+      "WATCH": "Часы",
+      "BAG": "Сумки",
+      "SHOES": "Обувь",
+      "DRESS": "Одежда"
+    },
+    "FOLLOW_US": "Подписаться на нас"
+  },
+
+  "AUTH": {
+    "MAIN": "Авторизоваться",
+    "EMAIL": "Электронная почта",
+    "PASSWORD": "Пароль",
+    "AUTHENTICATION_BUTTON": "Аутентификация",
+    "LABEL_REGISTER": "У вас нет аккаунта?",
+    "REGISTER_LINK": "Зарегистрироваться"
+  },
+  "REGISTER": {
+    "MAIN": "Зарегистрироваться",
+    "NAME": "Имя",
+    "SURNAME": "Фамилия",
+    "PHONE_NUMBER": "Номер телефона",
+    "EMAIL": "Электронная почта",
+    "PASSWORD": "Пароль",
+    "REGISTER_BUTTON": "Зарегистрируйтесь сейчас",
+    "LABEL_LOGIN": "У вас есть аккаунт?",
+    "LOGIN_LINK": "Авторизоваться"
+  },
+  "ADMIN_PANEL": {
+    "DASHBOARD": "Панель управления",
+    "CATEGORIES": "Категории",
+    "SUBCATEGORIES": "Подкатегории",
+    "USERS": "Пользователи"
+  }
+}

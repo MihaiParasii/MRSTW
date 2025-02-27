@@ -9,5 +9,52 @@
     "CREATE_DEAL": "Create deal"
   },
   "FOOTER": {
+    "COMPANY": {
+      "MAIN": "Company",
+      "ABOUT_US": "About Us",
+      "OUR_SERVICES": "Our Services",
+      "PRIVACY_POLICY": "Privacy Policy",
+      "AFFILIATE_PROGRAM": "Affiliate Program"
+    },
+    "GET_HELP": {
+      "MAIN": "Get Help",
+      "FAQ": "FAQ",
+      "SHIPPING": "Shipping",
+      "RETURNS": "Returns",
+      "ORDER_STATUS": "Order Status"
+    },
+    "CATEGORIES": {
+      "WATCH": "Watch",
+      "BAG": "Bag",
+      "SHOES": "Shoes",
+      "DRESS": "Dress"
+    },
+    "FOLLOW_US": "Follow Us"
+  },
+
+  "AUTH": {
+    "MAIN": "Authenticate",
+    "EMAIL": "E-mail",
+    "PASSWORD": "Password",
+    "AUTHENTICATION_BUTTON": "Authenticate",
+    "LABEL_REGISTER": "Do you not have account?",
+    "REGISTER_LINK": "Register"
+  },
+  "REGISTER": {
+    "MAIN": "Register",
+    "NAME": "Name",
+    "SURNAME": "Surname",
+    "PHONE_NUMBER": "Phone number",
+    "EMAIL": "E-mail",
+    "PASSWORD": "Password",
+    "REGISTER_BUTTON": "Register now",
+    "LABEL_LOGIN": "Do you have account?",
+    "LOGIN_LINK": "Authenticate"
+  },
+  "ADMIN_PANEL": {
+    "DASHBOARD": "Dashboard",
+    "CATEGORIES": "Categories",
+    "SUBCATEGORIES": "Subcategories",
+    "USERS": "Users"
   }
 }
