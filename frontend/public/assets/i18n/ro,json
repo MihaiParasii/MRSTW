@@ -1,0 +1,60 @@
+{
+  "NAVBAR": {
+    "AUTHENTICATION_BUTTON": "Autentifică-te",
+    "MY_PROFILE": "Profil"
+  },
+  "ACTION_BAR": {
+    "CATEGORIES": "Categorii",
+    "SEARCH_IN_DEALS": "Caută în anunțuri",
+    "CREATE_DEAL": "Crează un anunț"
+  },
+  "FOOTER": {
+    "COMPANY": {
+      "MAIN": "Companie",
+      "ABOUT_US": "Despre noi",
+      "OUR_SERVICES": "Serviciile noastre",
+      "PRIVACY_POLICY": "Politica de confidențialitate",
+      "AFFILIATE_PROGRAM": "Program de afiliere"
+    },
+    "GET_HELP": {
+      "MAIN": "Obțineți ajutor",
+      "FAQ": "FAQ",
+      "SHIPPING": "Livrare",
+      "RETURNS": "Returnuri",
+      "ORDER_STATUS": "Starea comenzii"
+    },
+    "CATEGORIES": {
+      "WATCH": "Ceasuri",
+      "BAG": "Genți",
+      "SHOES": "Încălțăminte",
+      "DRESS": "Haine"
+    },
+    "FOLLOW_US": "Urmați-ne"
+  },
+
+  "AUTH": {
+    "MAIN": "Autentifică-te",
+    "EMAIL": "E-mail",
+    "PASSWORD": "Parola",
+    "AUTHENTICATION_BUTTON": "Autentifică-te",
+    "LABEL_REGISTER": "Nu ai cont?",
+    "REGISTER_LINK": "Înregistrează-te"
+  },
+  "REGISTER": {
+    "MAIN": "Înregistrează-te",
+    "NAME": "Nume",
+    "SURNAME": "Prenume",
+    "PHONE_NUMBER": "Număr de telefon",
+    "EMAIL": "E-mail",
+    "PASSWORD": "Parolă",
+    "REGISTER_BUTTON": "Înregistrează-te",
+    "LABEL_LOGIN": "Ai cont deja?",
+    "LOGIN_LINK": "Autentifică-te"
+  },
+  "ADMIN_PANEL": {
+    "DASHBOARD": "Dashboard",
+    "CATEGORIES": "Categorii",
+    "SUBCATEGORIES": "Subcategorii",
+    "USERS": "Utilizatori"
+  }
+}
