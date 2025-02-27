@@ -8,9 +8,26 @@ import {AuthLayoutComponent} from './login-ui/auth-layout/auth-layout.component'
 import {RegisterComponent} from './login-ui/register/register.component';
 import {LoginComponent} from './login-ui/login/login.component';
 import {LayoutComponent} from './common-ui/components/layout/layout.component';
-import {CreateDealRequest} from './models/deal/create-deal-request';
 import {AddProductPageComponent} from './user-ui/components/add-product-page/add-product-page.component';
 import {SearchPageComponent} from './user-ui/components/search-page/search-page.component';
+import {AdminLayoutComponent} from './admin-ui/components/admin-layout/admin-layout/admin-layout.component';
+import {AdminPageComponent} from './admin-ui/components/admin-ui/admin-page/admin-page.component';
+import {
+  AdminAddCategoryComponent
+} from './admin-ui/components/admin-ui/admin-add-category/admin-add-category.component';
+import {
+  AdminAddSubcategoryComponent
+} from './admin-ui/components/admin-ui/admin-add-subcategory/admin-add-subcategory.component';
+import {AdminCategoriesComponent} from './admin-ui/components/admin-ui/admin-categories/admin-categories.component';
+import {
+  AdminSubcategoriesComponent
+} from './admin-ui/components/admin-ui/admin-subcategories/admin-subcategories.component';
+import {
+  AdminUpdateCategoryComponent
+} from './admin-ui/components/admin-ui/admin-update-category/admin-update-category.component';
+import {
+  AdminUpdateSubcategoryComponent
+} from './admin-ui/components/admin-ui/admin-update-subcategory/admin-update-subcategory.component';
 
 export const routes: Routes = [
   {
@@ -20,6 +37,19 @@ export const routes: Routes = [
     ]
   },
 
+  {
+    path: 'admin', component: AdminLayoutComponent, children: [
+      {path: '', component: AdminPageComponent},
+
+      {path: 'categories', component: AdminCategoriesComponent},
+      {path: 'add-category', component: AdminAddCategoryComponent},
+      {path: 'update-category', component: AdminUpdateCategoryComponent},
+
+      {path: 'subcategories', component: AdminSubcategoriesComponent},
+      {path: 'add-subcategory', component: AdminAddSubcategoryComponent},
+      {path: 'update-subcategory', component: AdminUpdateSubcategoryComponent},
+    ]
+  },
 
   {
     path: '', component: LayoutComponent, children: [
@@ -33,7 +63,6 @@ export const routes: Routes = [
       {path: ':id', component: DealDetailPageComponent},
     ]
   },
-
 ];
 
 
