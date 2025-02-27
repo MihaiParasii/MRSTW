@@ -1,1 +1,18 @@
-<p>admin-add-subcategory works!</p>
+<div class="d-flex">
+  <!-- Dropdown pentru selectarea categoriei -->
+  <select id="category-select" class="form-control">
+    <option value="" disabled selected>Selectează o categorie</option>
+    <!-- Opțiuni de categorii vor fi adăugate dinamic -->
+    <option value="1">Categorie 1</option>
+    <option value="2">Categorie 2</option>
+    <option value="3">Categorie 3</option>
+  </select>
+
+  <!-- Input pentru numele subcategoriei -->
+  <input type="text" id="subcategory-name" class="form-control" placeholder="Introduceți numele subcategoriei" required />
+
+  <!-- Buton de adăugare -->
+  <button type="submit" class="btn">
+    <i class="fa fa-plus"></i>
+  </button>
+</div>
