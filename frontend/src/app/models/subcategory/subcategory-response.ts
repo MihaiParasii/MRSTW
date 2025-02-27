@@ -3,4 +3,5 @@ export class SubcategoryResponse {
   UrlId!: string;
   Name!: string;
   CategoryId!: number;
+  CategoryName!: string;
 }

@@ -48,6 +48,9 @@ export const routes: Routes = [
       {path: 'subcategories', component: AdminSubcategoriesComponent},
       {path: 'add-subcategory', component: AdminAddSubcategoryComponent},
       {path: 'update-subcategory', component: AdminUpdateSubcategoryComponent},
+
+      {path: 'users', component: AdminSubcategoriesComponent},
+      {path: 'add-user', component: AdminAddSubcategoryComponent},
     ]
   },
 
