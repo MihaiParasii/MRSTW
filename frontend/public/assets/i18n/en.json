@@ -24,6 +24,7 @@
       "ORDER_STATUS": "Order Status"
     },
     "CATEGORIES": {
+      "MAIN": "Categories",
       "WATCH": "Watch",
       "BAG": "Bag",
       "SHOES": "Shoes",

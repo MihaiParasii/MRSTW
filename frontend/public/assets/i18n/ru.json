@@ -24,6 +24,7 @@
       "ORDER_STATUS": "Статус заказа"
     },
     "CATEGORIES": {
+      "MAIN": "Категории",
       "WATCH": "Часы",
       "BAG": "Сумки",
       "SHOES": "Обувь",

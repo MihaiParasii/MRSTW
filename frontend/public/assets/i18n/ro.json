@@ -24,6 +24,7 @@
       "ORDER_STATUS": "Starea comenzii"
     },
     "CATEGORIES": {
+      "MAIN": "Categorii",
       "WATCH": "Ceasuri",
       "BAG": "Genți",
       "SHOES": "Încălțăminte",
