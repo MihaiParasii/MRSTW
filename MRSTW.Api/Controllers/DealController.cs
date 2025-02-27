@@ -15,12 +15,12 @@ public class DealController(DealService dealService) : ControllerBase
         {
             return BadRequest("Page count must be a positive integer.");
         }
-        
+
         if (pageSize <= 0)
         {
             return BadRequest("Page size must be a positive integer.");
         }
-        
+
         var result = await dealService.GetPaginatedListAsync(pageSize, pageCount);
         return Ok(result);
     }
@@ -45,7 +45,7 @@ public class DealController(DealService dealService) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<DealResponse>> Post([FromBody] CreateDealRequest request)
+    public async Task<ActionResult> Post([FromForm] CreateDealRequest request, [FromForm] List<IFormFile> files)
     {
         try
         {
@@ -59,7 +59,7 @@ public class DealController(DealService dealService) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult> Put(int id, [FromBody] UpdateDealRequest request)
+    public async Task<ActionResult> Put(int id, [FromForm] UpdateDealRequest request, [FromForm] List<IFormFile> files)
     {
         if (id < 0)
         {

@@ -5,8 +5,8 @@ using MRSTW.BusinessLogicLayer.Common.Interfaces;
 
 namespace MRSTW.DataAccessLayer.Data.Repositories;
 
-public class SubcategoryRepository(AppDbContext dbContext)
-    : GenericRepository<Subcategory>(dbContext), ISubcategoryRepository
+public class SubcategoryRepository(AppDbContext context)
+    : GenericRepository<Subcategory>(context), ISubcategoryRepository
 {
     public override async Task UpdateAsync(Subcategory entity)
     {
@@ -16,5 +16,10 @@ public class SubcategoryRepository(AppDbContext dbContext)
                 .SetProperty(e => e.Name, entity.Name)
                 .SetProperty(e => e.CategoryId, entity.CategoryId)
             );
+    }
+
+    public async Task<List<Subcategory>> GetAllByCategoryIdAsync(int categoryId)
+    {
+        return await context.Subcategories.Where(s => s.CategoryId == categoryId).AsNoTracking().ToListAsync();
     }
 }

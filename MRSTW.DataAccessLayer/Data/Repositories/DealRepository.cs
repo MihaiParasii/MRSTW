@@ -7,7 +7,7 @@ using MRSTW.BusinessLogicLayer.Common.Models;
 
 namespace MRSTW.DataAccessLayer.Data.Repositories;
 
-public class DealRepository(AppDbContext dbContext) : GenericRepository<Deal>(dbContext), IDealRepository
+public class DealRepository(AppDbContext context) : GenericRepository<Deal>(context), IDealRepository
 {
     public override async Task UpdateAsync(Deal entity)
     {
