@@ -1,10 +1,10 @@
-<h2 class="auth-title">Înregistrare</h2>
+<h2 class="auth-title">{{ "REGISTER.MAIN" | translate }}</h2>
 <form>
-  <input type="text" placeholder="Name" class="auth-input" required>
-  <input type="text" placeholder="Surname" class="auth-input" required>
-  <input type="tel" placeholder="Phone number" class="auth-input" required>
-  <input type="text" placeholder="Email" class="auth-input" required>
-  <input type="password" placeholder="Parola" class="auth-input" required>
-  <button class="auth-button">Înregistrează-te</button>
+  <input type="text" placeholder="{{ 'REGISTER.NAME' | translate }}" class="auth-input" required>
+  <input type="text" placeholder="{{ 'REGISTER.SURNAME' | translate }}" class="auth-input" required>
+  <input type="tel" placeholder="{{ 'REGISTER.PHONE_NUMBER' | translate }}" class="auth-input" required>
+  <input type="text" placeholder="{{ 'REGISTER.EMAIL' | translate }}" class="auth-input" required>
+  <input type="password" placeholder="{{ 'REGISTER.PASSWORD' | translate }}" class="auth-input" required>
+  <button class="auth-button">{{ "REGISTER.REGISTER_BUTTON" | translate }}</button>
 </form>
-<p class="auth-footer">Ai deja un cont? <a routerLink="/auth/login">Autentifică-te</a></p>
+<p class="auth-footer">{{ "REGISTER.LABEL_LOGIN" | translate }} <a routerLink="/auth/login">{{ 'REGISTER.LOGIN_LINK' | translate }}</a></p>

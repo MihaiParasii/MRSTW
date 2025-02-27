@@ -1,8 +1,8 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {NgForOf, NgIf, UpperCasePipe} from '@angular/common';
 import {HomeComponent} from '../../../user-ui/components/home/home.component';
-import {TranslatePipe} from '@ngx-translate/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {ActionBarComponent} from '../action-bar/action-bar.component';
 
 @Component({
@@ -21,16 +21,17 @@ import {ActionBarComponent} from '../action-bar/action-bar.component';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
+  private translateService: TranslateService = inject(TranslateService);
   protected currentLanguage: string = 'ro';
   protected languages: string[] = ['ro', 'ru', 'en'];
 
 
   public translateText(lang: string) {
     this.currentLanguage = lang;
+    this.translateService.use(lang);
   }
 
-
-  protected isLoggedIn(): boolean {
+  public IsLoggedIn(): boolean {
     return false;
   }
 }

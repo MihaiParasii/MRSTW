@@ -1,6 +1,6 @@
 {
   "NAVBAR": {
-    "AUTHENTICATION_BUTTON": "Authenticate",
+    "AUTHENTICATION_BUTTON": "Login",
     "MY_PROFILE": "Profile"
   },
   "ACTION_BAR": {

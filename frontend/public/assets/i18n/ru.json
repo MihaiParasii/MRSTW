@@ -1,11 +1,11 @@
 {
   "NAVBAR": {
-    "AUTHENTICATION_BUTTON": "Авторизоваться",
+    "AUTHENTICATION_BUTTON": "Войти",
     "MY_PROFILE": "Мой профиль"
   },
   "ACTION_BAR": {
     "CATEGORIES": "Категории",
-    "SEARCH_IN_DEALS": "Искать в объявлених",
+    "SEARCH_IN_DEALS": "Искать в объявлениях",
     "CREATE_DEAL": "Создать объявление"
   },
   "FOOTER": {
@@ -31,7 +31,6 @@
     },
     "FOLLOW_US": "Подписаться на нас"
   },
-
   "AUTH": {
     "MAIN": "Авторизоваться",
     "EMAIL": "Электронная почта",

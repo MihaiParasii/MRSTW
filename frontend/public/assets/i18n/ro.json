@@ -1,12 +1,12 @@
 {
   "NAVBAR": {
-    "AUTHENTICATION_BUTTON": "Autentifică-te",
+    "AUTHENTICATION_BUTTON": "Intră",
     "MY_PROFILE": "Profil"
   },
   "ACTION_BAR": {
     "CATEGORIES": "Categorii",
     "SEARCH_IN_DEALS": "Caută în anunțuri",
-    "CREATE_DEAL": "Crează un anunț"
+    "CREATE_DEAL": "Creează un anunț"
   },
   "FOOTER": {
     "COMPANY": {

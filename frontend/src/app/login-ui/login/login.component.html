@@ -1,7 +1,7 @@
-<h2 class="auth-title">Autentificare</h2>
+<h2 class="auth-title">{{ "AUTH.MAIN" | translate }}</h2>
 <form>
-  <input type="text" placeholder="Email" class="auth-input" required>
-  <input type="password" placeholder="Parola" class="auth-input" required>
-  <button class="auth-button">Autentifică-te</button>
+  <input type="text" placeholder="{{ 'AUTH.EMAIL' | translate }}" class="auth-input" required>
+  <input type="password" placeholder="{{ 'AUTH.PASSWORD' | translate }}" class="auth-input" required>
+  <button class="auth-button">{{ 'AUTH.AUTHENTICATION_BUTTON' | translate }}</button>
 </form>
-<p class="auth-footer">Nu ai cont? <a routerLink="/auth/register">Înregistrează-te</a></p>
+<p class="auth-footer">{{ 'AUTH.LABEL_REGISTER' | translate }} <a routerLink="/auth/register">{{ 'AUTH.REGISTER_LINK' | translate }}</a></p>

@@ -8,13 +8,14 @@
       </button>
       <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
         <ul class="navbar-nav flex-grow-1">
-          @if (isLoggedIn()) {
+          @if (IsLoggedIn()) {
             <li>
               <a class="nav-link text-dark">{{ "NAVBAR.MY_PROFILE" | translate }}</a>
             </li>
           } @else {
             <li class="nav-item">
-              <a class="nav-link text-dark" routerLink="/auth/login">{{ "NAVBAR.AUTHENTICATION_BUTTON" | translate }}</a>
+              <a class="nav-link text-dark"
+                 routerLink="/auth/login">{{ "NAVBAR.AUTHENTICATION_BUTTON" | translate }}</a>
             </li>
           }
           <li>
@@ -28,8 +29,7 @@
                   <li *ngFor="let language of languages">
 
                     <button class="dropdown-item" (click)="translateText(language)"
-                            *ngIf="language !== currentLanguage">
-                      {{ language | uppercase }}
+                            *ngIf="language !== currentLanguage">{{ language | uppercase }}
                     </button>
                   </li>
                 </ul>

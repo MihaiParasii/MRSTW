@@ -12,6 +12,26 @@ export function createTranslateLoader(http: HttpClient) {
 
 }
 
+// export const appConfig: ApplicationConfig = {
+//   providers: [
+//     provideZoneChangeDetection({eventCoalescing: true}),
+//     importProvidersFrom([
+//       TranslateModule.forRoot({
+//         loader: {
+//           provide: TranslateLoader,
+//           useFactory: (createTranslateLoader),
+//           deps: [HttpClient]
+//         },
+//         defaultLanguage: 'en'
+//       })
+//     ]),
+//     provideRouter(routes),
+//     provideHttpClient(withInterceptorsFromDi())
+//   ]
+// };
+//
+
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({eventCoalescing: true}),
@@ -22,10 +42,10 @@ export const appConfig: ApplicationConfig = {
           useFactory: (createTranslateLoader),
           deps: [HttpClient]
         },
-        defaultLanguage: 'en'
+        defaultLanguage: 'ro'
       })
     ]),
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi())
-  ]
+  ],
 };
