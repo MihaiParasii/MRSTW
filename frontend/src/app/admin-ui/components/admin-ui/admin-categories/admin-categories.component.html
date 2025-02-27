@@ -1,18 +1,28 @@
-<div class="container">
-  <h1>Alege o categorie</h1>
+<div class="container-fluid vh-100 d-flex flex-column">
+  <h1 class="text-primary text-center mt-3">📂 Categorii:</h1>
 
-  <!-- Selector de categorii -->
-  <select class="category-selector" id="categorySelector">
-    <option value="">Selectează o categorie</option>
-    <option value="categorie1">Categorie 1</option>
-    <option value="categorie2">Categorie 2</option>
-    <option value="categorie3">Categorie 3</option>
-    <option value="categorie4">Categorie 4</option>
-  </select>
-
-  <!-- Zona unde va fi afișată informația despre categorie -->
-  <div class="category-info" id="categoryInfo">
-    <h2>Informații</h2>
-    <p>Selectează o categorie din lista de mai sus pentru a vizualiza detaliile.</p>
+  <div class="card shadow-lg p-4 mt-3 flex-grow-1 d-flex">
+    <div class="table-responsive flex-grow-1">
+      <table class="table table-hover text-center align-middle">
+        <thead class="table-dark">
+        <tr>
+          <th class="w-75">Name</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (category of categories; track category) {
+            <tr>
+              <td class="fw-semibold">{{ category.Name }}</td>
+              <td>
+                <button class="btn btn-danger btn-sm px-3">
+                  <i class="fas fa-trash-alt"></i> Delete
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
