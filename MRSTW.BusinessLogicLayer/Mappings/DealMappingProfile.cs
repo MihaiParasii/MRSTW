@@ -8,8 +8,8 @@ public class DealMappingProfile : Profile
 {
     public DealMappingProfile()
     {
-        CreateMap<Deal, DealResponse>();
-        CreateMap<CreateDealRequest, Deal>();
-        CreateMap<UpdateDealRequest, Deal>();
+        CreateMap<DealModel, DealResponse>();
+        CreateMap<CreateDealRequest, DealModel>();
+        CreateMap<UpdateDealRequest, DealModel>();
     }
 }

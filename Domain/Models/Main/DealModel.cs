@@ -2,7 +2,7 @@ using Domain.Common;
 
 namespace Domain.Models.Main;
 
-public class Deal : BaseEntity
+public class DealModel : BaseEntity
 {
     public required Guid UserId { get; set; }
     public required string[] PhotoPaths { get; set; }
@@ -13,5 +13,5 @@ public class Deal : BaseEntity
     public required DateOnly CreationDate { get; set; }
 
     public required int SubcategoryId { get; set; }
-    public required Subcategory Subcategory { get; set; }
+    public required SubcategoryModel SubcategoryModel { get; set; }
 }

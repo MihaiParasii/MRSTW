@@ -9,6 +9,6 @@ public class PaginatedListWithDealsMappingProfile : Profile
 {
     public PaginatedListWithDealsMappingProfile()
     {
-        CreateMap<PaginatedList<Deal>, PaginatedList<DealResponse>>();
+        CreateMap<PaginatedList<DealModel>, PaginatedList<DealResponse>>();
     }
 }

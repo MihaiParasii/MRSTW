@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using MRSTW.BusinessLogicLayer.Contracts.Deal;
 using MRSTW.BusinessLogicLayer.Services;
@@ -6,7 +7,10 @@ namespace MRSTW.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/v1")]
-public class DealController(DealService dealService) : ControllerBase
+public class DealController(
+    DealService dealService,
+    IValidator<CreateDealRequest> createDealValidator,
+    IValidator<UpdateDealRequest> updateDealValidator) : ControllerBase
 {
     [HttpGet("{pageSize:int},{pageCount:int}")]
     public async Task<ActionResult<List<DealResponse>>> Get(int pageSize, int pageCount)
@@ -47,6 +51,12 @@ public class DealController(DealService dealService) : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Post([FromForm] CreateDealRequest request, [FromForm] List<IFormFile> files)
     {
+        var validationResult = await createDealValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.ToDictionary());
+        }
 
         try
         {
@@ -62,6 +72,13 @@ public class DealController(DealService dealService) : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult> Put(int id, [FromForm] UpdateDealRequest request, [FromForm] List<IFormFile> files)
     {
+        var validationResult = await updateDealValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.ToDictionary());
+        }
+
         if (id < 0)
         {
             return BadRequest("The id can't be negative");

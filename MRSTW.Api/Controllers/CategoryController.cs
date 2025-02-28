@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using MRSTW.BusinessLogicLayer.Contracts.Category;
 using MRSTW.BusinessLogicLayer.Services;
@@ -6,7 +7,10 @@ namespace MRSTW.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/v1")]
-public class CategoryController(CategoryService categoryService) : ControllerBase
+public class CategoryController(
+    CategoryService categoryService,
+    IValidator<CreateCategoryRequest> createCategoryValidator,
+    IValidator<UpdateCategoryRequest> updateCategoryValidator) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<List<CategoryResponse>>> Get()
@@ -37,6 +41,13 @@ public class CategoryController(CategoryService categoryService) : ControllerBas
     [HttpPost]
     public async Task<ActionResult<CategoryResponse>> Post([FromBody] CreateCategoryRequest request)
     {
+        var validationResult = await createCategoryValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.ToDictionary());
+        }
+
         try
         {
             await categoryService.CreateAsync(request);
@@ -51,10 +62,13 @@ public class CategoryController(CategoryService categoryService) : ControllerBas
     [HttpPut("{id:int}")]
     public async Task<ActionResult> Put(int id, [FromBody] UpdateCategoryRequest request)
     {
-        if (id < 0)
+        var validationResult = await updateCategoryValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
         {
-            return BadRequest("The id can't be negative");
+            return BadRequest(validationResult.ToDictionary());
         }
+       
 
         if (id != request.Id)
         {

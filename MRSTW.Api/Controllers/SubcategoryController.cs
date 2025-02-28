@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using MRSTW.BusinessLogicLayer.Contracts.Subcategory;
 using MRSTW.BusinessLogicLayer.Services;
@@ -5,8 +6,11 @@ using MRSTW.BusinessLogicLayer.Services;
 namespace MRSTW.Api.Controllers;
 
 [ApiController]
-[Route("api/v1/[controller]")]
-public class SubcategoryController(SubcategoryService subcategoryService) : ControllerBase
+[Route("api/[controller]/v1")]
+public class SubcategoryController(
+    SubcategoryService subcategoryService,
+    IValidator<CreateSubcategoryRequest> createSubcategoryValidator,
+    IValidator<UpdateSubcategoryRequest> updateSubcategoryValidator) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<List<SubcategoryResponse>>> Get()
@@ -37,6 +41,13 @@ public class SubcategoryController(SubcategoryService subcategoryService) : Cont
     [HttpPost]
     public async Task<ActionResult<SubcategoryResponse>> Post([FromBody] CreateSubcategoryRequest request)
     {
+        var validationResult = await createSubcategoryValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.ToDictionary());
+        }
+
         try
         {
             await subcategoryService.CreateAsync(request);
@@ -51,6 +62,13 @@ public class SubcategoryController(SubcategoryService subcategoryService) : Cont
     [HttpPut("{id:int}")]
     public async Task<ActionResult> Put(int id, [FromBody] UpdateSubcategoryRequest request)
     {
+        var validationResult = await updateSubcategoryValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.ToDictionary());
+        }
+
         if (id < 0)
         {
             return BadRequest("The id can't be negative");

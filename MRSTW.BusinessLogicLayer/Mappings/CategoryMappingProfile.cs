@@ -8,8 +8,8 @@ public class CategoryMappingProfile : Profile
 {
     public CategoryMappingProfile()
     {
-        CreateMap<Category, CategoryResponse>();
-        CreateMap<CreateCategoryRequest, Category>();
-        CreateMap<UpdateCategoryRequest, Category>();
+        CreateMap<CategoryModel, CategoryResponse>();
+        CreateMap<CreateCategoryRequest, CategoryModel>();
+        CreateMap<UpdateCategoryRequest, CategoryModel>();
     }
 }

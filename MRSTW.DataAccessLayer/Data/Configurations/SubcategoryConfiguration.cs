@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MRSTW.DataAccessLayer.Data.Configurations;
 
-public class SubcategoryConfiguration : IEntityTypeConfiguration<Subcategory>
+public class SubcategoryConfiguration : IEntityTypeConfiguration<SubcategoryModel>
 {
-    public void Configure(EntityTypeBuilder<Subcategory> builder)
+    public void Configure(EntityTypeBuilder<SubcategoryModel> builder)
     {
         throw new NotImplementedException();
     }

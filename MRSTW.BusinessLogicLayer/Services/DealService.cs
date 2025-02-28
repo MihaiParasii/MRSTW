@@ -7,11 +7,11 @@ using MRSTW.BusinessLogicLayer.Contracts.Deal;
 
 namespace MRSTW.BusinessLogicLayer.Services;
 
-public class DealService(IDealRepository dealRepository, IMapper mapper, IValidator<Deal> dealValidator)
+public class DealService(IDealRepository dealRepository, IMapper mapper, IValidator<DealModel> dealValidator)
 {
     public async Task CreateAsync(CreateDealRequest request)
     {
-        var deal = mapper.Map<Deal>(request);
+        var deal = mapper.Map<DealModel>(request);
 
         var validationResult = await dealValidator.ValidateAsync(deal);
 
@@ -25,7 +25,7 @@ public class DealService(IDealRepository dealRepository, IMapper mapper, IValida
 
     public async Task UpdateAsync(UpdateDealRequest request)
     {
-        var deal = mapper.Map<Deal>(request);
+        var deal = mapper.Map<DealModel>(request);
 
         var validationResult = await dealValidator.ValidateAsync(deal);
 

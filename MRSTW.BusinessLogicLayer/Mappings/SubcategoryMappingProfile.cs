@@ -8,8 +8,8 @@ public class SubcategoryMappingProfile : Profile
 {
     public SubcategoryMappingProfile()
     {
-        CreateMap<Subcategory, SubcategoryResponse>();
-        CreateMap<CreateSubcategoryRequest, Subcategory>();
-        CreateMap<UpdateSubcategoryRequest, Subcategory>();
+        CreateMap<SubcategoryModel, SubcategoryResponse>();
+        CreateMap<CreateSubcategoryRequest, SubcategoryModel>();
+        CreateMap<UpdateSubcategoryRequest, SubcategoryModel>();
     }
 }

@@ -3,7 +3,7 @@ using MRSTW.BusinessLogicLayer.Common.Models;
 
 namespace MRSTW.BusinessLogicLayer.Common.Interfaces;
 
-public interface IDealRepository : IGenericRepository<Deal>
+public interface IDealRepository : IGenericRepository<DealModel>
 {
-    Task<PaginatedList<Deal>> GetPaginatedListAsync(int pageSize, int pageCount);
+    Task<PaginatedList<DealModel>> GetPaginatedListAsync(int pageSize, int pageCount);
 }

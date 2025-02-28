@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MRSTW.DataAccessLayer.Data.Configurations;
 
-public class DealConfiguration : IEntityTypeConfiguration<Deal>
+public class DealConfiguration : IEntityTypeConfiguration<DealModel>
 {
-    public void Configure(EntityTypeBuilder<Deal> builder)
+    public void Configure(EntityTypeBuilder<DealModel> builder)
     {
         throw new NotImplementedException();
     }

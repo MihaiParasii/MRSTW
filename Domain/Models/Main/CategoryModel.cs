@@ -2,8 +2,8 @@ using Domain.Common;
 
 namespace Domain.Models.Main;
 
-public class Category : BaseEntity
+public class CategoryModel : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
-    public List<Subcategory> Subcategories { get; set; } = [];
+    public List<SubcategoryModel> Subcategories { get; set; } = [];
 }

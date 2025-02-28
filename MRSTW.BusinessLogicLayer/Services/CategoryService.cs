@@ -9,11 +9,11 @@ namespace MRSTW.BusinessLogicLayer.Services;
 public class CategoryService(
     ICategoryRepository categoryRepository,
     IMapper mapper,
-    IValidator<Category> categoryValidator)
+    IValidator<CategoryModel> categoryValidator)
 {
     public async Task CreateAsync(CreateCategoryRequest request)
     {
-        var category = mapper.Map<Category>(request);
+        var category = mapper.Map<CategoryModel>(request);
 
         var validationResult = await categoryValidator.ValidateAsync(category);
 
@@ -27,7 +27,7 @@ public class CategoryService(
 
     public async Task UpdateAsync(UpdateCategoryRequest request)
     {
-        var category = mapper.Map<Category>(request);
+        var category = mapper.Map<CategoryModel>(request);
 
         var validationResult = await categoryValidator.ValidateAsync(category);
 

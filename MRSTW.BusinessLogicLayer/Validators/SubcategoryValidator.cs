@@ -4,7 +4,7 @@ using MRSTW.BusinessLogicLayer.Common.Interfaces;
 
 namespace MRSTW.BusinessLogicLayer.Validators;
 
-public class SubcategoryValidator : AbstractValidator<Subcategory>
+public class SubcategoryValidator : AbstractValidator<SubcategoryModel>
 {
     private readonly ISubcategoryRepository _subcategoryRepository;
 
@@ -24,23 +24,23 @@ public class SubcategoryValidator : AbstractValidator<Subcategory>
         RuleFor(x => x.CategoryId).NotEmpty();
     }
 
-    private bool IsUniqueSubcategoryName(Subcategory subcategory)
+    private bool IsUniqueSubcategoryName(SubcategoryModel subcategoryModel)
     {
-        if (string.IsNullOrWhiteSpace(subcategory.Name))
+        if (string.IsNullOrWhiteSpace(subcategoryModel.Name))
         {
             return false;
         }
 
-        if (subcategory.CategoryId <= 0)
+        if (subcategoryModel.CategoryId <= 0)
         {
             return false;
         }
 
-        var subcategories = _subcategoryRepository.GetAllByCategoryIdAsync(subcategory.CategoryId).GetAwaiter()
+        var subcategories = _subcategoryRepository.GetAllByCategoryIdAsync(subcategoryModel.CategoryId).GetAwaiter()
             .GetResult();
 
         return subcategories.All(x =>
-            !string.Equals(x.Name, subcategory.Name, StringComparison.CurrentCultureIgnoreCase));
+            !string.Equals(x.Name, subcategoryModel.Name, StringComparison.CurrentCultureIgnoreCase));
     }
 
     private static bool IsValidName(string name)

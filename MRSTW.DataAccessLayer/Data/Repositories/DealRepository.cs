@@ -6,9 +6,9 @@ using MRSTW.BusinessLogicLayer.Common.Models;
 
 namespace MRSTW.DataAccessLayer.Data.Repositories;
 
-public class DealRepository(AppDbContext context) : GenericRepository<Deal>(context), IDealRepository
+public class DealRepository(AppDbContext context) : GenericRepository<DealModel>(context), IDealRepository
 {
-    public override async Task UpdateAsync(Deal entity)
+    public override async Task UpdateAsync(DealModel entity)
     {
         await DbSet
             .Where(e => e.Id == entity.Id)
@@ -19,7 +19,7 @@ public class DealRepository(AppDbContext context) : GenericRepository<Deal>(cont
             );
     }
     
-    public async Task<PaginatedList<Deal>> GetPaginatedListAsync(int pageSize, int pageNumber)
+    public async Task<PaginatedList<DealModel>> GetPaginatedListAsync(int pageSize, int pageNumber)
     {
         return await DbSet.ToPaginatedListAsync(pageNumber, pageSize);
     }

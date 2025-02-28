@@ -9,11 +9,11 @@ namespace MRSTW.BusinessLogicLayer.Services;
 public class SubcategoryService(
     ISubcategoryRepository subcategoryRepository,
     IMapper mapper,
-    IValidator<Subcategory> subcategoryValidator)
+    IValidator<SubcategoryModel> subcategoryValidator)
 {
     public async Task CreateAsync(CreateSubcategoryRequest request)
     {
-        var deal = mapper.Map<Subcategory>(request);
+        var deal = mapper.Map<SubcategoryModel>(request);
 
         var validationResult = await subcategoryValidator.ValidateAsync(deal);
 
@@ -27,7 +27,7 @@ public class SubcategoryService(
 
     public async Task UpdateAsync(UpdateSubcategoryRequest request)
     {
-        var subcategory = mapper.Map<Subcategory>(request);
+        var subcategory = mapper.Map<SubcategoryModel>(request);
 
         var validationResult = await subcategoryValidator.ValidateAsync(subcategory);
 

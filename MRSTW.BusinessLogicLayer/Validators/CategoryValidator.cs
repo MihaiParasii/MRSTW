@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace MRSTW.BusinessLogicLayer.Validators;
 
-public class CategoryValidator : AbstractValidator<Category>
+public class CategoryValidator : AbstractValidator<CategoryModel>
 {
     public CategoryValidator()
     {
