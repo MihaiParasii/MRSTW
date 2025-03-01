@@ -1,6 +1,63 @@
 ﻿services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "4200:80"  # Accesezi frontend-ul pe http://localhost:4200
+    depends_on:
+      - mrstw.api
+    networks:
+      - mynetwork
+
   mrstw.api:
     image: mrstw.api
     build:
       context: .
       dockerfile: MRSTW.Api/Dockerfile
+    container_name: mrstw_api
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      - ConnectionStrings__PostgreSQL=Host=db;Port=5432;Database=mydb;Username=admin;Password=admin
+      - RabbitMQ__Host=rabbitmq
+    ports:
+      - "8080:8080"
+    networks:
+      - mynetwork
+
+  db:
+    image: postgres:latest
+    container_name: postgresql
+    restart: always
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+
+volumes:
+  pgdata:
