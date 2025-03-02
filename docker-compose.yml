@@ -1,4 +1,20 @@
 ﻿services:
+  db:
+    image: postgres:latest
+    container_name: postgresql
+    restart: always
+    environment:
+      POSTGRES_DB: mrswt
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+  
+  
   frontend:
     build:
       context: ./frontend
@@ -21,25 +37,16 @@
       - db
       - rabbitmq
     environment:
-      - ConnectionStrings__PostgreSQL=Host=db;Port=5432;Database=mydb;Username=admin;Password=admin
-      - RabbitMQ__Host=rabbitmq
+#      server: "db"
+#      port: "5432"
+#      database: "mrstw"
+#      username: "postgres"
+#      password: "postgres"
+      DB_CONNECTION_STRING: "Host=postgres;Port=5432;Database=mrstw;Username=postgres;Password=postgres;Pooling=true"
+#      RabbitMQ__Host=rabbitmq
+#              - ConnectionStrings__PostgreSQL=Host=db;Port=5432;Database=mydb;Username=admin;Password=admin
     ports:
       - "8080:8080"
-    networks:
-      - mynetwork
-
-  db:
-    image: postgres:latest
-    container_name: postgresql
-    restart: always
-    environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
     networks:
       - mynetwork
 

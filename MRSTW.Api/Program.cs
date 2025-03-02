@@ -1,24 +1,37 @@
+using Microsoft.EntityFrameworkCore;
 using MRSTW.BusinessLogicLayer;
 using MRSTW.DataAccessLayer;
+using MRSTW.DataAccessLayer.Data;
+using MRSTW.DataAccessLayer.Services;
 
 namespace MRSTW.Api;
 
 public static class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        
+        string? connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
+                                   builder.Configuration.GetConnectionString("DefaultConnection");
 
-        builder.Services.AddApplicationServices();
-        builder.Services.AddInfrastructureServices(builder.Configuration);
+
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(connectionString));
+        
+        
         builder.Services.AddApiServices();
+        builder.Services.AddInfrastructureServices(builder.Configuration);
+        builder.Services.AddApplicationServices();
 
 
         builder.Services.AddEndpointsApiExplorer();
 
         var app = builder.Build();
 
-        if (app.Environment.IsDevelopment())
+        // await DatabaseManagementService.MigrationInitialization(app);
+
+        // if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
@@ -28,6 +41,6 @@ public static class Program
 
         app.MapControllers();
 
-        app.Run();
+        await app.RunAsync();
     }
 }

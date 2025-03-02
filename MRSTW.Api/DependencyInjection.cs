@@ -1,5 +1,8 @@
+using FluentValidation;
 using Microsoft.OpenApi.Models;
+using MRSTW.Api.Validators;
 using MRSTW.BusinessLogicLayer.Mappings;
+using MRSTW.BusinessLogicLayer.Validators;
 
 namespace MRSTW.Api;
 
@@ -21,6 +24,14 @@ public static class DependencyInjection
                     .AllowAnyMethod()
                     .AllowAnyHeader());
         });
+        
+        services.AddValidatorsFromAssemblyContaining<CreateSubcategoryRequestValidator>();
+        services.AddValidatorsFromAssemblyContaining<CreateCategoryRequestValidator>();
+        services.AddValidatorsFromAssemblyContaining<CreateDealRequestValidator>();
+        services.AddValidatorsFromAssemblyContaining<UpdateSubcategoryRequestValidator>();
+        services.AddValidatorsFromAssemblyContaining<UpdateCategoryRequestValidator>();
+        services.AddValidatorsFromAssemblyContaining<UpdateDealRequestValidator>();
+
 
 
         return services;

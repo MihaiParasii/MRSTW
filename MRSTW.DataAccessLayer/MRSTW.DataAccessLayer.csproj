@@ -16,6 +16,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
     </ItemGroup>
 
@@ -24,12 +25,30 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Microsoft.AspNetCore">
-        <HintPath>..\..\..\..\..\..\..\usr\local\share\dotnet\shared\Microsoft.AspNetCore.App\8.0.5\Microsoft.AspNetCore.dll</HintPath>
+      <Reference Include="Microsoft.AspNetCore.Http.Abstractions">
+        <HintPath>..\..\..\..\..\.dotnet\packs\Microsoft.AspNetCore.App.Ref\8.0.3\ref\net8.0\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
       </Reference>
-      <Reference Include="Microsoft.Extensions.Configuration.Abstractions">
-        <HintPath>..\..\..\..\..\..\..\usr\local\share\dotnet\shared\Microsoft.AspNetCore.App\8.0.5\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+      <Reference Include="Microsoft.Extensions.Configuration">
+        <HintPath>..\..\..\..\..\..\..\usr\local\share\dotnet\packs\Microsoft.AspNetCore.App.Ref\8.0.13\ref\net8.0\Microsoft.Extensions.Configuration.dll</HintPath>
       </Reference>
     </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore.Http.Abstractions">
+        <HintPath>..\..\..\..\..\.dotnet\packs\Microsoft.AspNetCore.App.Ref\8.0.3\ref\net8.0\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+<!--    <ItemGroup>-->
+<!--      <Reference Include="Microsoft.AspNetCore">-->
+<!--        <HintPath>..\..\..\..\..\..\..\usr\local\share\dotnet\shared\Microsoft.AspNetCore.App\8.0.5\Microsoft.AspNetCore.dll</HintPath>-->
+<!--      </Reference>-->
+<!--      <Reference Include="Microsoft.AspNetCore.Http.Abstractions">-->
+<!--        <HintPath>..\..\..\..\..\.dotnet\packs\Microsoft.AspNetCore.App.Ref\8.0.3\ref\net8.0\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>-->
+<!--      </Reference>-->
+<!--      <Reference Include="Microsoft.Extensions.Configuration.Abstractions">-->
+<!--        <HintPath>..\..\..\..\..\..\..\usr\local\share\dotnet\shared\Microsoft.AspNetCore.App\8.0.5\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>-->
+<!--      </Reference>-->
+<!--    </ItemGroup>-->
 
 </Project>

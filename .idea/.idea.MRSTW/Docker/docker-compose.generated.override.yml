@@ -1,0 +1,21 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  mrstw.api:
+    build:
+      context: "/Users/admin/Downloads/UTM/SEM4/MRSTW"
+      dockerfile: "MRSTW.Api/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/MRSTW.Api.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "mrstw.api:dev"
+    ports: []
+    volumes:
+    - "/Users/admin/.nuget/packages:/home/app/.nuget/packages"
+    - "/Users/admin/Downloads/UTM/SEM4/MRSTW/MRSTW.Api:/app:rw"
+    - "/Users/admin/Downloads/UTM/SEM4/MRSTW:/src:rw"
+    working_dir: "/app"

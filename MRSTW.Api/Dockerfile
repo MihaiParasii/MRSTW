@@ -8,6 +8,9 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["MRSTW.Api/MRSTW.Api.csproj", "MRSTW.Api/"]
+COPY ["MRSTW.BusinessLogicLayer/MRSTW.BusinessLogicLayer.csproj", "MRSTW.BusinessLogicLayer/"]
+COPY ["MRSTW.DataAccessLayer/MRSTW.DataAccessLayer.csproj", "MRSTW.DataAccessLayer/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
 RUN dotnet restore "MRSTW.Api/MRSTW.Api.csproj"
 COPY . .
 WORKDIR "/src/MRSTW.Api"
