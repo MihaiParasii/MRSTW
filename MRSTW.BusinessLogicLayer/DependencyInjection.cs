@@ -14,6 +14,8 @@ public static class DependencyInjection
         services.AddScoped<CategoryService, CategoryService>();
         services.AddScoped<SubcategoryService, SubcategoryService>();
 
+        services.AddScoped<IRabbitMqService, RabbitMqService>();
+
 
         return services;
     }

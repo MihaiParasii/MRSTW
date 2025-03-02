@@ -20,6 +20,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.DataAccessLayer", "Auth.DataAccessLayer\Auth.DataAccessLayer.csproj", "{8188D3F9-3B18-495A-8BC0-F7235ABF7190}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Auth.Service", "Test.Auth.Service\Test.Auth.Service.csproj", "{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{65C2EF8F-5E0C-400F-ABB5-5953FD92C852} = {65C2EF8F-5E0C-400F-ABB5-5953FD92C852}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Api", "Notification.Api\Notification.Api.csproj", "{C0976FFA-055B-4BCB-9AA9-360631F95C4C}"
 EndProject

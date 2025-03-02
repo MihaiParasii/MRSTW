@@ -4,5 +4,5 @@ namespace Notification.Api.Services;
 
 public interface IEmailService
 {
-    Task SendEmailAsync(Email email);
+    Task SendEmailAsync(SendEmailRequest request);
 }

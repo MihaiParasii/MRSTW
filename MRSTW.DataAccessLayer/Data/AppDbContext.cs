@@ -1,4 +1,4 @@
-using Domain.Models;
+using Domain.Models.Main;
 using Microsoft.EntityFrameworkCore;
 using MRSTW.DataAccessLayer.Data.Configurations;
 
@@ -6,9 +6,9 @@ namespace MRSTW.DataAccessLayer.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public DbSet<Category> Categories => Set<Category>();
-    public DbSet<Subcategory> Subcategories => Set<Subcategory>();
-    public DbSet<Deal> Deals => Set<Deal>();
+    public DbSet<CategoryModel> Categories { get; init; }
+    public DbSet<SubcategoryModel> Subcategories { get; init; }
+    public DbSet<DealModel> Deals { get; init; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
