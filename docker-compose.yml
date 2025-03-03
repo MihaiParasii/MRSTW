@@ -1,52 +1,45 @@
 ﻿services:
-  db:
-    image: postgres:latest
-    container_name: postgresql
-    restart: always
-    environment:
-      POSTGRES_DB: mrswt
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks:
-      - mynetwork
-  
-  
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend
     ports:
-      - "4200:80"  # Accesezi frontend-ul pe http://localhost:4200
+      - "4200:80"
     depends_on:
-      - mrstw.api
+      - backend
     networks:
       - mynetwork
 
-  mrstw.api:
-    image: mrstw.api
+  backend:
     build:
       context: .
       dockerfile: MRSTW.Api/Dockerfile
-    container_name: mrstw_api
+    container_name: backend
+    environment:
+      - DB_CONNECTION_STRING=Host=postgresql;Port=5432;Database=mrstw;Username=postgres;Password=postgres;Pooling=true
+      - RabbitMQ__Host=rabbitmq
     depends_on:
       - db
       - rabbitmq
-    environment:
-#      server: "db"
-#      port: "5432"
-#      database: "mrstw"
-#      username: "postgres"
-#      password: "postgres"
-      DB_CONNECTION_STRING: "Host=postgres;Port=5432;Database=mrstw;Username=postgres;Password=postgres;Pooling=true"
-#      RabbitMQ__Host=rabbitmq
-#              - ConnectionStrings__PostgreSQL=Host=db;Port=5432;Database=mydb;Username=admin;Password=admin
     ports:
       - "8080:8080"
+      - "8081:8081"
+    networks:
+      - mynetwork
+
+  db:
+    image: postgres:latest
+    container_name: postgresql
+    restart: always
+    environment:
+      POSTGRES_DB: mrstw
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./.containers/mrstw:/var/lib/postgresql/data
     networks:
       - mynetwork
 
@@ -59,7 +52,7 @@
       RABBITMQ_DEFAULT_PASS: guest
     ports:
       - "5672:5672"
-      - "15672:15672"
+      - "15672:15672"  # Management UI at http://localhost:15672
     networks:
       - mynetwork
 

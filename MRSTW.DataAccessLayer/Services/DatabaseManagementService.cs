@@ -7,10 +7,10 @@ namespace MRSTW.DataAccessLayer.Services;
 
 public static class DatabaseManagementService
 {
-    // public static async Task MigrationInitialization(IApplicationBuilder app)
-    // {
-    //     await using var serviceScope = app.ApplicationServices.CreateAsyncScope();
-    //
-    //     await serviceScope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
-    // }
+    public static async Task MigrationInitializationAsync(IApplicationBuilder app)
+    {
+        await using var serviceScope = app.ApplicationServices.CreateAsyncScope();
+
+        await serviceScope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
+    }
 }

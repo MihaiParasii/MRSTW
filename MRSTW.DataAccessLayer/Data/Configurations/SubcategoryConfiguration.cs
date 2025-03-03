@@ -8,6 +8,22 @@ public class SubcategoryConfiguration : IEntityTypeConfiguration<SubcategoryMode
 {
     public void Configure(EntityTypeBuilder<SubcategoryModel> builder)
     {
-        throw new NotImplementedException();
+        builder.HasKey(s => s.Id);
+
+        builder.Property(s => s.Name)
+            .IsRequired()
+            .HasMaxLength(255);
+
+        builder.HasOne(s => s.CategoryModel)
+            .WithMany(c => c.Subcategories)
+            .HasForeignKey(s => s.CategoryId);
+        // .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(s => s.Deals)
+            .WithOne(d => d.SubcategoryModel)
+            .HasForeignKey(d => d.SubcategoryId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.ToTable("Subcategories");
     }
 }

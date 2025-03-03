@@ -8,6 +8,17 @@ public class CategoryConfiguration : IEntityTypeConfiguration<CategoryModel>
 {
     public void Configure(EntityTypeBuilder<CategoryModel> builder)
     {
-        throw new NotImplementedException();
+        builder.HasKey(c => c.Id);
+
+        builder.Property(c => c.Name)
+            .IsRequired()
+            .HasMaxLength(255);
+
+        builder.HasMany(c => c.Subcategories)
+            .WithOne(s => s.CategoryModel)
+            .HasForeignKey(s => s.CategoryId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.ToTable("Categories");
     }
 }

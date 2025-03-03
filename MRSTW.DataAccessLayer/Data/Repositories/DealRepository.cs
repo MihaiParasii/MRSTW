@@ -18,7 +18,7 @@ public class DealRepository(AppDbContext context) : GenericRepository<DealModel>
                 .SetProperty(e => e.SubcategoryId, entity.SubcategoryId)
             );
     }
-    
+
     public async Task<PaginatedList<DealModel>> GetPaginatedListAsync(int pageSize, int pageNumber)
     {
         return await DbSet.ToPaginatedListAsync(pageNumber, pageSize);

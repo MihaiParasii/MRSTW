@@ -1,6 +1,6 @@
 # This is a generated file. Not intended for manual editing.
 services:
-  mrstw.api:
+  backend:
     build:
       context: "/Users/admin/Downloads/UTM/SEM4/MRSTW"
       dockerfile: "MRSTW.Api/Dockerfile"

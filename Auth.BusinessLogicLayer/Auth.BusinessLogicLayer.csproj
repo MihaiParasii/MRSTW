@@ -11,8 +11,4 @@
       <Folder Include="Common\Mappings\" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.13" />
-    </ItemGroup>
-
 </Project>

@@ -11,17 +11,17 @@ public static class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        
-        string? connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
-                                   builder.Configuration.GetConnectionString("DefaultConnection");
+
+        // string? connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
+        // builder.Configuration.GetConnectionString("DefaultConnection");
 
 
-        builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(connectionString));
-        
-        
-        builder.Services.AddApiServices();
+        // builder.Services.AddDbContext<AppDbContext>(options =>
+        // options.UseNpgsql(connectionString));
+
+
         builder.Services.AddInfrastructureServices(builder.Configuration);
+        builder.Services.AddApiServices();
         builder.Services.AddApplicationServices();
 
 
@@ -29,7 +29,19 @@ public static class Program
 
         var app = builder.Build();
 
-        // await DatabaseManagementService.MigrationInitialization(app);
+
+        // if (app.Environment.IsDevelopment())
+        // {
+        //     using IServiceScope serviceScope = app.Services.CreateScope();
+        //
+        //     var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
+        //     context.Database.Migrate();
+        // }
+
+        // await using var serviceScope = app.Services.CreateAsyncScope();
+
+        // await serviceScope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
+        // await DatabaseManagementService.MigrationInitializationAsync(app);
 
         // if (app.Environment.IsDevelopment())
         {
