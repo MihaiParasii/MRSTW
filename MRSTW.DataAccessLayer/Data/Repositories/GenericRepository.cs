@@ -4,9 +4,9 @@ using MRSTW.BusinessLogicLayer.Common.Interfaces;
 
 namespace MRSTW.DataAccessLayer.Data.Repositories;
 
-public abstract class GenericRepository<T>(AppDbContext context) : IGenericRepository<T> where T : BaseEntity
+public abstract class GenericRepository<T>() : IGenericRepository<T> where T : BaseEntity
 {
-    protected readonly DbSet<T> DbSet = context.Set<T>();
+    protected readonly DbSet<T> DbSet = null!;
 
     public async Task<T?> GetByIdAsync(int id)
     {
@@ -21,7 +21,7 @@ public abstract class GenericRepository<T>(AppDbContext context) : IGenericRepos
     public async Task AddAsync(T entity)
     {
         DbSet.Add(entity);
-        await context.SaveChangesAsync();
+        // await context.SaveChangesAsync();
     }
 
     public abstract Task UpdateAsync(T entity);
@@ -29,6 +29,6 @@ public abstract class GenericRepository<T>(AppDbContext context) : IGenericRepos
     public async Task DeleteAsync(T entity)
     {
         DbSet.Remove(entity);
-        await context.SaveChangesAsync();
+        // await context.SaveChangesAsync();
     }
 }

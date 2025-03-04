@@ -11,6 +11,6 @@ public static class DatabaseManagementService
     {
         await using var serviceScope = app.ApplicationServices.CreateAsyncScope();
 
-        await serviceScope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
+        // await serviceScope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
     }
 }

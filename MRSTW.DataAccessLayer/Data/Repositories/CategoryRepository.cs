@@ -4,7 +4,7 @@ using MRSTW.BusinessLogicLayer.Common.Interfaces;
 
 namespace MRSTW.DataAccessLayer.Data.Repositories;
 
-public class CategoryRepository(AppDbContext context) : GenericRepository<CategoryModel>(context), ICategoryRepository
+public class CategoryRepository() : GenericRepository<CategoryModel>(), ICategoryRepository
 {
     public override async Task UpdateAsync(CategoryModel entity)
     {

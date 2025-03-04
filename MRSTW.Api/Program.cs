@@ -18,6 +18,15 @@ public static class Program
 
         // builder.Services.AddDbContext<AppDbContext>(options =>
         // options.UseNpgsql(connectionString));
+        
+        // string? connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"); //??
+        string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+        builder.Services.AddDbContext<AppDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString, b => b.MigrationsAssembly("MRSTW.DataAccessLayer"))
+                .LogTo(Console.WriteLine, LogLevel.Information);
+        });
 
 
         builder.Services.AddInfrastructureServices(builder.Configuration);
@@ -43,7 +52,7 @@ public static class Program
         // await serviceScope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
         // await DatabaseManagementService.MigrationInitializationAsync(app);
 
-        // if (app.Environment.IsDevelopment())
+        if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
