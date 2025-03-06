@@ -12,38 +12,23 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // string? connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
-        // builder.Configuration.GetConnectionString("DefaultConnection");
-
-
-        // builder.Services.AddDbContext<AppDbContext>(options =>
-        // options.UseNpgsql(connectionString));
-
-
         builder.Services.AddInfrastructureServices(builder.Configuration);
         builder.Services.AddApiServices();
         builder.Services.AddApplicationServices();
 
-
         builder.Services.AddEndpointsApiExplorer();
 
         var app = builder.Build();
+        
+        if (app.Environment.IsDevelopment())
+        {
+            using IServiceScope serviceScope = app.Services.CreateScope();
+        
+            var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await context.Database.MigrateAsync();
+        }
 
-
-        // if (app.Environment.IsDevelopment())
-        // {
-        //     using IServiceScope serviceScope = app.Services.CreateScope();
-        //
-        //     var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
-        //     context.Database.Migrate();
-        // }
-
-        // await using var serviceScope = app.Services.CreateAsyncScope();
-
-        // await serviceScope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
-        // await DatabaseManagementService.MigrationInitializationAsync(app);
-
-        // if (app.Environment.IsDevelopment())
+        if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();

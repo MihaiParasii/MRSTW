@@ -7,6 +7,8 @@ namespace MRSTW.DataAccessLayer.Data.Repositories;
 public class SubcategoryRepository(AppDbContext context)
     : GenericRepository<SubcategoryModel>(context), ISubcategoryRepository
 {
+    private readonly AppDbContext _context = context;
+
     public override async Task UpdateAsync(SubcategoryModel entity)
     {
         await DbSet
@@ -19,6 +21,6 @@ public class SubcategoryRepository(AppDbContext context)
 
     public async Task<List<SubcategoryModel>> GetAllByCategoryIdAsync(int categoryId)
     {
-        return await context.Subcategories.Where(s => s.CategoryId == categoryId).AsNoTracking().ToListAsync();
+        return await _context.Subcategories.Where(s => s.CategoryId == categoryId).AsNoTracking().ToListAsync();
     }
 }

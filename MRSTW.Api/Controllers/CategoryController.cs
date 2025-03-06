@@ -68,7 +68,7 @@ public class CategoryController(
         {
             return BadRequest(validationResult.ToDictionary());
         }
-       
+
 
         if (id != request.Id)
         {

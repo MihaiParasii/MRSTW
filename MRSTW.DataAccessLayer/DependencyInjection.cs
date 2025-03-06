@@ -12,12 +12,13 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
         IConfiguration configuration)
     {
-        string? connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"); //??
-                                   // configuration.GetConnectionString("DefaultConnection");
+        string? connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
+                                   configuration.GetConnectionString("DefaultConnection");
 
         services.AddDbContext<AppDbContext>(options => { options.UseNpgsql(connectionString); });
 
-        services.AddScoped<AppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
+        // TODO There was the problem
+        // services.AddScoped<AppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IDealRepository, DealRepository>();
