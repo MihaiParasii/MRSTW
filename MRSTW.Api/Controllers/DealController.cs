@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using MRSTW.Api.UnitOfWork;
 using MRSTW.BusinessLogicLayer.Contracts.Deal;
 using MRSTW.BusinessLogicLayer.Services;
 
@@ -7,10 +8,7 @@ namespace MRSTW.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/v1")]
-public class DealController(
-    DealService dealService,
-    IValidator<CreateDealRequest> createDealValidator,
-    IValidator<UpdateDealRequest> updateDealValidator) : ControllerBase
+public class DealController(IApiUnitOfWork unitOfWork) : ControllerBase
 {
     [HttpGet("{pageSize:int},{pageCount:int}")]
     public async Task<ActionResult<List<DealResponse>>> Get(int pageSize, int pageCount)
@@ -25,7 +23,7 @@ public class DealController(
             return BadRequest("Page size must be a positive integer.");
         }
 
-        var result = await dealService.GetPaginatedListAsync(pageSize, pageCount);
+        var result = await unitOfWork.DealService.GetPaginatedListAsync(pageSize, pageCount);
         return Ok(result);
     }
 
@@ -39,7 +37,7 @@ public class DealController(
 
         try
         {
-            var result = await dealService.GetByIdAsync(id);
+            var result = await unitOfWork.DealService.GetByIdAsync(id);
             return Ok(result);
         }
         catch (ArgumentException e)
@@ -51,16 +49,16 @@ public class DealController(
     [HttpPost]
     public async Task<ActionResult> Post([FromForm] CreateDealRequest request, [FromForm] List<IFormFile> files)
     {
-        var validationResult = await createDealValidator.ValidateAsync(request);
+        var validationResult = await unitOfWork.CreateDealValidator.ValidateAsync(request);
 
         if (!validationResult.IsValid)
         {
-            return BadRequest(validationResult.ToDictionary());
+            return BadRequest(validationResult.Errors[0].ToString());
         }
 
         try
         {
-            await dealService.CreateAsync(request);
+            await unitOfWork.DealService.CreateAsync(request);
             return Created();
         }
         catch (ArgumentException e)
@@ -69,29 +67,19 @@ public class DealController(
         }
     }
 
-    [HttpPut("{id:int}")]
-    public async Task<ActionResult> Put(int id, [FromForm] UpdateDealRequest request, [FromForm] List<IFormFile> files)
+    [HttpPut]
+    public async Task<ActionResult> Put([FromForm] UpdateDealRequest request, [FromForm] List<IFormFile> files)
     {
-        var validationResult = await updateDealValidator.ValidateAsync(request);
+        var validationResult = await unitOfWork.UpdateDealValidator.ValidateAsync(request);
 
         if (!validationResult.IsValid)
         {
             return BadRequest(validationResult.ToDictionary());
         }
-
-        if (id < 0)
-        {
-            return BadRequest("The id can't be negative");
-        }
-
-        if (id != request.Id)
-        {
-            return BadRequest("The id can't be negative");
-        }
-
+        
         try
         {
-            await dealService.UpdateAsync(request);
+            await unitOfWork.DealService.UpdateAsync(request);
             return NoContent();
         }
         catch (ArgumentException e)
@@ -110,7 +98,7 @@ public class DealController(
 
         try
         {
-            await dealService.DeleteAsync(id);
+            await unitOfWork.DealService.DeleteAsync(id);
             return NoContent();
         }
         catch (ArgumentException e)

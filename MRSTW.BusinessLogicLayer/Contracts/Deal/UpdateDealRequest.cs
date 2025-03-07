@@ -4,4 +4,5 @@ public record UpdateDealRequest(
     int Id,
     string Title,
     string Description,
+    int SubcategoryId,
     string[] PhotoPaths);

@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using MRSTW.Api.UnitOfWork;
 using MRSTW.BusinessLogicLayer.Contracts.Subcategory;
 using MRSTW.BusinessLogicLayer.Services;
 
@@ -7,15 +8,12 @@ namespace MRSTW.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/v1")]
-public class SubcategoryController(
-    SubcategoryService subcategoryService,
-    IValidator<CreateSubcategoryRequest> createSubcategoryValidator,
-    IValidator<UpdateSubcategoryRequest> updateSubcategoryValidator) : ControllerBase
+public class SubcategoryController(IApiUnitOfWork unitOfWork) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<List<SubcategoryResponse>>> Get()
     {
-        var result = await subcategoryService.GetAllAsync();
+        var result = await unitOfWork.SubcategoryService.GetAllAsync();
         return Ok(result);
     }
 
@@ -29,7 +27,7 @@ public class SubcategoryController(
 
         try
         {
-            var result = await subcategoryService.GetByIdAsync(id);
+            var result = await unitOfWork.SubcategoryService.GetByIdAsync(id);
             return Ok(result);
         }
         catch (ArgumentException e)
@@ -41,7 +39,7 @@ public class SubcategoryController(
     [HttpPost]
     public async Task<ActionResult<SubcategoryResponse>> Post([FromBody] CreateSubcategoryRequest request)
     {
-        var validationResult = await createSubcategoryValidator.ValidateAsync(request);
+        var validationResult = await unitOfWork.CreateSubcategoryValidator.ValidateAsync(request);
 
         if (!validationResult.IsValid)
         {
@@ -50,7 +48,7 @@ public class SubcategoryController(
 
         try
         {
-            await subcategoryService.CreateAsync(request);
+            await unitOfWork.SubcategoryService.CreateAsync(request);
             return Created();
         }
         catch (ArgumentException e)
@@ -59,29 +57,19 @@ public class SubcategoryController(
         }
     }
 
-    [HttpPut("{id:int}")]
-    public async Task<ActionResult> Put(int id, [FromBody] UpdateSubcategoryRequest request)
+    [HttpPut]
+    public async Task<ActionResult> Put([FromBody] UpdateSubcategoryRequest request)
     {
-        var validationResult = await updateSubcategoryValidator.ValidateAsync(request);
-
+        var validationResult = await unitOfWork.UpdateSubcategoryValidator.ValidateAsync(request);
+        
         if (!validationResult.IsValid)
         {
             return BadRequest(validationResult.ToDictionary());
         }
-
-        if (id < 0)
-        {
-            return BadRequest("The id can't be negative");
-        }
-
-        if (id != request.Id)
-        {
-            return BadRequest("The id can't be negative");
-        }
-
+        
         try
         {
-            await subcategoryService.UpdateAsync(request);
+            await unitOfWork.SubcategoryService.UpdateAsync(request);
             return NoContent();
         }
         catch (ArgumentException e)
@@ -100,7 +88,7 @@ public class SubcategoryController(
 
         try
         {
-            await subcategoryService.DeleteAsync(id);
+            await unitOfWork.SubcategoryService.DeleteAsync(id);
             return NoContent();
         }
         catch (ArgumentException e)

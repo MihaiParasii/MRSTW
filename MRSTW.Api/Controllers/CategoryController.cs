@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using MRSTW.Api.UnitOfWork;
 using MRSTW.BusinessLogicLayer.Contracts.Category;
 using MRSTW.BusinessLogicLayer.Services;
 
@@ -7,15 +8,12 @@ namespace MRSTW.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/v1")]
-public class CategoryController(
-    CategoryService categoryService,
-    IValidator<CreateCategoryRequest> createCategoryValidator,
-    IValidator<UpdateCategoryRequest> updateCategoryValidator) : ControllerBase
+public class CategoryController(IApiUnitOfWork unitOfWork) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<List<CategoryResponse>>> Get()
     {
-        var result = await categoryService.GetAllAsync();
+        var result = await unitOfWork.CategoryService.GetAllAsync();
         return Ok(result);
     }
 
@@ -29,7 +27,7 @@ public class CategoryController(
 
         try
         {
-            var result = await categoryService.GetByIdAsync(id);
+            var result = await unitOfWork.CategoryService.GetByIdAsync(id);
             return Ok(result);
         }
         catch (ArgumentException e)
@@ -41,7 +39,7 @@ public class CategoryController(
     [HttpPost]
     public async Task<ActionResult<CategoryResponse>> Post([FromBody] CreateCategoryRequest request)
     {
-        var validationResult = await createCategoryValidator.ValidateAsync(request);
+        var validationResult = await unitOfWork.CreateCategoryValidator.ValidateAsync(request);
 
         if (!validationResult.IsValid)
         {
@@ -50,7 +48,7 @@ public class CategoryController(
 
         try
         {
-            await categoryService.CreateAsync(request);
+            await unitOfWork.CategoryService.CreateAsync(request);
             return Created();
         }
         catch (ArgumentException e)
@@ -59,25 +57,19 @@ public class CategoryController(
         }
     }
 
-    [HttpPut("{id:int}")]
-    public async Task<ActionResult> Put(int id, [FromBody] UpdateCategoryRequest request)
+    [HttpPut]
+    public async Task<ActionResult> Put([FromBody] UpdateCategoryRequest request)
     {
-        var validationResult = await updateCategoryValidator.ValidateAsync(request);
+        var validationResult = await unitOfWork.UpdateCategoryValidator.ValidateAsync(request);
 
         if (!validationResult.IsValid)
         {
             return BadRequest(validationResult.ToDictionary());
         }
-
-
-        if (id != request.Id)
-        {
-            return BadRequest("The id can't be negative");
-        }
-
+        
         try
         {
-            await categoryService.UpdateAsync(request);
+            await unitOfWork.CategoryService.UpdateAsync(request);
             return NoContent();
         }
         catch (ArgumentException e)
@@ -96,7 +88,7 @@ public class CategoryController(
 
         try
         {
-            await categoryService.DeleteAsync(id);
+            await unitOfWork.CategoryService.DeleteAsync(id);
             return NoContent();
         }
         catch (ArgumentException e)

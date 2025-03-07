@@ -1,42 +1,37 @@
-using AutoMapper;
 using Domain.Models.Main;
-using FluentValidation;
 using MRSTW.BusinessLogicLayer.Common.Interfaces;
 using MRSTW.BusinessLogicLayer.Contracts.Category;
 
 namespace MRSTW.BusinessLogicLayer.Services;
 
-public class CategoryService(
-    ICategoryRepository categoryRepository,
-    IMapper mapper,
-    IValidator<CategoryModel> categoryValidator)
+public class CategoryService(IBusinessUnitOfWork unitOfWork) : ICategoryService
 {
     public async Task CreateAsync(CreateCategoryRequest request)
     {
-        var category = mapper.Map<CategoryModel>(request);
+        var category = unitOfWork.Mapper.Map<CategoryModel>(request);
 
-        var validationResult = await categoryValidator.ValidateAsync(category);
+        var validationResult = await unitOfWork.CategoryValidator.ValidateAsync(category);
 
         if (!validationResult.IsValid)
         {
             throw new ArgumentException("Invalid category data.");
         }
 
-        await categoryRepository.AddAsync(category);
+        await unitOfWork.CategoryRepository.AddAsync(category);
     }
 
     public async Task UpdateAsync(UpdateCategoryRequest request)
     {
-        var category = mapper.Map<CategoryModel>(request);
+        var category = unitOfWork.Mapper.Map<CategoryModel>(request);
 
-        var validationResult = await categoryValidator.ValidateAsync(category);
+        var validationResult = await unitOfWork.CategoryValidator.ValidateAsync(category);
 
         if (!validationResult.IsValid)
         {
             throw new ArgumentException("Invalid category data.");
         }
 
-        await categoryRepository.UpdateAsync(category);
+        await unitOfWork.CategoryRepository.UpdateAsync(category);
     }
 
     public async Task DeleteAsync(int id)
@@ -45,34 +40,34 @@ public class CategoryService(
         {
             throw new ArgumentException("Invalid category ID.");
         }
-        
-        var category = await categoryRepository.GetByIdAsync(id);
+
+        var category = await unitOfWork.CategoryRepository.GetByIdAsync(id);
 
         if (category == null)
         {
             throw new ArgumentException("Category not found.");
         }
 
-        await categoryRepository.DeleteAsync(category);
+        await unitOfWork.CategoryRepository.DeleteAsync(category);
     }
 
     public async Task<CategoryResponse> GetByIdAsync(int id)
     {
-        var category = await categoryRepository.GetByIdAsync(id);
+        var category = await unitOfWork.CategoryRepository.GetByIdAsync(id);
 
         if (category == null)
         {
             throw new ArgumentException("Category not found.");
         }
 
-        return mapper.Map<CategoryResponse>(category);
+        return unitOfWork.Mapper.Map<CategoryResponse>(category);
     }
 
     public async Task<List<CategoryResponse>> GetAllAsync()
     {
-        var categories = await categoryRepository.GetAllAsync();
+        var categories = await unitOfWork.CategoryRepository.GetAllAsync();
 
-        var result = mapper.Map<List<CategoryResponse>>(categories);
+        var result = unitOfWork.Mapper.Map<List<CategoryResponse>>(categories);
 
         return result;
     }

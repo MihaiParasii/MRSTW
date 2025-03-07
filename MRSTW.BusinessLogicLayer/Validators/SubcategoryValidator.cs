@@ -6,10 +6,12 @@ namespace MRSTW.BusinessLogicLayer.Validators;
 
 public class SubcategoryValidator : AbstractValidator<SubcategoryModel>
 {
+    private readonly ICategoryRepository _categoryRepository;
     private readonly ISubcategoryRepository _subcategoryRepository;
 
-    public SubcategoryValidator(ISubcategoryRepository subcategoryRepository)
+    public SubcategoryValidator(ISubcategoryRepository subcategoryRepository, ICategoryRepository categoryRepository)
     {
+        _categoryRepository = categoryRepository;
         _subcategoryRepository = subcategoryRepository;
 
         RuleFor(x => x).Must(IsUniqueSubcategoryName)
@@ -19,9 +21,12 @@ public class SubcategoryValidator : AbstractValidator<SubcategoryModel>
             .WithMessage("Subcategory name must not be empty!");
 
         RuleFor(x => x.Name).Must(IsValidName)
-            .WithMessage("Subcategory name can only contain letters!");
+            .WithMessage("Subcategory name can only contain letters and white spaces!");
 
         RuleFor(x => x.CategoryId).NotEmpty();
+        
+        RuleFor(x => x.CategoryId).Must(IsValidCategoryId)
+           .WithMessage("Invalid category id!");
     }
 
     private bool IsUniqueSubcategoryName(SubcategoryModel subcategoryModel)
@@ -45,6 +50,23 @@ public class SubcategoryValidator : AbstractValidator<SubcategoryModel>
 
     private static bool IsValidName(string name)
     {
-        return name.All(char.IsLetter);
+        foreach (char c in name)
+        {
+            if ((!char.IsLetter(c) && c != ' ')) return false;
+        }
+
+        return true;
+    }
+
+    private bool IsValidCategoryId(int categoryId)
+    {
+        if (categoryId <= 0)
+        {
+            return false;
+        }
+
+        CategoryModel? category = _categoryRepository.GetByIdAsync(categoryId).GetAwaiter().GetResult();
+
+        return category != null;
     }
 }

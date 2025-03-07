@@ -15,8 +15,5 @@ public class CreateDealRequestValidator : AbstractValidator<CreateDealRequest>
 
         RuleFor(x => x.SubcategoryId).NotEmpty()
             .WithMessage("SubcategoryId is required");
-
-        // RuleFor(x => x.SubcategoryId).Must(subcategoryId => dealService.SubcategoryExists(subcategoryId))
-        // .WithMessage("SubcategoryId does not exist");
     }
 }

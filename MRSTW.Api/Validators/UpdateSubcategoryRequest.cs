@@ -14,15 +14,6 @@ public class UpdateSubcategoryRequestValidator : AbstractValidator<UpdateSubcate
             .GreaterThanOrEqualTo(0)
             .WithMessage("Invalid category ID.");
 
-        RuleFor(x => x.Name).Must(IsValidName)
-            .WithMessage("Subcategory name can only contain letters!");
-
-
         RuleFor(x => x.CategoryId).NotEmpty();
-    }
-
-    private static bool IsValidName(string name)
-    {
-        return name.All(char.IsLetter);
     }
 }

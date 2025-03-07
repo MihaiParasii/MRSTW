@@ -1,70 +1,68 @@
-using AutoMapper;
 using Domain.Models.Main;
-using FluentValidation;
 using MRSTW.BusinessLogicLayer.Common.Interfaces;
 using MRSTW.BusinessLogicLayer.Common.Models;
 using MRSTW.BusinessLogicLayer.Contracts.Deal;
 
 namespace MRSTW.BusinessLogicLayer.Services;
 
-public class DealService(IDealRepository dealRepository, IMapper mapper, IValidator<DealModel> dealValidator)
+public class DealService(IBusinessUnitOfWork unitOfWork) : IDealService
 {
     public async Task CreateAsync(CreateDealRequest request)
     {
-        var deal = mapper.Map<DealModel>(request);
+        var deal = unitOfWork.Mapper.Map<DealModel>(request);
 
-        var validationResult = await dealValidator.ValidateAsync(deal);
+        var validationResult = await unitOfWork.DealValidator.ValidateAsync(deal);
 
         if (!validationResult.IsValid)
         {
-            throw new ArgumentException("Invalid deal data.");
+            throw new ArgumentException(validationResult.Errors[0].ToString());
         }
 
-        await dealRepository.AddAsync(deal);
+        await unitOfWork.DealRepository.AddAsync(deal);
     }
 
     public async Task UpdateAsync(UpdateDealRequest request)
     {
-        var deal = mapper.Map<DealModel>(request);
+        var deal = unitOfWork.Mapper.Map<DealModel>(request);
 
-        var validationResult = await dealValidator.ValidateAsync(deal);
+        var validationResult = await unitOfWork.DealValidator.ValidateAsync(deal);
 
         if (!validationResult.IsValid)
         {
             throw new ArgumentException("Invalid deal data.");
         }
 
-        await dealRepository.UpdateAsync(deal);
+        await unitOfWork.DealRepository.UpdateAsync(deal);
     }
 
     public async Task DeleteAsync(int id)
     {
-        var deal = await dealRepository.GetByIdAsync(id);
+        var deal = await unitOfWork.DealRepository.GetByIdAsync(id);
 
         if (deal == null)
         {
             throw new ArgumentException("Deal not found.");
         }
 
-        await dealRepository.DeleteAsync(deal);
+        await unitOfWork.DealRepository.DeleteAsync(deal);
     }
 
     public async Task<PaginatedList<DealResponse>> GetPaginatedListAsync(int pageSize, int pageCount)
     {
-        var deals = await dealRepository.GetPaginatedListAsync(pageSize, pageCount);
+        var deals = await unitOfWork.DealRepository.GetPaginatedListAsync(pageSize, pageCount);
 
-        return mapper.Map<PaginatedList<DealResponse>>(deals);
+        return unitOfWork.Mapper.Map<PaginatedList<DealResponse>>(deals);
     }
 
     public async Task<DealResponse> GetByIdAsync(int id)
     {
-        var deal = await dealRepository.GetByIdAsync(id);
+        var deal = await unitOfWork.DealRepository.GetByIdAsync(id);
 
         if (deal == null)
         {
             throw new ArgumentException("Deal not found.");
         }
 
-        return mapper.Map<DealResponse>(deal);
+        return unitOfWork.Mapper.Map<DealResponse>(deal);
     }
 }

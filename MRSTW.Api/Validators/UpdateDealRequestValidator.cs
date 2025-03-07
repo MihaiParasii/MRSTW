@@ -3,7 +3,7 @@ using MRSTW.BusinessLogicLayer.Contracts.Deal;
 
 namespace MRSTW.Api.Validators;
 
-public class UpdateDealRequestValidator : AbstractValidator<CreateDealRequest>
+public class UpdateDealRequestValidator : AbstractValidator<UpdateDealRequest>
 {
     public UpdateDealRequestValidator()
     {

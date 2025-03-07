@@ -1,71 +1,66 @@
-using AutoMapper;
 using Domain.Models.Main;
-using FluentValidation;
 using MRSTW.BusinessLogicLayer.Common.Interfaces;
 using MRSTW.BusinessLogicLayer.Contracts.Subcategory;
 
 namespace MRSTW.BusinessLogicLayer.Services;
 
-public class SubcategoryService(
-    ISubcategoryRepository subcategoryRepository,
-    IMapper mapper,
-    IValidator<SubcategoryModel> subcategoryValidator)
+public class SubcategoryService(IBusinessUnitOfWork unitOfWork) : ISubcategoryService
 {
     public async Task CreateAsync(CreateSubcategoryRequest request)
     {
-        var deal = mapper.Map<SubcategoryModel>(request);
+        var deal = unitOfWork.Mapper.Map<SubcategoryModel>(request);
 
-        var validationResult = await subcategoryValidator.ValidateAsync(deal);
+        var validationResult = await unitOfWork.SubcategoryValidator.ValidateAsync(deal);
 
         if (!validationResult.IsValid)
         {
-            throw new ArgumentException("Invalid subcategory data.");
+            throw new ArgumentException(validationResult.Errors[0].ToString());
         }
 
-        await subcategoryRepository.AddAsync(deal);
+        await unitOfWork.SubcategoryRepository.AddAsync(deal);
     }
 
     public async Task UpdateAsync(UpdateSubcategoryRequest request)
     {
-        var subcategory = mapper.Map<SubcategoryModel>(request);
-
-        var validationResult = await subcategoryValidator.ValidateAsync(subcategory);
-
+        var subcategory = unitOfWork.Mapper.Map<SubcategoryModel>(request);
+        
+        var validationResult = await unitOfWork.SubcategoryValidator.ValidateAsync(subcategory);
+        
         if (!validationResult.IsValid)
         {
-            throw new ArgumentException("Invalid subcategory data.");
+            throw new ArgumentException(validationResult.Errors[0].ToString());
         }
-
-        await subcategoryRepository.UpdateAsync(subcategory);
+        
+        await unitOfWork.SubcategoryRepository.UpdateAsync(subcategory);
     }
 
     public async Task DeleteAsync(int id)
     {
-        var subcategory = await subcategoryRepository.GetByIdAsync(id);
+        var subcategory = await unitOfWork.SubcategoryRepository.GetByIdAsync(id);
 
         if (subcategory == null)
         {
             throw new ArgumentException("Subcategory not found.");
         }
 
-        await subcategoryRepository.DeleteAsync(subcategory);
+        await unitOfWork.SubcategoryRepository.DeleteAsync(subcategory);
     }
 
     public async Task<SubcategoryResponse> GetByIdAsync(int id)
     {
-        var subcategory = await subcategoryRepository.GetByIdAsync(id);
+        var subcategory = await unitOfWork.SubcategoryRepository.GetByIdAsync(id);
 
         if (subcategory == null)
         {
             throw new ArgumentException("Subcategory not found.");
         }
 
-        return mapper.Map<SubcategoryResponse>(subcategory);
+        return unitOfWork.Mapper.Map<SubcategoryResponse>(subcategory);
     }
 
     public async Task<List<SubcategoryResponse>> GetAllAsync()
     {
-        var subcategories = await subcategoryRepository.GetAllAsync();
-        return mapper.Map<List<SubcategoryResponse>>(subcategories);
+        var subcategories = await unitOfWork.SubcategoryRepository.GetAllAsync();
+        return unitOfWork.Mapper.Map<List<SubcategoryResponse>>(subcategories);
     }
 }
