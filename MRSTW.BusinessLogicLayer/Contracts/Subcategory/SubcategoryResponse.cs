@@ -1,3 +1,3 @@
 namespace MRSTW.BusinessLogicLayer.Contracts.Subcategory;
 
-public record SubcategoryResponse();
+public record SubcategoryResponse(int Id, string Name);

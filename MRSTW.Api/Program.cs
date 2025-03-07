@@ -22,9 +22,10 @@ public static class Program
         
         if (app.Environment.IsDevelopment())
         {
-            using IServiceScope serviceScope = app.Services.CreateScope();
+            await using var serviceScope = app.Services.CreateAsyncScope();
         
-            var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await using var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await context.Database.EnsureCreatedAsync();
             await context.Database.MigrateAsync();
         }
 
