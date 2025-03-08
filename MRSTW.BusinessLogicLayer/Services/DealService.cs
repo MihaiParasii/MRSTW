@@ -7,7 +7,7 @@ namespace MRSTW.BusinessLogicLayer.Services;
 
 public class DealService(IBusinessUnitOfWork unitOfWork) : IDealService
 {
-    public async Task CreateAsync(CreateDealRequest request)
+    public async Task CreateAsync(CreateDealRequest request, List<string> filePaths)
     {
         var deal = unitOfWork.Mapper.Map<DealModel>(request);
 
@@ -21,7 +21,7 @@ public class DealService(IBusinessUnitOfWork unitOfWork) : IDealService
         await unitOfWork.DealRepository.AddAsync(deal);
     }
 
-    public async Task UpdateAsync(UpdateDealRequest request)
+    public async Task UpdateAsync(UpdateDealRequest request, List<string> filePaths)
     {
         var deal = unitOfWork.Mapper.Map<DealModel>(request);
 

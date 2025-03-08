@@ -7,7 +7,7 @@
     ports:
       - "4200:80"
     depends_on:
-      - backend
+      - backend 
     networks:
       - mynetwork
 
@@ -19,6 +19,8 @@
     environment:
       - DB_CONNECTION_STRING=Host=postgresql;Port=5432;Database=mrstw;Username=postgres;Password=postgres;Pooling=true
       - RabbitMQ__Host=rabbitmq
+      - AWS_ACCESS_KEY_ID=AKIAYSE4N5O2CHM65UZZ
+      - AWS_SECRET_ACCESS_KEY=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
     depends_on:
       - db
       - rabbitmq

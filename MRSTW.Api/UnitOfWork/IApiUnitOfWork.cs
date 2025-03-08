@@ -1,9 +1,9 @@
 using FluentValidation;
+using MRSTW.Api.Services;
 using MRSTW.BusinessLogicLayer.Common.Interfaces;
 using MRSTW.BusinessLogicLayer.Contracts.Category;
 using MRSTW.BusinessLogicLayer.Contracts.Deal;
 using MRSTW.BusinessLogicLayer.Contracts.Subcategory;
-using MRSTW.BusinessLogicLayer.Services;
 
 namespace MRSTW.Api.UnitOfWork;
 
@@ -21,4 +21,6 @@ public interface IApiUnitOfWork
 
     public IValidator<CreateDealRequest> CreateDealValidator { get; }
     public IValidator<UpdateDealRequest> UpdateDealValidator { get; }
+    
+    public AmazonS3Service AmazonS3Service { get; }
 }

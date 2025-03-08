@@ -2,7 +2,6 @@ using AutoMapper;
 using Domain.Models.Main;
 using FluentValidation;
 using MRSTW.BusinessLogicLayer.Common.Interfaces;
-using MRSTW.BusinessLogicLayer.Services;
 
 namespace MRSTW.DataAccessLayer.Services;
 

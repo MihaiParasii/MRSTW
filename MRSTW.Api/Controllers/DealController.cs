@@ -1,8 +1,7 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using MRSTW.Api.Contracts;
 using MRSTW.Api.UnitOfWork;
 using MRSTW.BusinessLogicLayer.Contracts.Deal;
-using MRSTW.BusinessLogicLayer.Services;
 
 namespace MRSTW.Api.Controllers;
 
@@ -58,7 +57,10 @@ public class DealController(IApiUnitOfWork unitOfWork) : ControllerBase
 
         try
         {
-            await unitOfWork.DealService.CreateAsync(request);
+            // TODO Get UserId
+            var userId = Guid.Empty;
+            var response = await unitOfWork.AmazonS3Service.UploadFilesAsync(new UploadFilesRequest(files, userId));
+            await unitOfWork.DealService.CreateAsync(request, response.UploadedFilePaths);
             return Created();
         }
         catch (ArgumentException e)
@@ -76,10 +78,16 @@ public class DealController(IApiUnitOfWork unitOfWork) : ControllerBase
         {
             return BadRequest(validationResult.ToDictionary());
         }
-        
+
         try
         {
-            await unitOfWork.DealService.UpdateAsync(request);
+            var deal = await unitOfWork.DealService.GetByIdAsync(request.Id);
+            await unitOfWork.AmazonS3Service.DeleteFilesAsync(deal.PhotoPaths.ToList());
+
+            // TODO Get UserId
+            var userId = Guid.Empty;
+            var response = await unitOfWork.AmazonS3Service.UploadFilesAsync(new UploadFilesRequest(files, userId));
+            await unitOfWork.DealService.UpdateAsync(request, response.UploadedFilePaths);
             return NoContent();
         }
         catch (ArgumentException e)
@@ -98,6 +106,8 @@ public class DealController(IApiUnitOfWork unitOfWork) : ControllerBase
 
         try
         {
+            var deal = await unitOfWork.DealService.GetByIdAsync(id);
+            await unitOfWork.AmazonS3Service.DeleteFilesAsync(deal.PhotoPaths.ToList());
             await unitOfWork.DealService.DeleteAsync(id);
             return NoContent();
         }
@@ -105,5 +115,18 @@ public class DealController(IApiUnitOfWork unitOfWork) : ControllerBase
         {
             return NotFound(e.Message);
         }
+    }
+
+    [HttpPost("upload-files")]
+    public async Task<ActionResult<UploadFilesResponse>> UploadFiles([FromForm] List<IFormFile> files)
+    {
+        return await unitOfWork.AmazonS3Service.UploadFilesAsync(new UploadFilesRequest(files, new Guid()));
+    }
+
+    [HttpPost("delete-files")]
+    public async Task<ActionResult> DeleteFiles([FromBody] List<string> filePaths)
+    {
+        await unitOfWork.AmazonS3Service.DeleteFilesAsync(filePaths);
+        return NoContent();
     }
 }

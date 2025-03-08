@@ -1,8 +1,6 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using MRSTW.Api.UnitOfWork;
 using MRSTW.BusinessLogicLayer.Contracts.Category;
-using MRSTW.BusinessLogicLayer.Services;
 
 namespace MRSTW.Api.Controllers;
 
