@@ -2,7 +2,7 @@
 services:
   backend:
     build:
-      context: "/Users/admin/Downloads/UTM/SEM4/MRSTW"
+      context: "/Users/mihaiparasii/Downloads/UTM/SEM4/MRSTW"
       dockerfile: "MRSTW.Api/Dockerfile"
       target: "base"
     command: []
@@ -15,7 +15,7 @@ services:
     image: "mrstw.api:dev"
     ports: []
     volumes:
-    - "/Users/admin/.nuget/packages:/home/app/.nuget/packages"
-    - "/Users/admin/Downloads/UTM/SEM4/MRSTW/MRSTW.Api:/app:rw"
-    - "/Users/admin/Downloads/UTM/SEM4/MRSTW:/src:rw"
+    - "/Users/mihaiparasii/Downloads/UTM/SEM4/MRSTW/MRSTW.Api:/app:rw"
+    - "/Users/mihaiparasii/Downloads/UTM/SEM4/MRSTW:/src:rw"
+    - "/Users/mihaiparasii/.nuget/packages:/home/app/.nuget/packages"
     working_dir: "/app"

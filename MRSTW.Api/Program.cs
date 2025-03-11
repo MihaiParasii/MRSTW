@@ -24,10 +24,10 @@ public static class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        DotNetEnv.Env.Load();
 
-//
-        string? awsSecretAccessKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
-        string? awsAccessKeyId = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
+        string awsSecretAccessKey = DotNetEnv.Env.GetString("AWS_SECRET_ACCESS_KEY");
+        string awsAccessKeyId = DotNetEnv.Env.GetString("AWS_ACCESS_KEY_ID");
         RegionEndpoint region = RegionEndpoint.USEast1;
         
         string? connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
