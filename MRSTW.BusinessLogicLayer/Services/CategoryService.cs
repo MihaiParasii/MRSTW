@@ -14,7 +14,7 @@ public class CategoryService(IBusinessUnitOfWork unitOfWork) : ICategoryService
 
         if (!validationResult.IsValid)
         {
-            throw new ArgumentException("Invalid category data.");
+            throw new ArgumentException(validationResult.Errors[0].ToString());
         }
 
         await unitOfWork.CategoryRepository.AddAsync(category);
@@ -28,7 +28,7 @@ public class CategoryService(IBusinessUnitOfWork unitOfWork) : ICategoryService
 
         if (!validationResult.IsValid)
         {
-            throw new ArgumentException("Invalid category data.");
+            throw new ArgumentException(validationResult.Errors[0].ToString());
         }
 
         await unitOfWork.CategoryRepository.UpdateAsync(category);

@@ -1,12 +1,52 @@
 using Domain.Models.Main;
 using FluentValidation;
+using MRSTW.BusinessLogicLayer.Common.Interfaces;
 
 namespace MRSTW.BusinessLogicLayer.Validators;
 
 public class CategoryValidator : AbstractValidator<CategoryModel>
 {
-    public CategoryValidator()
+    private readonly ICategoryRepository _categoryRepository;
+
+    public CategoryValidator(ICategoryRepository categoryRepository)
     {
-        RuleFor(x => x.Name).NotEmpty().Length(1, 100).WithMessage("Category name must not be empty!");
+        _categoryRepository = categoryRepository;
+
+        RuleFor(x => x.Name).NotEmpty().Length(1, 100)
+            .WithMessage("Category name must not be empty!");
+
+        RuleFor(x => x).Must(IsUniqueCategoryName)
+            .WithMessage("Category name must be unique!");
+
+        RuleFor(x => x.Name).Must(IsValidName)
+            .WithMessage("Category name can only contain letters and white spaces!");
+    }
+
+    private bool IsUniqueCategoryName(CategoryModel categoryModel)
+    {
+        if (string.IsNullOrWhiteSpace(categoryModel.Name))
+        {
+            return false;
+        }
+
+        if (categoryModel.Id <= 0)
+        {
+            return false;
+        }
+
+        var categories = _categoryRepository.GetAllAsync().GetAwaiter().GetResult();
+
+        return categories.All(
+            x => !string.Equals(x.Name, categoryModel.Name, StringComparison.CurrentCultureIgnoreCase));
+    }
+
+    private static bool IsValidName(string name)
+    {
+        foreach (char c in name)
+        {
+            if (!char.IsLetter(c) && c != ' ') return false;
+        }
+
+        return true;
     }
 }

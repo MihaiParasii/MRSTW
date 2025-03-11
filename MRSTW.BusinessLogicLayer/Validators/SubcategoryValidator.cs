@@ -52,7 +52,7 @@ public class SubcategoryValidator : AbstractValidator<SubcategoryModel>
     {
         foreach (char c in name)
         {
-            if ((!char.IsLetter(c) && c != ' ')) return false;
+            if (!char.IsLetter(c) && c != ' ') return false;
         }
 
         return true;
