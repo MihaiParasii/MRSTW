@@ -42,11 +42,6 @@ public class CategoryValidator : AbstractValidator<CategoryModel>
 
     private static bool IsValidName(string name)
     {
-        foreach (char c in name)
-        {
-            if (!char.IsLetter(c) && c != ' ') return false;
-        }
-
-        return true;
+        return name.All(c => char.IsLetter(c) || c == ' ');
     }
 }
