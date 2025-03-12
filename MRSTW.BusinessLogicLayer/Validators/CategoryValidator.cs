@@ -29,15 +29,23 @@ public class CategoryValidator : AbstractValidator<CategoryModel>
             return false;
         }
 
-        if (categoryModel.Id <= 0)
+        if (categoryModel.Id < 0)
         {
             return false;
         }
 
         var categories = _categoryRepository.GetAllAsync().GetAwaiter().GetResult();
 
-        return categories.All(
-            x => !string.Equals(x.Name, categoryModel.Name, StringComparison.CurrentCultureIgnoreCase));
+
+        foreach (var x in categories)
+        {
+            if (string.Equals(x.Name, categoryModel.Name, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static bool IsValidName(string name)

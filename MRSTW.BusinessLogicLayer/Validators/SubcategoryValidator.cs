@@ -23,10 +23,8 @@ public class SubcategoryValidator : AbstractValidator<SubcategoryModel>
         RuleFor(x => x.Name).Must(IsValidName)
             .WithMessage("Subcategory name can only contain letters and white spaces!");
 
-        RuleFor(x => x.CategoryId).NotEmpty();
-        
         RuleFor(x => x.CategoryId).Must(IsValidCategoryId)
-           .WithMessage("Invalid category id!");
+            .WithMessage("Invalid category id!");
     }
 
     private bool IsUniqueSubcategoryName(SubcategoryModel subcategoryModel)
