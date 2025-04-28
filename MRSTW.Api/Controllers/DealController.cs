@@ -2,11 +2,15 @@ using Microsoft.AspNetCore.Mvc;
 using MRSTW.Api.Contracts;
 using MRSTW.Api.UnitOfWork;
 using MRSTW.BusinessLogicLayer.Contracts.Deal;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MRSTW.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]/v1")]
+
+[AllowAnonymous]
 public class DealController(IApiUnitOfWork unitOfWork) : ControllerBase
 {
     [HttpGet("{pageSize:int},{pageCount:int}")]
@@ -27,6 +31,8 @@ public class DealController(IApiUnitOfWork unitOfWork) : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    
+    [AllowAnonymous]
     public async Task<ActionResult<DealResponse>> Get(int id)
     {
         if (id < 0)

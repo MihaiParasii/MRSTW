@@ -98,7 +98,33 @@ public static class Program
         builder.Services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "MRSTW API", Version = "v1" });
+            
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Enter 'Bearer' [space] and then your valid token.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIs...\""
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
         });
+
 
         builder.Services.AddCors(options =>
         {
@@ -131,8 +157,6 @@ public static class Program
         builder.Services.AddScoped<IApiUnitOfWork, ApiUnitOfWork>();
 
         builder.Services.AddScoped<IAuthService, AuthService>();
-//
-
 
         builder.Services.AddEndpointsApiExplorer();
 
