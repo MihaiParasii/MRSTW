@@ -16,6 +16,10 @@ using MRSTW.BusinessLogicLayer.Validators;
 using MRSTW.DataAccessLayer.Data;
 using MRSTW.DataAccessLayer.Data.Repositories;
 using MRSTW.DataAccessLayer.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 namespace MRSTW.Api;
 
@@ -25,6 +29,33 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         DotNetEnv.Env.Load();
+        
+        // JWT Authentication
+        var jwtSettings = builder.Configuration.GetSection("Jwt");
+        var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+        builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+        
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings["Audience"],
+
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
         string awsSecretAccessKey = DotNetEnv.Env.GetString("AWS_SECRET_ACCESS_KEY");
         string awsAccessKeyId = DotNetEnv.Env.GetString("AWS_ACCESS_KEY_ID");
@@ -99,7 +130,7 @@ public static class Program
 
         builder.Services.AddScoped<IApiUnitOfWork, ApiUnitOfWork>();
 
-
+        builder.Services.AddScoped<IAuthService, AuthService>();
 //
 
 
@@ -133,6 +164,9 @@ public static class Program
 
         app.UseHttpsRedirection();
 
+        app.UseAuthentication();
+        app.UseAuthorization();
+        
         app.MapControllers();
 
         await app.RunAsync();
