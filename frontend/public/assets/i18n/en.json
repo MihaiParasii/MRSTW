@@ -48,6 +48,7 @@
     "PHONE_NUMBER": "Phone number",
     "EMAIL": "E-mail",
     "PASSWORD": "Password",
+    "REPEATED_PASSWORD": "Repeat password",
     "REGISTER_BUTTON": "Register now",
     "LABEL_LOGIN": "Do you have account?",
     "LOGIN_LINK": "Authenticate"

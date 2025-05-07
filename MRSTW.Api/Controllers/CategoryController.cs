@@ -1,20 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
 using MRSTW.Api.UnitOfWork;
 using MRSTW.BusinessLogicLayer.Contracts.Category;
+using Microsoft.AspNetCore.Authorization; 
 
 namespace MRSTW.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]/v1")]
 public class CategoryController(IApiUnitOfWork unitOfWork) : ControllerBase
 {
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<List<CategoryResponse>>> Get()
     {
         var result = await unitOfWork.CategoryService.GetAllAsync();
         return Ok(result);
     }
-
+    
+    [AllowAnonymous]
     [HttpGet("{id:int}")]
     public async Task<ActionResult<CategoryResponse>> Get(int id)
     {
