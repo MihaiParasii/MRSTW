@@ -47,6 +47,7 @@
     "PHONE_NUMBER": "Номер телефона",
     "EMAIL": "Электронная почта",
     "PASSWORD": "Пароль",
+    "REPEATED_PASSWORD": "Повторите пароль",
     "REGISTER_BUTTON": "Зарегистрируйтесь сейчас",
     "LABEL_LOGIN": "У вас есть аккаунт?",
     "LOGIN_LINK": "Авторизоваться"

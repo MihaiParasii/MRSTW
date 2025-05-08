@@ -48,6 +48,7 @@
     "PHONE_NUMBER": "Număr de telefon",
     "EMAIL": "E-mail",
     "PASSWORD": "Parolă",
+    "REPEATED_PASSWORD": "Repetă parola",
     "REGISTER_BUTTON": "Înregistrează-te",
     "LABEL_LOGIN": "Ai cont deja?",
     "LOGIN_LINK": "Autentifică-te"

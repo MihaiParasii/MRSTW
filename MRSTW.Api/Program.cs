@@ -16,6 +16,10 @@ using MRSTW.BusinessLogicLayer.Validators;
 using MRSTW.DataAccessLayer.Data;
 using MRSTW.DataAccessLayer.Data.Repositories;
 using MRSTW.DataAccessLayer.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 namespace MRSTW.Api;
 
@@ -25,6 +29,33 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         DotNetEnv.Env.Load();
+        
+        // JWT Authentication
+        var jwtSettings = builder.Configuration.GetSection("Jwt");
+        var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+        builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+        
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings["Audience"],
+
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
         string awsSecretAccessKey = DotNetEnv.Env.GetString("AWS_SECRET_ACCESS_KEY");
         string awsAccessKeyId = DotNetEnv.Env.GetString("AWS_ACCESS_KEY_ID");
@@ -67,7 +98,33 @@ public static class Program
         builder.Services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "MRSTW API", Version = "v1" });
+            
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Enter 'Bearer' [space] and then your valid token.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIs...\""
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
         });
+
 
         builder.Services.AddCors(options =>
         {
@@ -99,9 +156,7 @@ public static class Program
 
         builder.Services.AddScoped<IApiUnitOfWork, ApiUnitOfWork>();
 
-
-//
-
+        builder.Services.AddScoped<IAuthService, AuthService>();
 
         builder.Services.AddEndpointsApiExplorer();
 
@@ -133,6 +188,9 @@ public static class Program
 
         app.UseHttpsRedirection();
 
+        app.UseAuthentication();
+        app.UseAuthorization();
+        
         app.MapControllers();
 
         await app.RunAsync();

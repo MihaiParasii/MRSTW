@@ -1,13 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using MRSTW.Api.UnitOfWork;
 using MRSTW.BusinessLogicLayer.Contracts.Subcategory;
+using Microsoft.AspNetCore.Authorization; 
 
 namespace MRSTW.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]/v1")]
+
 public class SubcategoryController(IApiUnitOfWork unitOfWork) : ControllerBase
 {
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<List<SubcategoryResponse>>> Get()
     {
@@ -15,6 +19,7 @@ public class SubcategoryController(IApiUnitOfWork unitOfWork) : ControllerBase
         return Ok(result);
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:int}")]
     public async Task<ActionResult<SubcategoryResponse>> Get(int id)
     {
