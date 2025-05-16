@@ -4,6 +4,7 @@ using MRSTW.BusinessLogicLayer.Common.Interfaces;
 using MRSTW.BusinessLogicLayer.Contracts.Category;
 using MRSTW.BusinessLogicLayer.Contracts.Deal;
 using MRSTW.BusinessLogicLayer.Contracts.Subcategory;
+using MRSTW.BusinessLogicLayer.Services;
 
 namespace MRSTW.Api.UnitOfWork;
 
@@ -17,12 +18,14 @@ public class ApiUnitOfWork(
     IValidator<UpdateSubcategoryRequest> updateSubcategoryValidator,
     IValidator<CreateDealRequest> createDealValidator,
     IValidator<UpdateDealRequest> updateDealValidator,
-    AmazonS3Service amazonS3Service)
+    AmazonS3Service amazonS3Service,
+    IAuthService userService)
     : IApiUnitOfWork
 {
     public ICategoryService CategoryService { get; } = categoryService;
     public IDealService DealService { get; } = dealService;
     public ISubcategoryService SubcategoryService { get; } = subcategoryService;
+    public IAuthService UserService { get; } = userService;
     public IValidator<CreateCategoryRequest> CreateCategoryValidator { get; } = createCategoryValidator;
     public IValidator<UpdateCategoryRequest> UpdateCategoryValidator { get; } = updateCategoryValidator;
     public IValidator<CreateSubcategoryRequest> CreateSubcategoryValidator { get; } = createSubcategoryValidator;

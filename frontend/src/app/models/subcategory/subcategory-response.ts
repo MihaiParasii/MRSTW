@@ -1,7 +1,6 @@
-export class SubcategoryResponse {
-  Id!: number;
-  UrlId!: string;
-  Name!: string;
-  CategoryId!: number;
-  CategoryName!: string;
+export interface SubcategoryResponse {
+  id: number;
+  name: string;
+  categoryId: number;
+  categoryName: string;
 }

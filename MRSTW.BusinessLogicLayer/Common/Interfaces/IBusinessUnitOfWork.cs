@@ -1,4 +1,5 @@
 using AutoMapper;
+using Domain.Models.Auth;
 using Domain.Models.Main;
 using FluentValidation;
 
@@ -9,11 +10,13 @@ public interface IBusinessUnitOfWork
     public ICategoryRepository CategoryRepository { get;}
     public ISubcategoryRepository SubcategoryRepository { get; }
     public IDealRepository DealRepository { get; }
+    public IUserRepository UserRepository { get; }
     
     public IMapper Mapper { get; }
     public IValidator<DealModel> DealValidator  { get; }
     public IValidator<CategoryModel> CategoryValidator  { get; }
     public IValidator<SubcategoryModel> SubcategoryValidator  { get; }
+    
     
     public IRabbitMqService RabbitMqService { get; }
 }

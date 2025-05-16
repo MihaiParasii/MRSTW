@@ -1,4 +1,4 @@
-export class RegionResponse {
-  public Id!:number;
-  public Name!: string;
+export interface RegionResponse {
+  id:number;
+  name: string;
 }

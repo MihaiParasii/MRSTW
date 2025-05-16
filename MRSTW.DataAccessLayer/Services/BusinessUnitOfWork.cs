@@ -1,4 +1,5 @@
 using AutoMapper;
+using Domain.Models.Auth;
 using Domain.Models.Main;
 using FluentValidation;
 using MRSTW.BusinessLogicLayer.Common.Interfaces;
@@ -13,12 +14,14 @@ public class BusinessUnitOfWork(
     IValidator<DealModel> dealValidator,
     IValidator<CategoryModel> categoryValidator,
     IValidator<SubcategoryModel> subcategoryValidator,
-    IRabbitMqService rabbitMqService)
+    IRabbitMqService rabbitMqService,
+    IUserRepository userRepository)
     : IBusinessUnitOfWork
 {
     public ICategoryRepository CategoryRepository { get; } = categoryRepository;
     public ISubcategoryRepository SubcategoryRepository { get; } = subcategoryRepository;
     public IDealRepository DealRepository { get; } = dealRepository;
+    public IUserRepository UserRepository { get; } = userRepository;
     public IMapper Mapper { get; } = mapper;
     public IValidator<DealModel> DealValidator { get; } = dealValidator;
     public IValidator<CategoryModel> CategoryValidator { get; } = categoryValidator;

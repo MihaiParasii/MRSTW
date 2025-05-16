@@ -1,47 +1,39 @@
-using MRSTW.Api.Contracts;
-using MRSTW.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using MRSTW.BusinessLogicLayer.Contracts;
+using MRSTW.BusinessLogicLayer.Services;
 
-namespace MRSTW.Api.Controllers
+namespace MRSTW.Api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+[Consumes("application/json")]
+public class AuthController(IAuthService authService) : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    [Consumes("application/json")]
-    public class AuthController : ControllerBase
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        private readonly IAuthService _authService;
-
-        public AuthController(IAuthService authService)
+        try
         {
-            _authService = authService;
+            await authService.RegisterAsync(request);
+            return Ok(new { message = "Registration successful." });
         }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        catch (Exception ex)
         {
-            try
-            {
-                await _authService.RegisterAsync(request);
-                return Ok(new { message = "Registration successful." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+            return BadRequest(new { error = ex.Message });
         }
+    }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        try
         {
-            try
-            {
-                var response = await _authService.LoginAsync(request);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return Unauthorized(new { error = ex.Message });
-            }
+            var response = await authService.LoginAsync(request);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return Unauthorized(new { error = ex.Message });
         }
     }
 }

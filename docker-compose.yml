@@ -10,9 +10,7 @@
       - backend
     networks:
       - mynetwork
-    volumes:
-      - ./frontend:/app
-  
+
   backend:
     build:
       context: .
@@ -41,8 +39,6 @@
       POSTGRES_PORT: 5432
     ports:
       - "5432:5432"
-    volumes:
-      - ./.containers/mrstw:/var/lib/postgresql/data
     networks:
       - mynetwork
 

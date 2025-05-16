@@ -1,4 +1,4 @@
-export class CreateSubcategoryRequest {
-  Name!: string;
-  CategoryId!: number;
+export interface CreateSubcategoryRequest {
+  name: string;
+  categoryId: number;
 }

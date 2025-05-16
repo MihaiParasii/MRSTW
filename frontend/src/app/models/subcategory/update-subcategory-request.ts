@@ -1,5 +1,5 @@
-export class UpdateSubcategoryRequest {
-  Id!: number;
-  Name!: string;
-  CategoryId!: number;
+export interface UpdateSubcategoryRequest {
+	id: number;
+	name: string;
+	categoryId: number;
 }

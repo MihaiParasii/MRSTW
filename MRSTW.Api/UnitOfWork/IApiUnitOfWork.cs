@@ -4,6 +4,7 @@ using MRSTW.BusinessLogicLayer.Common.Interfaces;
 using MRSTW.BusinessLogicLayer.Contracts.Category;
 using MRSTW.BusinessLogicLayer.Contracts.Deal;
 using MRSTW.BusinessLogicLayer.Contracts.Subcategory;
+using MRSTW.BusinessLogicLayer.Services;
 
 namespace MRSTW.Api.UnitOfWork;
 
@@ -12,6 +13,7 @@ public interface IApiUnitOfWork
     public ICategoryService CategoryService { get; }
     public IDealService DealService { get; }
     public ISubcategoryService SubcategoryService { get; }
+    public IAuthService UserService { get; }
 
     public IValidator<CreateCategoryRequest> CreateCategoryValidator { get; }
     public IValidator<UpdateCategoryRequest> UpdateCategoryValidator { get; }

@@ -17,14 +17,14 @@ export class RegionService {
 
 
   private regions: Array<RegionResponse> = [
-    {Id: 1, Name: "Chișinău"},
-    {Id: 2, Name: "Bălți"},
-    {Id: 3, Name: "Orhei"},
-    {Id: 4, Name: "Cahul"},
-    {Id: 5, Name: "Soroca"},
-    {Id: 6, Name: "Strășeni"},
-    {Id: 7, Name: "Drochia"},
-    {Id: 8, Name: "Florești"},
+    {id: 1, name: "Chișinău"},
+    {id: 2, name: "Bălți"},
+    {id: 3, name: "Orhei"},
+    {id: 4, name: "Cahul"},
+    {id: 5, name: "Soroca"},
+    {id: 6, name: "Strășeni"},
+    {id: 7, name: "Drochia"},
+    {id: 8, name: "Florești"},
   ]
 
   get(): Observable<Array<RegionResponse>> {

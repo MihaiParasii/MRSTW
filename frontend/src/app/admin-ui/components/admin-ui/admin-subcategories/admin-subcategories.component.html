@@ -11,9 +11,9 @@
         </tr>
         </thead>
         <tbody>
-          @for (group of groupedSubcategories; track group) {
+          @for (subcategory of subcategories; track subcategory) {
             <tr class="table-primary">
-              <td class="fw-bold">{{ group.category.CategoryName }}</td>
+              <td class="fw-bold">{{ subcategory.name }}</td>
               <td>
                 <button class="btn btn-danger btn-sm px-3">
                   <i class="fas fa-trash-alt"></i> Delete Category
@@ -21,9 +21,9 @@
               </td>
             </tr>
 
-            @for (subcategory of group.subcategories; track subcategory) {
+            @for (subcategory of subcategories; track subcategory) {
               <tr>
-                <td class="ps-4 text-muted">↳ {{ subcategory.Name }}</td>
+                <td class="ps-4 text-muted">↳ {{ subcategory.name }}</td>
                 <td>
                   <button class="btn btn-outline-danger btn-sm px-3">
                     <i class="fas fa-trash-alt"></i> Delete

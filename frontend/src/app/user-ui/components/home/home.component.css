@@ -13,6 +13,7 @@
   background-color: #e9e9e9; /* Un fundal pentru content */
 }
 
+
 h2 {
   color: #333;
 }
@@ -49,7 +50,7 @@ app-deal-card {
 }
 
 app-deal-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(28, 27, 27, 0.1);
   transform: translateY(-5px); /* Slight lift on hover */
 }
 

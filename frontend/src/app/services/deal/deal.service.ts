@@ -17,15 +17,15 @@ export class DealService {
 
 
   private deals: Array<DealResponse> = [
-    {Id: 1, Name: "Deal 1", Description: "Description 1"},
-    {Id: 2, Name: "Deal 2", Description: "Description 2"},
-    {Id: 3, Name: "Deal 3", Description: "Description 3"},
-    {Id: 4, Name: "Deal 4", Description: "Description 4"},
-    {Id: 5, Name: "Deal 5", Description: "Description 5"},
-    {Id: 6, Name: "Deal 6", Description: "Description 6"},
-    {Id: 7, Name: "Deal 7", Description: "Description 7"},
-    {Id: 8, Name: "Deal 8", Description: "Description 8"},
-    {Id: 9, Name: "Deal 9", Description: "Description 9"},
+    // {Id: 1, Name: "Deal 1", Description: "Description 1"},
+    // {Id: 2, Name: "Deal 2", Description: "Description 2"},
+    // {Id: 3, Name: "Deal 3", Description: "Description 3"},
+    // {Id: 4, Name: "Deal 4", Description: "Description 4"},
+    // {Id: 5, Name: "Deal 5", Description: "Description 5"},
+    // {Id: 6, Name: "Deal 6", Description: "Description 6"},
+    // {Id: 7, Name: "Deal 7", Description: "Description 7"},
+    // {Id: 8, Name: "Deal 8", Description: "Description 8"},
+    // {Id: 9, Name: "Deal 9", Description: "Description 9"},
   ]
 
   get(): Observable<Array<DealResponse>> {

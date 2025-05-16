@@ -1,4 +1,4 @@
-export class UpdateCategoryRequest {
-  Id!: number;
-  Name!: string;
+export interface UpdateCategoryRequest {
+  id: number;
+  name: string;
 }

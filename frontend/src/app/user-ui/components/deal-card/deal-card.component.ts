@@ -12,5 +12,5 @@ import {RouterLink} from '@angular/router';
   styleUrl: './deal-card.component.css'
 })
 export class DealCardComponent {
-  @Input() public deal = new DealResponse();
+  @Input() public deal!: DealResponse;
 }

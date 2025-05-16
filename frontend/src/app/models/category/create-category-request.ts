@@ -1,3 +1,3 @@
-export class CreateCategoryRequest {
-  Name!: string;
+export interface CreateCategoryRequest {
+  name: string;
 }

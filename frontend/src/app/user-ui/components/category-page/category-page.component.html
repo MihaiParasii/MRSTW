@@ -1,5 +1,5 @@
 <div class="category-container">
-  @for (subcategory of subcategories; track subcategory.Id) {
-    <a routerLink="/{{categoryUrlId}}/{{ subcategory.UrlId }}">{{ subcategory.Name }}</a><br><br>
+  @for (subcategory of subcategories; track subcategory.id) {
+    <a routerLink="/{{categoryUrlId}}/{{ subcategory.id }}">{{ subcategory.name }}</a><br><br>
   }
 </div>
