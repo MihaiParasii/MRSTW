@@ -5,6 +5,8 @@ import {Observable, Subscriber} from 'rxjs';
 import {CreateCategoryRequest} from '../../models/category/create-category-request';
 import {UpdateCategoryRequest} from '../../models/category/update-category-request';
 import {DealResponse} from '../../models/deal/deal-response';
+import { CreateDealRequest } from '../../models/deal/create-deal-request'
+import { UpdateDealRequest } from '../../models/deal/update-deal-request'
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +15,22 @@ export class DealService {
   http = inject(HttpClient);
 
   baseApiUrl = "https://darom.md/"
-  testApiUrl = "http://localhost:5079/api/v1"
+  testApiUrl = "http://localhost:5076/api/Deals/v1"
 
 
   private deals: Array<DealResponse> = [
-    // {Id: 1, Name: "Deal 1", Description: "Description 1"},
+    {id: 1, name: "Deal 1", description: "Description 1"},
+    {id: 1, name: "Deal 2", description: "Description 1"},
+    {id: 1, name: "Deal 3", description: "Description 1"},
+    {id: 1, name: "Deal 4", description: "Description 1"},
+    {id: 1, name: "Deal 1", description: "Description 1"},
+    {id: 1, name: "Deal 1", description: "Description 1"},
+    {id: 1, name: "Deal 1", description: "Description 1"},
+    {id: 1, name: "Deal 1", description: "Description 1"},
+    {id: 1, name: "Deal 1", description: "Description 1"},
+    {id: 1, name: "Deal 1", description: "Description 1"},
+    {id: 1, name: "Deal 1", description: "Description 1"},
+    {id: 1, name: "Deal 1", description: "Description 1"},
     // {Id: 2, Name: "Deal 2", Description: "Description 2"},
     // {Id: 3, Name: "Deal 3", Description: "Description 3"},
     // {Id: 4, Name: "Deal 4", Description: "Description 4"},
@@ -34,7 +47,7 @@ export class DealService {
       observer.complete();
     });
     // return Observable<this.categories>;
-    // return this.http.get<Doctor[]>(`${this.testApiUrl}/doctors`)
+    // return this.http.get<Doctor[]>(`${this.testApiUrl}/deals`)
   }
 
   getTop9() : Observable<Array<DealResponse>> {
@@ -45,7 +58,7 @@ export class DealService {
   }
 
   getById(id: number): Observable<DealResponse> {
-    // return this.http.get<Doctor>(`${this.testApiUrl}/doctors/${id}`)
+    // return this.http.get<Doctor>(`${this.testApiUrl}/deals/${id}`)
 
     return Observable.create((observer: Subscriber<any>) => {
       observer.next(this.deals[id - 1]);
@@ -53,23 +66,22 @@ export class DealService {
     });
   }
 
-  create(request: CreateCategoryRequest) {
-    // return this.http.post(`${this.testApiUrl}/doctor`, {
-    //   "Name": request.Name,
-    //   "Surname": request.Surname,
-    //   "PhotoPath": request.PhotoPath,
-    //   "SpecialityId": request.SpecialityId
-    // });
+  create(request: CreateDealRequest) : Observable<any> {
+    return this.http.post(`${this.testApiUrl}`, {
+      "Title": request.title,
+      "Description": request.description,
+      "SubcategoryId": request.subcategoryId,
+      "CategoryId": request.categoryId,
+    });
   }
 
-  update(request: UpdateCategoryRequest) {
-    // return this.http.put(`${this.testApiUrl}/doctors`, {
-    //   "Id": request.Id,
-    //   "Name": request.Name,
-    //   "Surname": request.Surname,
-    //   "PhotoPath": request.PhotoPath,
-    //   "SpecialityId": request.SpecialityId,
-    // });
+  update(request: UpdateDealRequest) {
+    return this.http.put(`${this.testApiUrl}`, {
+      "Title": request.title,
+      "Description": request.description,
+      "SubcategoryId": request.subcategoryId,
+      "CategoryId": request.categoryId,
+    });
   }
 
   delete(id: number) {

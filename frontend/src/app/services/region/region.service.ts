@@ -13,7 +13,7 @@ export class RegionService {
   http = inject(HttpClient);
 
   baseApiUrl = "https://darom.md/"
-  testApiUrl = "http://localhost:5079/api/v1"
+  testApiUrl = "http://localhost:5076/api/v1"
 
 
   private regions: Array<RegionResponse> = [

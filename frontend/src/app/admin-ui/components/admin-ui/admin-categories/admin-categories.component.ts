@@ -17,9 +17,7 @@ export class AdminCategoriesComponent implements OnInit {
 	protected categories: CategoryResponse[] = []
 	
 	ngOnInit(): void {
-      console.log("on init");
       this.categoryService.get().subscribe(category => {
-        console.log('categories: ', category)
         this.categories = category
       })
 	}

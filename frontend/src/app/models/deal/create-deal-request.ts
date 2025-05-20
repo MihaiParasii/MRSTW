@@ -1,7 +1,7 @@
 export interface CreateDealRequest {
-	title: string;
-	description: string;
-	categoryId: number;
-	subcategoryId: number;
-	regionId: number;
+	title: string
+	description: string
+	categoryId: number | null
+	subcategoryId: number | null
+	regionId: number | null
 }

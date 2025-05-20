@@ -11,7 +11,7 @@ import { UpdateSubcategoryRequest } from '../../models/subcategory/update-subcat
 export class SubcategoryService {
 	http = inject(HttpClient)
 	
-	url = 'http://localhost:8080/api/Subcategory/v1'
+	url = 'http://localhost:5076/api/Subcategory/v1'
 	
 	
 	get(): Observable<SubcategoryResponse[]> {

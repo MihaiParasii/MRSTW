@@ -12,7 +12,8 @@ import {SidebarCategoriesComponent} from '../sidebar-categories/sidebar-categori
     NavbarComponent,
     FooterComponent,
     SidebarCategoriesComponent,
-    ActionBarComponent
+    ActionBarComponent,
+    NavbarComponent
   ],
   templateUrl: './layout.component.html',
   standalone: true,

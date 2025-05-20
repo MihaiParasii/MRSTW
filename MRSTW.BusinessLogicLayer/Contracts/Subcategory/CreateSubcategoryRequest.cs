@@ -1,3 +1,7 @@
 namespace MRSTW.BusinessLogicLayer.Contracts.Subcategory;
 
-public record CreateSubcategoryRequest(string Name, int CategoryId);
+public class CreateSubcategoryRequest
+{
+    public string Name { get; init; }
+    public int CategoryId { get; init; }
+}

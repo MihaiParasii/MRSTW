@@ -1,0 +1,41 @@
+.deal-card {
+    background-color: #ffffff;
+    border: 2px solid #dddddd;
+    border-left: 6px solid #4f46e5; /* Indigo accent */
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.deal-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+.deal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.deal-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin: 0;
+    color: #333333;
+}
+
+.deal-id {
+    font-size: 0.9rem;
+    color: #888888;
+}
+
+.deal-description {
+    font-size: 1rem;
+    color: #555555;
+    line-height: 1.5;
+}

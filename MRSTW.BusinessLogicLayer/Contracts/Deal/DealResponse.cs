@@ -1,9 +1,12 @@
 namespace MRSTW.BusinessLogicLayer.Contracts.Deal;
 
-public record DealResponse(
-    int Id,
-    string[] PhotoPaths,
-    string Title,
-    string Description,
-    DateOnly CreationDate,
-    string Subcategory);
+public class DealResponse
+{
+    public int Id { get; init; }
+    public string[] PhotoPaths { get; init; }
+    public string Title { get; init; }
+    public string Description { get; init; }
+    public DateOnly CreationDate { get; init; }
+    public string Subcategory { get; init; }
+}
+

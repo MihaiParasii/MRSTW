@@ -61,20 +61,20 @@ public static class Program
         string awsAccessKeyId = DotNetEnv.Env.GetString("AWS_ACCESS_KEY_ID");
         RegionEndpoint region = RegionEndpoint.USEast1;
 
-        string? connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ??
+        string? connectionString = 
                                    builder.Configuration.GetConnectionString("DefaultConnection");
 
         builder.Services.AddDbContext<AppDbContext>(options => { options.UseNpgsql(connectionString); });
+       
+        builder.Services.AddAutoMapper(typeof(CategoryMappingProfile));
+        builder.Services.AddAutoMapper(typeof(SubcategoryMappingProfile));
+        builder.Services.AddAutoMapper(typeof(DealMappingProfile));
 
 
         builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
         builder.Services.AddScoped<IDealRepository, DealRepository>();
         builder.Services.AddScoped<ISubcategoryRepository, SubcategoryRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-
-        builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
-
 
         builder.Services.AddScoped<IRabbitMqService, RabbitMqService>();
 
@@ -92,8 +92,8 @@ public static class Program
 
         builder.Services.AddControllers();
 
-        builder.Services.AddAutoMapper(typeof(CategoryMappingProfile), typeof(SubcategoryMappingProfile),
-            typeof(DealMappingProfile));
+        // builder.Services.AddAutoMapper(typeof(CategoryMappingProfile), typeof(SubcategoryMappingProfile),
+        //     typeof(DealMappingProfile));
 
         builder.Services.AddSwaggerGen(c =>
         {

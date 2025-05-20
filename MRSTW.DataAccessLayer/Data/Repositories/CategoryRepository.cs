@@ -18,4 +18,9 @@ public class CategoryRepository(AppDbContext context) : GenericRepository<Catego
     {
         return await DbSet.Include(x => x.Subcategories).AsNoTracking().ToListAsync();
     }
+
+    override public async Task<CategoryModel> GetByIdAsync(int id)
+    {
+        return await DbSet.Include(x => x.Subcategories).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+    }
 }

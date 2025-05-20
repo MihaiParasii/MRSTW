@@ -12,7 +12,7 @@ export class CategoryService {
 	http = inject(HttpClient)
 	
 	// baseApiUrl = "https://darom.md/"
-	url = 'http://localhost:8080/api/Category/v1'
+	url = 'http://localhost:5076/api/Category/v1'
 	
 	
 	get(): Observable<CategoryResponse[]> {

@@ -1,20 +1,24 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MRSTW.Api.UnitOfWork;
 using MRSTW.BusinessLogicLayer.Contracts.Category;
-using Microsoft.AspNetCore.Authorization; 
+using Microsoft.AspNetCore.Authorization;
 
 namespace MRSTW.Api.Controllers;
 
 [Authorize]
 [ApiController]
 [Route("api/[controller]/v1")]
-public class CategoryController(IApiUnitOfWork unitOfWork) : ControllerBase
+public class CategoryController(IApiUnitOfWork unitOfWork, IMapper mapper) : ControllerBase
 {
     [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<List<CategoryResponse>>> Get()
     {
         var result = await unitOfWork.CategoryService.GetAllAsync();
+        Console.WriteLine("\n\n\n----------------------------------------------");
+        Console.WriteLine($"result, {result} ");
+        Console.WriteLine("\n\n\n----------------------------------------------");
         return Ok(result);
     }
     

@@ -2,25 +2,30 @@
   <h2 class="create-deal-title">Creare Anunț</h2>
 
   <form (submit)="onSubmit()">
-    <div class="form-group">
-      <label for="category">Categorie</label>
-      <select id="category" class="form-control" [(ngModel)]="createDealRequest.categoryId"
-              (change)="onCategoryChange()"
-              [ngModelOptions]="{standalone: true}">
-        <option disabled selected>Select category:</option>
-        <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
-      </select>
-    </div>
-
-    <div class="form-group" *ngIf="createDealRequest.categoryId">
-      <label for="subcategory">Subcategorie</label>
-      <select id="subcategory" class="form-control" [(ngModel)]="createDealRequest.subcategoryId"
-              [ngModelOptions]="{standalone: true}">
-        <option disabled selected>Select subcategory:</option>
-        <option *ngFor="let subcategory of subcategories" [value]="subcategory.id">{{ subcategory.name }}</option>
-      </select>
-    </div>
-
+	  <div class="form-group">
+		  <label for="category">Categorie</label>
+		  <select id="category" class="form-control"
+				  [(ngModel)]="createDealRequest.categoryId"
+				  (change)="onCategoryChange()"
+				  [ngModelOptions]="{standalone: true}">
+			  <option [ngValue]="null" disabled>Select category:</option>
+			  <option *ngFor="let category of categories" [ngValue]="category.id">
+				  {{ category.name }}
+			  </option>
+		  </select>
+	  </div>
+	  
+	  <div class="form-group">
+		  <label for="subcategory">Subcategorie</label>
+		  <select id="subcategory" class="form-control"
+				  [(ngModel)]="createDealRequest.subcategoryId"
+				  [ngModelOptions]="{standalone: true}">
+			  <option [ngValue]="null" disabled>Select subcategory:</option>
+			  <option *ngFor="let subcategory of subcategories" [ngValue]="subcategory.id">
+				  {{ subcategory.name }}
+			  </option>
+		  </select>
+	  </div>
     <div class="form-group">
       <label for="title">Titlu</label>
       <input id="title" type="text" class="form-control" [(ngModel)]="createDealRequest.title"

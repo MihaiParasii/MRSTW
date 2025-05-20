@@ -1,5 +1,5 @@
 export interface CategoryResponse {
-  id: number;
-  name: string;
-  subcategoryIds: number[];
+	id: number
+	name: string
+	subcategoryIds: number[]
 }

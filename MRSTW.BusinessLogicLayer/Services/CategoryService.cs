@@ -1,10 +1,11 @@
+using AutoMapper;
 using Domain.Models.Main;
 using MRSTW.BusinessLogicLayer.Common.Interfaces;
 using MRSTW.BusinessLogicLayer.Contracts.Category;
 
 namespace MRSTW.BusinessLogicLayer.Services;
 
-public class CategoryService(IBusinessUnitOfWork unitOfWork) : ICategoryService
+public class CategoryService(IBusinessUnitOfWork unitOfWork, IMapper mapper) : ICategoryService
 {
     public async Task CreateAsync(CreateCategoryRequest request)
     {
@@ -67,8 +68,13 @@ public class CategoryService(IBusinessUnitOfWork unitOfWork) : ICategoryService
     {
         var categories = await unitOfWork.CategoryRepository.GetAllAsync();
 
-        var result = unitOfWork.Mapper.Map<List<CategoryResponse>>(categories);
+        List<CategoryResponse> result = [];
 
+        foreach (var category in categories)
+        {
+            result.Add(unitOfWork.Mapper.Map<CategoryResponse>(category));
+        }
+        
         return result;
     }
 }

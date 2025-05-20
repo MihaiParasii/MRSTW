@@ -42,15 +42,15 @@ export const routes: Routes = [
       {path: '', component: AdminPageComponent},
 
       {path: 'categories', component: AdminCategoriesComponent},
-      {path: 'add-category', component: AdminAddCategoryComponent},
-      {path: 'update-category', component: AdminUpdateCategoryComponent},
+      {path: 'addCategory', component: AdminAddCategoryComponent},
+      {path: 'updateCategory', component: AdminUpdateCategoryComponent},
 
       {path: 'subcategories', component: AdminSubcategoriesComponent},
-      {path: 'add-subcategory', component: AdminAddSubcategoryComponent},
-      {path: 'update-subcategory', component: AdminUpdateSubcategoryComponent},
+      {path: 'addSubcategory', component: AdminAddSubcategoryComponent},
+      {path: 'updateSubcategory', component: AdminUpdateSubcategoryComponent},
 
       {path: 'users', component: AdminSubcategoriesComponent},
-      {path: 'add-user', component: AdminAddSubcategoryComponent},
+      {path: 'addUser', component: AdminAddSubcategoryComponent},
     ]
   },
 
@@ -60,10 +60,11 @@ export const routes: Routes = [
       {path: 'add', component: AddProductPageComponent},
       {path: 'search/:query', component: SearchPageComponent},
 
-      {path: 'categories/:category-id', component: CategoryPageComponent},
-      {path: ':category-id/:subcategory-id', component: DealsPageComponent},
+      {path: 'categories/:categoryId', component: CategoryPageComponent},
+      {path: ':categoryId/:subcategoryId', component: DealsPageComponent},
 
-      {path: ':id', component: DealDetailPageComponent},
+      {path: 'deals/:id', component: DealDetailPageComponent},
+      {path: 'deals/:categoryId/:subcategoryId', component: DealsPageComponent},
     ]
   },
 ];

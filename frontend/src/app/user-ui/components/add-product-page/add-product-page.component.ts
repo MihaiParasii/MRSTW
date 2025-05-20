@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, OnInit } from '@angular/core'
 import { SubcategoryResponse } from '../../../models/subcategory/subcategory-response'
 import { CategoryResponse } from '../../../models/category/category-response'
 import { CategoryService } from '../../../services/category/category.service'
@@ -8,6 +8,8 @@ import { CreateDealRequest } from '../../../models/deal/create-deal-request'
 import { NgForOf, NgIf } from '@angular/common'
 import { RegionService } from '../../../services/region/region.service'
 import { RegionResponse } from '../../../models/region/region-response'
+import { forkJoin, tap } from 'rxjs'
+import { DealService } from '../../../services/deal/deal.service'
 
 @Component({
 	selector: 'app-add-product-page',
@@ -20,9 +22,10 @@ import { RegionResponse } from '../../../models/region/region-response'
 	standalone: true,
 	styleUrl: './add-product-page.component.css'
 })
-export class AddProductPageComponent {
+export class AddProductPageComponent implements OnInit {
 	private categoryService: CategoryService = inject(CategoryService)
 	private subcategoryService: SubcategoryService = inject(SubcategoryService)
+	private dealService: DealService = inject(DealService)
 	private regionService: RegionService = inject(RegionService)
 	protected categories: CategoryResponse[] = []
 	protected subcategories: SubcategoryResponse[] = []
@@ -31,21 +34,42 @@ export class AddProductPageComponent {
 	protected photos: File[] = []
 	protected photoPreviews: string[] = []
 	
+	protected allSubcategories: SubcategoryResponse[] = []
 	
-	constructor() {
-		this.regionService.get().subscribe(value => {
-			this.regions = value
-		})
+	ngOnInit(): void {
+		this.createDealRequest = {
+			title: '',
+			description: '',
+			categoryId: null,
+			subcategoryId: null,
+			regionId: null
+		}
 		
-		this.categoryService.get().subscribe(value => {
-			this.categories = value
+		forkJoin({
+			categories: this.categoryService.get(),
+			subcategories: this.subcategoryService.get(),
+			regions: this.regionService.get()
+		}).subscribe(({ categories, subcategories, regions }) => {
+			this.categories = categories
+			this.allSubcategories = subcategories
+			this.regions = regions
 		})
-		
-		this.subcategoryService.get().subscribe(value => {
-			this.subcategories = value
-		})
-		
 	}
+	
+	onCategoryChange(): void {
+		const selectedCategory = this.categories.find(cat => cat.id === this.createDealRequest.categoryId)
+		if (selectedCategory) {
+			this.subcategories = this.allSubcategories.filter(
+					sub => selectedCategory.subcategoryIds.includes(sub.id)
+			)
+			if (!this.subcategories.some(s => s.id === this.createDealRequest.subcategoryId)) {
+				this.createDealRequest.subcategoryId = null
+			}
+		} else {
+			this.subcategories = []
+		}
+	}
+
 	
 	onFileSelect(event: any): void {
 		const selectedFiles: File[] = Array.from(event.target.files)
@@ -57,18 +81,9 @@ export class AddProductPageComponent {
 		this.photoPreviews = []
 		for (let photo of this.photos) {
 			const reader = new FileReader()
-			reader.onload = (e: any) => {
-				this.photoPreviews.push(e.target.result)
-			}
+			reader.onload = (e: any) => this.photoPreviews.push(e.target.result)
 			reader.readAsDataURL(photo)
 		}
-	}
-	
-	
-	onCategoryChange() {
-		this.subcategoryService.get().subscribe(value => {
-			this.subcategories = value
-		})
 	}
 	
 	onSubmit() {
@@ -77,9 +92,7 @@ export class AddProductPageComponent {
 		console.log('Create Deal Request: CategoryId', this.createDealRequest.categoryId)
 		console.log('Create Deal Request: SubcategoryId', this.createDealRequest.subcategoryId)
 		console.log('Create Deal Request: RegionId', this.createDealRequest.regionId)
-		//
-		this.photos.forEach(photo => {
-			console.log(`Create Deal Request: Photo ${photo.name}`)
-		})
+		
+		this.dealService.create(this.createDealRequest).subscribe()
 	}
 }

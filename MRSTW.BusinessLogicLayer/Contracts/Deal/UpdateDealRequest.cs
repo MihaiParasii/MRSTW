@@ -1,8 +1,10 @@
 namespace MRSTW.BusinessLogicLayer.Contracts.Deal;
 
-public record UpdateDealRequest(
-    int Id,
-    string Title,
-    string Description,
-    int SubcategoryId,
-    string[] PhotoPaths);
+public class UpdateDealRequest
+{
+    public int Id { get; init; }
+    public string Title { get; init; }
+    public string Description { get; init; }
+    public int SubcategoryId { get; init; }
+    public string[] PhotoPaths { get; init; }
+}

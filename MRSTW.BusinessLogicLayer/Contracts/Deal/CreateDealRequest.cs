@@ -1,6 +1,8 @@
 namespace MRSTW.BusinessLogicLayer.Contracts.Deal;
 
-public record CreateDealRequest(
-    string Title,
-    string Description,
-    int SubcategoryId);
+public class CreateDealRequest
+{
+    public string Title { get; init; }
+    public string Description { get; init; }
+    public int SubcategoryId { get; init; }
+}

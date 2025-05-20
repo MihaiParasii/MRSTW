@@ -17,9 +17,6 @@ export class SidebarCategoriesComponent implements OnInit {
 	protected categories: CategoryResponse[] = []
 	
 	ngOnInit(): void {
-		this.categoryService.get().subscribe(category => {
-			console.log('categories: ', category)
-			this.categories = category
-		})
+		this.categoryService.get().subscribe(category => this.categories = category)
 	}
 }
