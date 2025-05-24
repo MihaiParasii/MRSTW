@@ -1,0 +1,1169 @@
+Index: MRSTW.Api/Controllers/DealController.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>using Microsoft.AspNetCore.Mvc;\nusing MRSTW.Api.Contracts;\nusing MRSTW.Api.UnitOfWork;\nusing MRSTW.BusinessLogicLayer.Contracts.Deal;\nusing Microsoft.AspNetCore.Authorization;\n\nnamespace MRSTW.Api.Controllers;\n\n[Authorize]\n[ApiController]\n[Route(\"api/[controller]/v1\")]\n\n[AllowAnonymous]\npublic class DealController(IApiUnitOfWork unitOfWork) : ControllerBase\n{\n    [HttpGet(\"{pageSize:int},{pageCount:int}\")]\n    public async Task<ActionResult<List<DealResponse>>> Get(int pageSize, int pageCount)\n    {\n        if (pageCount <= 0)\n        {\n            return BadRequest(\"Page count must be a positive integer.\");\n        }\n\n        if (pageSize <= 0)\n        {\n            return BadRequest(\"Page size must be a positive integer.\");\n        }\n\n        var result = await unitOfWork.DealService.GetPaginatedListAsync(pageSize, pageCount);\n        return Ok(result);\n    }\n\n    [HttpGet(\"{id:int}\")]\n    \n    [AllowAnonymous]\n    public async Task<ActionResult<DealResponse>> Get(int id)\n    {\n        if (id < 0)\n        {\n            return BadRequest(\"The id can't be negative\");\n        }\n\n        try\n        {\n            var result = await unitOfWork.DealService.GetByIdAsync(id);\n            return Ok(result);\n        }\n        catch (ArgumentException e)\n        {\n            return NotFound(e.Message);\n        }\n    }\n\n    [HttpPost]\n    public async Task<ActionResult> Post([FromForm] CreateDealRequest request, [FromForm] List<IFormFile> files)\n    {\n        var validationResult = await unitOfWork.CreateDealValidator.ValidateAsync(request);\n\n        if (!validationResult.IsValid)\n        {\n            return BadRequest(validationResult.Errors[0].ToString());\n        }\n\n        try\n        {\n            // TODO Get UserId\n            var userId = Guid.Empty;\n            var response = await unitOfWork.AmazonS3Service.UploadFilesAsync(new UploadFilesRequest(files, userId));\n            await unitOfWork.DealService.CreateAsync(request, response.UploadedFilePaths);\n            return Created();\n        }\n        catch (ArgumentException e)\n        {\n            return BadRequest(e.Message);\n        }\n    }\n\n    [HttpPut]\n    public async Task<ActionResult> Put([FromForm] UpdateDealRequest request, [FromForm] List<IFormFile> files)\n    {\n        var validationResult = await unitOfWork.UpdateDealValidator.ValidateAsync(request);\n\n        if (!validationResult.IsValid)\n        {\n            return BadRequest(validationResult.ToDictionary());\n        }\n\n        try\n        {\n            var deal = await unitOfWork.DealService.GetByIdAsync(request.Id);\n            await unitOfWork.AmazonS3Service.DeleteFilesAsync(deal.PhotoPaths.ToList());\n\n            // TODO Get UserId\n            var userId = Guid.Empty;\n            var response = await unitOfWork.AmazonS3Service.UploadFilesAsync(new UploadFilesRequest(files, userId));\n            await unitOfWork.DealService.UpdateAsync(request, response.UploadedFilePaths);\n            return NoContent();\n        }\n        catch (ArgumentException e)\n        {\n            return BadRequest(e.Message);\n        }\n    }\n\n    [HttpDelete(\"{id:int}\")]\n    public async Task<ActionResult> Delete(int id)\n    {\n        if (id < 0)\n        {\n            return BadRequest(\"The id can't be negative\");\n        }\n\n        try\n        {\n            var deal = await unitOfWork.DealService.GetByIdAsync(id);\n            await unitOfWork.AmazonS3Service.DeleteFilesAsync(deal.PhotoPaths.ToList());\n            await unitOfWork.DealService.DeleteAsync(id);\n            return NoContent();\n        }\n        catch (ArgumentException e)\n        {\n            return NotFound(e.Message);\n        }\n    }\n\n    [HttpPost(\"upload-files\")]\n    public async Task<ActionResult<UploadFilesResponse>> UploadFiles([FromForm] List<IFormFile> files)\n    {\n        return await unitOfWork.AmazonS3Service.UploadFilesAsync(new UploadFilesRequest(files, new Guid()));\n    }\n\n    [HttpPost(\"delete-files\")]\n    public async Task<ActionResult> DeleteFiles([FromBody] List<string> filePaths)\n    {\n        await unitOfWork.AmazonS3Service.DeleteFilesAsync(filePaths);\n        return NoContent();\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/MRSTW.Api/Controllers/DealController.cs b/MRSTW.Api/Controllers/DealController.cs
+--- a/MRSTW.Api/Controllers/DealController.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ b/MRSTW.Api/Controllers/DealController.cs	(date 1746009278151)
+@@ -10,9 +10,9 @@
+ [ApiController]
+ [Route("api/[controller]/v1")]
+ 
+-[AllowAnonymous]
+ public class DealController(IApiUnitOfWork unitOfWork) : ControllerBase
+ {
++    [AllowAnonymous]
+     [HttpGet("{pageSize:int},{pageCount:int}")]
+     public async Task<ActionResult<List<DealResponse>>> Get(int pageSize, int pageCount)
+     {
+Index: frontend/src/app/login-ui/register/register.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><h2 class=\"auth-title\">{{ \"REGISTER.MAIN\" | translate }}</h2>\n<form>\n  <input type=\"text\" placeholder=\"{{ 'REGISTER.NAME' | translate }}\" class=\"auth-input\" required>\n  <input type=\"text\" placeholder=\"{{ 'REGISTER.SURNAME' | translate }}\" class=\"auth-input\" required>\n  <input type=\"tel\" placeholder=\"{{ 'REGISTER.PHONE_NUMBER' | translate }}\" class=\"auth-input\" required>\n  <input type=\"text\" placeholder=\"{{ 'REGISTER.EMAIL' | translate }}\" class=\"auth-input\" required>\n  <input type=\"password\" placeholder=\"{{ 'REGISTER.PASSWORD' | translate }}\" class=\"auth-input\" required>\n  <input type=\"password\" placeholder=\"{{ 'REGISTER.REPEATED_PASSWORD' | translate }}\" class=\"auth-input\" required>\n  <button class=\"auth-button\">{{ \"REGISTER.REGISTER_BUTTON\" | translate }}</button>\n</form>\n<p class=\"auth-footer\">{{ \"REGISTER.LABEL_LOGIN\" | translate }} <a routerLink=\"/auth/login\">{{ 'REGISTER.LOGIN_LINK' | translate }}</a></p>\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/app/login-ui/register/register.component.html b/frontend/src/app/login-ui/register/register.component.html
+--- a/frontend/src/app/login-ui/register/register.component.html	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ b/frontend/src/app/login-ui/register/register.component.html	(date 1746704679678)
+@@ -1,11 +1,23 @@
+ <h2 class="auth-title">{{ "REGISTER.MAIN" | translate }}</h2>
+-<form>
+-  <input type="text" placeholder="{{ 'REGISTER.NAME' | translate }}" class="auth-input" required>
+-  <input type="text" placeholder="{{ 'REGISTER.SURNAME' | translate }}" class="auth-input" required>
+-  <input type="tel" placeholder="{{ 'REGISTER.PHONE_NUMBER' | translate }}" class="auth-input" required>
+-  <input type="text" placeholder="{{ 'REGISTER.EMAIL' | translate }}" class="auth-input" required>
+-  <input type="password" placeholder="{{ 'REGISTER.PASSWORD' | translate }}" class="auth-input" required>
+-  <input type="password" placeholder="{{ 'REGISTER.REPEATED_PASSWORD' | translate }}" class="auth-input" required>
+-  <button class="auth-button">{{ "REGISTER.REGISTER_BUTTON" | translate }}</button>
++
++<form (ngSubmit)="register()" #registerForm="ngForm" novalidate>
++
++  <input type="text" name="name" [(ngModel)]="formData.name" placeholder="{{ 'REGISTER.NAME' | translate }}" class="auth-input" required>
++
++  <input type="text" name="surname" [(ngModel)]="formData.surname" placeholder="{{ 'REGISTER.SURNAME' | translate }}" class="auth-input" required>
++
++  <input type="tel" name="phoneNumber" [(ngModel)]="formData.phoneNumber" placeholder="{{ 'REGISTER.PHONE_NUMBER' | translate }}" class="auth-input" required>
++
++  <input type="text" name="email" [(ngModel)]="formData.email" placeholder="{{ 'REGISTER.EMAIL' | translate }}" class="auth-input" required>
++
++  <input type="password" name="password" [(ngModel)]="formData.password" placeholder="{{ 'REGISTER.PASSWORD' | translate }}" class="auth-input" required>
++
++  <input type="password" name="repeatedPassword" [(ngModel)]="formData.repeatedPassword" placeholder="{{ 'REGISTER.REPEATED_PASSWORD' | translate }}" class="auth-input" required>
++
++  <button type="submit" class="auth-button">{{ "REGISTER.REGISTER_BUTTON" | translate }}</button>
+ </form>
+-<p class="auth-footer">{{ "REGISTER.LABEL_LOGIN" | translate }} <a routerLink="/auth/login">{{ 'REGISTER.LOGIN_LINK' | translate }}</a></p>
++
++<p class="auth-footer">
++  {{ "REGISTER.LABEL_LOGIN" | translate }}
++  <a routerLink="/auth/login">{{ 'REGISTER.LOGIN_LINK' | translate }}</a>
++</p>
+Index: frontend/src/app/login-ui/register/register.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import { Component } from '@angular/core';\nimport {RouterLink} from '@angular/router';\nimport {TranslatePipe} from \"@ngx-translate/core\";\n\n@Component({\n  selector: 'app-register',\n    imports: [\n        RouterLink,\n        TranslatePipe\n    ],\n  templateUrl: './register.component.html',\n  standalone: true,\n  styleUrl: './register.component.css'\n})\nexport class RegisterComponent {\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/app/login-ui/register/register.component.ts b/frontend/src/app/login-ui/register/register.component.ts
+--- a/frontend/src/app/login-ui/register/register.component.ts	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ b/frontend/src/app/login-ui/register/register.component.ts	(date 1746704600134)
+@@ -1,17 +1,59 @@
+ import { Component } from '@angular/core';
+-import {RouterLink} from '@angular/router';
+-import {TranslatePipe} from "@ngx-translate/core";
++import { HttpClient } from '@angular/common/http';
++import { Router, RouterLink } from '@angular/router';
++import { TranslatePipe } from '@ngx-translate/core';
++import { FormsModule } from '@angular/forms';
++import { ToastrService } from 'ngx-toastr';
++import { CommonModule } from '@angular/common';
+ 
+ @Component({
+   selector: 'app-register',
+-    imports: [
+-        RouterLink,
+-        TranslatePipe
+-    ],
++  standalone: true,
++  imports: [
++    CommonModule,
++    FormsModule,
++    RouterLink,
++    TranslatePipe
++  ],
+   templateUrl: './register.component.html',
+-  standalone: true,
+-  styleUrl: './register.component.css'
++  styleUrls: ['./register.component.css']
+ })
+ export class RegisterComponent {
++  formData = {
++    name: '',
++    surname: '',
++    phoneNumber: '',
++    email: '',
++    password: '',
++    repeatedPassword: ''
++  };
++
++  constructor(private http: HttpClient, private toastr: ToastrService, private router: Router) {}
+ 
++  register() {
++    console.log('Formular trimis');
++    if (this.formData.password !== this.formData.repeatedPassword) {
++      this.toastr.error('Parolele nu coincid.');
++      return;
++    }
++
++    const body = {
++      name: this.formData.name,
++      surname: this.formData.surname,
++      phoneNumber: this.formData.phoneNumber,
++      email: this.formData.email,
++      password: this.formData.password,
++    };
++
++    this.http.post('https://localhost:5001/api/Auth/register', body).subscribe({
++      next: () => {
++        this.toastr.success('Înregistrare realizată cu succes!');
++        this.router.navigate(['/auth/login']);
++      },
++      error: (err) => {
++        console.error(err);
++        this.toastr.error('A apărut o eroare la înregistrare.');
++      }
++    });
++  }
+ }
+Index: frontend/src/main.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import { bootstrapApplication } from '@angular/platform-browser';\nimport { appConfig } from './app/app.config';\nimport { AppComponent } from './app/app.component';\n\nbootstrapApplication(AppComponent, appConfig)\n  .catch((err) => console.error(err));\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/main.ts b/frontend/src/main.ts
+--- a/frontend/src/main.ts	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ b/frontend/src/main.ts	(date 1746704252452)
+@@ -1,6 +1,19 @@
+-import { bootstrapApplication } from '@angular/platform-browser';
+-import { appConfig } from './app/app.config';
+-import { AppComponent } from './app/app.component';
++import { ApplicationConfig, importProvidersFrom } from '@angular/core';
++import { provideRouter } from '@angular/router';
++import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
++import { provideAnimations } from '@angular/platform-browser/animations';
++import { provideToastr } from 'ngx-toastr';
++import { TranslateModule } from '@ngx-translate/core';
++import {routes } from './app/app.routes';
+ 
+-bootstrapApplication(AppComponent, appConfig)
+-  .catch((err) => console.error(err));
++export const appConfig: ApplicationConfig = {
++  providers: [
++    provideRouter(routes),
++    provideHttpClient(withInterceptorsFromDi()),
++    provideAnimations(),
++    provideToastr(),
++    importProvidersFrom(
++      TranslateModule.forRoot()
++    )
++  ]
++};
+Index: MRSTW.Api/Controllers/CategoryController.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>using Microsoft.AspNetCore.Mvc;\nusing MRSTW.Api.UnitOfWork;\nusing MRSTW.BusinessLogicLayer.Contracts.Category;\nusing Microsoft.AspNetCore.Authorization; \n\nnamespace MRSTW.Api.Controllers;\n\n[Authorize]\n[ApiController]\n[Route(\"api/[controller]/v1\")]\npublic class CategoryController(IApiUnitOfWork unitOfWork) : ControllerBase\n{\n    [AllowAnonymous]\n    [HttpGet]\n    public async Task<ActionResult<List<CategoryResponse>>> Get()\n    {\n        var result = await unitOfWork.CategoryService.GetAllAsync();\n        return Ok(result);\n    }\n    \n    [AllowAnonymous]\n    [HttpGet(\"{id:int}\")]\n    public async Task<ActionResult<CategoryResponse>> Get(int id)\n    {\n        if (id < 0)\n        {\n            return BadRequest(\"The id can't be negative\");\n        }\n\n        try\n        {\n            var result = await unitOfWork.CategoryService.GetByIdAsync(id);\n            return Ok(result);\n        }\n        catch (ArgumentException e)\n        {\n            return NotFound(e.Message);\n        }\n    }\n\n    [HttpPost]\n    public async Task<ActionResult<CategoryResponse>> Post([FromBody] CreateCategoryRequest request)\n    {\n        var validationResult = await unitOfWork.CreateCategoryValidator.ValidateAsync(request);\n\n        if (!validationResult.IsValid)\n        {\n            return BadRequest(validationResult.ToDictionary());\n        }\n\n        try\n        {\n            await unitOfWork.CategoryService.CreateAsync(request);\n            return Created();\n        }\n        catch (ArgumentException e)\n        {\n            return BadRequest(e.Message);\n        }\n    }\n\n    [HttpPut]\n    public async Task<ActionResult> Put([FromBody] UpdateCategoryRequest request)\n    {\n        var validationResult = await unitOfWork.UpdateCategoryValidator.ValidateAsync(request);\n\n        if (!validationResult.IsValid)\n        {\n            return BadRequest(validationResult.ToDictionary());\n        }\n        \n        try\n        {\n            await unitOfWork.CategoryService.UpdateAsync(request);\n            return NoContent();\n        }\n        catch (ArgumentException e)\n        {\n            return BadRequest(e.Message);\n        }\n    }\n\n    [HttpDelete(\"{id:int}\")]\n    public async Task<ActionResult> Delete(int id)\n    {\n        if (id < 0)\n        {\n            return BadRequest(\"The id can't be negative\");\n        }\n\n        try\n        {\n            await unitOfWork.CategoryService.DeleteAsync(id);\n            return NoContent();\n        }\n        catch (ArgumentException e)\n        {\n            return NotFound(e.Message);\n        }\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/MRSTW.Api/Controllers/CategoryController.cs b/MRSTW.Api/Controllers/CategoryController.cs
+--- a/MRSTW.Api/Controllers/CategoryController.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ b/MRSTW.Api/Controllers/CategoryController.cs	(date 1746009787379)
+@@ -45,7 +45,7 @@
+ 
+         if (!validationResult.IsValid)
+         {
+-            return BadRequest(validationResult.ToDictionary());
++            return BadRequest($"test 123 ${validationResult.ToDictionary()}");
+         }
+ 
+         try
+Index: Auth.Api/appsettings.Development.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Auth.Api/appsettings.Development.json b/Auth.Api/appsettings.Development.json
+deleted file mode 100644
+--- a/Auth.Api/appsettings.Development.json	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,8 +0,0 @@
+-{
+-  "Logging": {
+-    "LogLevel": {
+-      "Default": "Information",
+-      "Microsoft.AspNetCore": "Warning"
+-    }
+-  }
+-}
+Index: Notification.Api/Services/EmailNotification.cs
+===================================================================
+diff --git a/Notification.Api/Services/EmailNotification.cs b/Notification.Api/Services/EmailNotification.cs
+deleted file mode 100644
+--- a/Notification.Api/Services/EmailNotification.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,21 +0,0 @@
+-using Notification.Api.Models;
+-
+-namespace Notification.Api.Services;
+-
+-public class EmailNotification(IEmailService emailService) : INotification
+-{
+-    public async Task NotifyAsync(SendNotificationRequest request)
+-    {
+-        var emailRequest = new SendEmailRequest
+-        {
+-            DealAuthorName = request.DealAuthorName,
+-            DealAuthorPhoneNumber = request.DealAuthorPhoneNumber,
+-            RecipientName = request.RecipientName,
+-            RecipientEmail = request.RecipientEmail,
+-            Subject = request.Subject,
+-            Message = request.Message
+-        };
+-        
+-        await emailService.SendEmailAsync(emailRequest);
+-    }
+-}
+Index: Notification.Api/Properties/launchSettings.json
+===================================================================
+diff --git a/Notification.Api/Properties/launchSettings.json b/Notification.Api/Properties/launchSettings.json
+deleted file mode 100644
+--- a/Notification.Api/Properties/launchSettings.json	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,41 +0,0 @@
+-{
+-  "$schema": "http://json.schemastore.org/launchsettings.json",
+-  "iisSettings": {
+-    "windowsAuthentication": false,
+-    "anonymousAuthentication": true,
+-    "iisExpress": {
+-      "applicationUrl": "http://localhost:14973",
+-      "sslPort": 44300
+-    }
+-  },
+-  "profiles": {
+-    "http": {
+-      "commandName": "Project",
+-      "dotnetRunMessages": true,
+-      "launchBrowser": true,
+-      "launchUrl": "swagger",
+-      "applicationUrl": "http://localhost:5078",
+-      "environmentVariables": {
+-        "ASPNETCORE_ENVIRONMENT": "Development"
+-      }
+-    },
+-    "https": {
+-      "commandName": "Project",
+-      "dotnetRunMessages": true,
+-      "launchBrowser": true,
+-      "launchUrl": "swagger",
+-      "applicationUrl": "https://localhost:7094;http://localhost:5078",
+-      "environmentVariables": {
+-        "ASPNETCORE_ENVIRONMENT": "Development"
+-      }
+-    },
+-    "IIS Express": {
+-      "commandName": "IISExpress",
+-      "launchBrowser": true,
+-      "launchUrl": "swagger",
+-      "environmentVariables": {
+-        "ASPNETCORE_ENVIRONMENT": "Development"
+-      }
+-    }
+-  }
+-}
+Index: Notification.Api/Services/IEmailService.cs
+===================================================================
+diff --git a/Notification.Api/Services/IEmailService.cs b/Notification.Api/Services/IEmailService.cs
+deleted file mode 100644
+--- a/Notification.Api/Services/IEmailService.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,8 +0,0 @@
+-using Notification.Api.Models;
+-
+-namespace Notification.Api.Services;
+-
+-public interface IEmailService
+-{
+-    Task SendEmailAsync(SendEmailRequest request);
+-}
+Index: Auth.BusinessLogicLayer/DependencyInjection.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Auth.BusinessLogicLayer/DependencyInjection.cs b/Auth.BusinessLogicLayer/DependencyInjection.cs
+deleted file mode 100644
+--- a/Auth.BusinessLogicLayer/DependencyInjection.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,12 +0,0 @@
+-namespace Auth.BusinessLogicLayer;
+-
+-public static class DependencyInjection
+-{
+-    // public static IServiceCollection AddAuthApplication(this IServiceCollection services)
+-    // {
+-    //     services.AddScoped<IUserService, UserService>();
+-    //     services.AddScoped<ITokenService, TokenService>();
+-    //
+-    //     return services;
+-    // }
+-}
+Index: Auth.Api/Program.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Auth.Api/Program.cs b/Auth.Api/Program.cs
+deleted file mode 100644
+--- a/Auth.Api/Program.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,34 +0,0 @@
+-namespace Auth.Api;
+-
+-public class Program
+-{
+-    public static void Main(string[] args)
+-    {
+-        var builder = WebApplication.CreateBuilder(args);
+-
+-        // Add services to the container.
+-
+-        builder.Services.AddControllers();
+-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+-        builder.Services.AddEndpointsApiExplorer();
+-        builder.Services.AddSwaggerGen();
+-
+-        var app = builder.Build();
+-
+-        // Configure the HTTP request pipeline.
+-        if (app.Environment.IsDevelopment())
+-        {
+-            app.UseSwagger();
+-            app.UseSwaggerUI();
+-        }
+-
+-        app.UseHttpsRedirection();
+-
+-        app.UseAuthorization();
+-
+-
+-        app.MapControllers();
+-
+-        app.Run();
+-    }
+-}
+Index: Auth.Api/appsettings.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Auth.Api/appsettings.json b/Auth.Api/appsettings.json
+deleted file mode 100644
+--- a/Auth.Api/appsettings.json	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,9 +0,0 @@
+-{
+-  "Logging": {
+-    "LogLevel": {
+-      "Default": "Information",
+-      "Microsoft.AspNetCore": "Warning"
+-    }
+-  },
+-  "AllowedHosts": "*"
+-}
+Index: Test.Notification.Service/Test.Notification.Service.csproj
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Test.Notification.Service/Test.Notification.Service.csproj b/Test.Notification.Service/Test.Notification.Service.csproj
+deleted file mode 100644
+--- a/Test.Notification.Service/Test.Notification.Service.csproj	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,23 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk">
+-
+-    <PropertyGroup>
+-        <TargetFramework>net8.0</TargetFramework>
+-        <ImplicitUsings>enable</ImplicitUsings>
+-        <Nullable>enable</Nullable>
+-
+-        <IsPackable>false</IsPackable>
+-        <IsTestProject>true</IsTestProject>
+-    </PropertyGroup>
+-
+-    <ItemGroup>
+-        <PackageReference Include="coverlet.collector" Version="6.0.0"/>
+-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
+-        <PackageReference Include="xunit" Version="2.5.3"/>
+-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3"/>
+-    </ItemGroup>
+-
+-    <ItemGroup>
+-        <Using Include="Xunit"/>
+-    </ItemGroup>
+-
+-</Project>
+Index: Notification.Api/Services/INotification.cs
+===================================================================
+diff --git a/Notification.Api/Services/INotification.cs b/Notification.Api/Services/INotification.cs
+deleted file mode 100644
+--- a/Notification.Api/Services/INotification.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,8 +0,0 @@
+-using Notification.Api.Models;
+-
+-namespace Notification.Api.Services;
+-
+-public interface INotification
+-{
+-    Task NotifyAsync(SendNotificationRequest request);
+-}
+Index: Notification.Api/Models/SendNotificationRequest.cs
+===================================================================
+diff --git a/Notification.Api/Models/SendNotificationRequest.cs b/Notification.Api/Models/SendNotificationRequest.cs
+deleted file mode 100644
+--- a/Notification.Api/Models/SendNotificationRequest.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,11 +0,0 @@
+-namespace Notification.Api.Models;
+-
+-public class SendNotificationRequest
+-{
+-    public required string DealAuthorName { get; set; }
+-    public required string DealAuthorPhoneNumber { get; set; }
+-    public required string RecipientName { get; set; }
+-    public required string RecipientEmail { get; set; }
+-    public required string Subject { get; set; }
+-    public required string Message { get; set; }
+-}
+\ No newline at end of file
+Index: Auth.Api/Properties/launchSettings.json
+===================================================================
+diff --git a/Auth.Api/Properties/launchSettings.json b/Auth.Api/Properties/launchSettings.json
+deleted file mode 100644
+--- a/Auth.Api/Properties/launchSettings.json	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,41 +0,0 @@
+-{
+-  "$schema": "http://json.schemastore.org/launchsettings.json",
+-  "iisSettings": {
+-    "windowsAuthentication": false,
+-    "anonymousAuthentication": true,
+-    "iisExpress": {
+-      "applicationUrl": "http://localhost:35009",
+-      "sslPort": 44316
+-    }
+-  },
+-  "profiles": {
+-    "http": {
+-      "commandName": "Project",
+-      "dotnetRunMessages": true,
+-      "launchBrowser": true,
+-      "launchUrl": "swagger",
+-      "applicationUrl": "http://localhost:5219",
+-      "environmentVariables": {
+-        "ASPNETCORE_ENVIRONMENT": "Development"
+-      }
+-    },
+-    "https": {
+-      "commandName": "Project",
+-      "dotnetRunMessages": true,
+-      "launchBrowser": true,
+-      "launchUrl": "swagger",
+-      "applicationUrl": "https://localhost:7023;http://localhost:5219",
+-      "environmentVariables": {
+-        "ASPNETCORE_ENVIRONMENT": "Development"
+-      }
+-    },
+-    "IIS Express": {
+-      "commandName": "IISExpress",
+-      "launchBrowser": true,
+-      "launchUrl": "swagger",
+-      "environmentVariables": {
+-        "ASPNETCORE_ENVIRONMENT": "Development"
+-      }
+-    }
+-  }
+-}
+Index: Notification.Api/Services/EmailService.cs
+===================================================================
+diff --git a/Notification.Api/Services/EmailService.cs b/Notification.Api/Services/EmailService.cs
+deleted file mode 100644
+--- a/Notification.Api/Services/EmailService.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,29 +0,0 @@
+-using Notification.Api.Models;
+-
+-namespace Notification.Api.Services;
+-
+-public class EmailService(IConfiguration configuration) : IEmailService
+-{
+-    public async Task SendEmailAsync(SendEmailRequest request)
+-    {
+-        string? sendgridApiKey = configuration["SendGridSettings:ApiKey"];
+-        string? senderEmail = configuration["SendGridSettings:FromEmail"];
+-        string? senderName = configuration["SendGridSettings:FromName"];
+-
+-         throw new NotImplementedException();
+-         /*
+-         var client = new SendGridClient(sendgridApiKey);
+-         var from = new EmailAddress(senderEmail, senderName);
+-         var to = new EmailAddress(toEmail);
+-         var msg = MailHelper.CreateSingleEmail(from, to, subject, body, body);
+-         var response = await client.SendEmailAsync(msg);
+-
+-         if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
+-         {
+-             // Handle error
+-             var responseBody = await response.Body.ReadAsStringAsync();
+-             throw new Exception($"Failed to send email: {response.StatusCode}, {responseBody}");
+-         }
+-         */
+-    }
+-}
+Index: Auth.DataAccessLayer/DependencyInjection.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Auth.DataAccessLayer/DependencyInjection.cs b/Auth.DataAccessLayer/DependencyInjection.cs
+deleted file mode 100644
+--- a/Auth.DataAccessLayer/DependencyInjection.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,6 +0,0 @@
+-// namespace Auth.DataAccessLayer;
+-//
+-// public static class DependencyInjection
+-// {
+-//     
+-// }
+Index: Auth.Api/Auth.Api.csproj
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Auth.Api/Auth.Api.csproj b/Auth.Api/Auth.Api.csproj
+deleted file mode 100644
+--- a/Auth.Api/Auth.Api.csproj	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,20 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk.Web">
+-
+-    <PropertyGroup>
+-        <TargetFramework>net8.0</TargetFramework>
+-        <Nullable>enable</Nullable>
+-        <ImplicitUsings>enable</ImplicitUsings>
+-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+-    </PropertyGroup>
+-
+-    <ItemGroup>
+-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
+-    </ItemGroup>
+-
+-    <ItemGroup>
+-      <Content Include="..\.dockerignore">
+-        <Link>.dockerignore</Link>
+-      </Content>
+-    </ItemGroup>
+-
+-</Project>
+Index: Auth.Api/Dockerfile
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Auth.Api/Dockerfile b/Auth.Api/Dockerfile
+deleted file mode 100644
+--- a/Auth.Api/Dockerfile	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,23 +0,0 @@
+-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+-USER $APP_UID
+-WORKDIR /app
+-EXPOSE 8080
+-EXPOSE 8081
+-
+-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+-ARG BUILD_CONFIGURATION=Release
+-WORKDIR /src
+-COPY ["Auth.Api/Auth.Api.csproj", "Auth.Api/"]
+-RUN dotnet restore "Auth.Api/Auth.Api.csproj"
+-COPY . .
+-WORKDIR "/src/Auth.Api"
+-RUN dotnet build "Auth.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+-
+-FROM build AS publish
+-ARG BUILD_CONFIGURATION=Release
+-RUN dotnet publish "Auth.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+-
+-FROM base AS final
+-WORKDIR /app
+-COPY --from=publish /app/publish .
+-ENTRYPOINT ["dotnet", "Auth.Api.dll"]
+Index: Notification.Api/Notification.Api.http
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Notification.Api/Notification.Api.http b/Notification.Api/Notification.Api.http
+deleted file mode 100644
+--- a/Notification.Api/Notification.Api.http	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,6 +0,0 @@
+-@Notification.Api_HostAddress = http://localhost:5078
+-
+-GET {{Notification.Api_HostAddress}}/weatherforecast/
+-Accept: application/json
+-
+-###
+Index: Notification.Api/Services/NotificationManager.cs
+===================================================================
+diff --git a/Notification.Api/Services/NotificationManager.cs b/Notification.Api/Services/NotificationManager.cs
+deleted file mode 100644
+--- a/Notification.Api/Services/NotificationManager.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,26 +0,0 @@
+-using Notification.Api.Models;
+-
+-namespace Notification.Api.Services;
+-
+-public class NotificationManager
+-{
+-    private readonly List<INotification> _notifications = [];
+-
+-    public void Subscribe(INotification notification)
+-    {
+-        _notifications.Add(notification);
+-    }
+-
+-    public void Unsubscribe(INotification notification)
+-    {
+-        _notifications.Remove(notification);
+-    }
+-
+-    public async Task Notify(SendNotificationRequest request)
+-    {
+-        foreach (var notification in _notifications)
+-        {
+-            await notification.NotifyAsync(request);
+-        }
+-    }
+-}
+Index: Auth.BusinessLogicLayer/Auth.BusinessLogicLayer.csproj
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Auth.BusinessLogicLayer/Auth.BusinessLogicLayer.csproj b/Auth.BusinessLogicLayer/Auth.BusinessLogicLayer.csproj
+deleted file mode 100644
+--- a/Auth.BusinessLogicLayer/Auth.BusinessLogicLayer.csproj	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,14 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk">
+-
+-    <PropertyGroup>
+-        <TargetFramework>net8.0</TargetFramework>
+-        <ImplicitUsings>enable</ImplicitUsings>
+-        <Nullable>enable</Nullable>
+-    </PropertyGroup>
+-
+-    <ItemGroup>
+-      <Folder Include="Common\Interfaces\" />
+-      <Folder Include="Common\Mappings\" />
+-    </ItemGroup>
+-
+-</Project>
+Index: Notification.Api/Notification.Api.csproj
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Notification.Api/Notification.Api.csproj b/Notification.Api/Notification.Api.csproj
+deleted file mode 100644
+--- a/Notification.Api/Notification.Api.csproj	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,27 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk.Web">
+-
+-    <PropertyGroup>
+-        <TargetFramework>net8.0</TargetFramework>
+-        <Nullable>enable</Nullable>
+-        <ImplicitUsings>enable</ImplicitUsings>
+-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+-    </PropertyGroup>
+-
+-    <ItemGroup>
+-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+-        <PackageReference Include="RabbitMQ.Client" Version="7.1.1" />
+-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
+-    </ItemGroup>
+-
+-    <ItemGroup>
+-      <Content Include="..\.dockerignore">
+-        <Link>.dockerignore</Link>
+-      </Content>
+-    </ItemGroup>
+-
+-    <ItemGroup>
+-      <Folder Include="Controllers\" />
+-    </ItemGroup>
+-
+-</Project>
+Index: Auth.DataAccessLayer/Auth.DataAccessLayer.csproj
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Auth.DataAccessLayer/Auth.DataAccessLayer.csproj b/Auth.DataAccessLayer/Auth.DataAccessLayer.csproj
+deleted file mode 100644
+--- a/Auth.DataAccessLayer/Auth.DataAccessLayer.csproj	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,13 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk">
+-
+-    <PropertyGroup>
+-        <TargetFramework>net8.0</TargetFramework>
+-        <ImplicitUsings>enable</ImplicitUsings>
+-        <Nullable>enable</Nullable>
+-    </PropertyGroup>
+-
+-    <ItemGroup>
+-      <ProjectReference Include="..\Domain\Domain.csproj" />
+-    </ItemGroup>
+-
+-</Project>
+Index: Notification.Api/appsettings.Development.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Notification.Api/appsettings.Development.json b/Notification.Api/appsettings.Development.json
+deleted file mode 100644
+--- a/Notification.Api/appsettings.Development.json	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,12 +0,0 @@
+-{
+-  "Logging": {
+-    "LogLevel": {
+-      "Default": "Information",
+-      "Microsoft.AspNetCore": "Warning"
+-    }
+-  },
+-  "ConnectionStrings": {
+-    "NotificationMicroservice": "",
+-    "RabbitMQMain-Notification": "notification-queue"
+-  }
+-}
+Index: Notification.Api/Models/SendEmailRequest.cs
+===================================================================
+diff --git a/Notification.Api/Models/SendEmailRequest.cs b/Notification.Api/Models/SendEmailRequest.cs
+deleted file mode 100644
+--- a/Notification.Api/Models/SendEmailRequest.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,11 +0,0 @@
+-namespace Notification.Api.Models;
+-
+-public class SendEmailRequest
+-{
+-    public required string DealAuthorName { get; set; }
+-    public required string DealAuthorPhoneNumber { get; set; }
+-    public required string RecipientName { get; set; }
+-    public required string RecipientEmail { get; set; }
+-    public required string Subject { get; set; }
+-    public required string Message { get; set; }
+-}
+Index: Auth.BusinessLogicLayer/Services/TokenService.cs
+===================================================================
+diff --git a/Auth.BusinessLogicLayer/Services/TokenService.cs b/Auth.BusinessLogicLayer/Services/TokenService.cs
+deleted file mode 100644
+--- a/Auth.BusinessLogicLayer/Services/TokenService.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,6 +0,0 @@
+-namespace Auth.BusinessLogicLayer.Services;
+-
+-public class TokenService
+-{
+-    
+-}
+Index: Notification.Api/Dockerfile
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Notification.Api/Dockerfile b/Notification.Api/Dockerfile
+deleted file mode 100644
+--- a/Notification.Api/Dockerfile	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,23 +0,0 @@
+-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+-USER $APP_UID
+-WORKDIR /app
+-EXPOSE 8080
+-EXPOSE 8081
+-
+-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+-ARG BUILD_CONFIGURATION=Release
+-WORKDIR /src
+-COPY ["Notification.Api/Notification.Api.csproj", "Notification.Api/"]
+-RUN dotnet restore "Notification.Api/Notification.Api.csproj"
+-COPY . .
+-WORKDIR "/src/Notification.Api"
+-RUN dotnet build "Notification.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+-
+-FROM build AS publish
+-ARG BUILD_CONFIGURATION=Release
+-RUN dotnet publish "Notification.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+-
+-FROM base AS final
+-WORKDIR /app
+-COPY --from=publish /app/publish .
+-ENTRYPOINT ["dotnet", "Notification.Api.dll"]
+Index: Auth.Api/Auth.Api.http
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Auth.Api/Auth.Api.http b/Auth.Api/Auth.Api.http
+deleted file mode 100644
+--- a/Auth.Api/Auth.Api.http	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,6 +0,0 @@
+-@Auth.Api_HostAddress = http://localhost:5219
+-
+-GET {{Auth.Api_HostAddress}}/weatherforecast/
+-Accept: application/json
+-
+-###
+Index: Auth.DataAccessLayer/Data/AuthDbContext.cs
+===================================================================
+diff --git a/Auth.DataAccessLayer/Data/AuthDbContext.cs b/Auth.DataAccessLayer/Data/AuthDbContext.cs
+deleted file mode 100644
+--- a/Auth.DataAccessLayer/Data/AuthDbContext.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,9 +0,0 @@
+-// using Domain.Models.Auth;
+-// using Microsoft.EntityFrameworkCore;
+-//
+-// namespace Auth.DataAccessLayer.Data;
+-//
+-// public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(options)
+-// {
+-//     public DbSet<Admin> Admins { get; set; }
+-// }
+\ No newline at end of file
+Index: Notification.Api/appsettings.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Notification.Api/appsettings.json b/Notification.Api/appsettings.json
+deleted file mode 100644
+--- a/Notification.Api/appsettings.json	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,9 +0,0 @@
+-{
+-  "Logging": {
+-    "LogLevel": {
+-      "Default": "Information",
+-      "Microsoft.AspNetCore": "Warning"
+-    }
+-  },
+-  "AllowedHosts": "*"
+-}
+Index: Notification.Api/Program.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Notification.Api/Program.cs b/Notification.Api/Program.cs
+deleted file mode 100644
+--- a/Notification.Api/Program.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,39 +0,0 @@
+-using Notification.Api.Services;
+-
+-namespace Notification.Api;
+-
+-public static class Program
+-{
+-    public static void Main(string[] args)
+-    {
+-        var builder = WebApplication.CreateBuilder(args);
+-
+-        builder.Services.AddControllers();
+-
+-        builder.Services.AddSingleton<IEmailService, EmailService>();
+-        builder.Services.AddScoped<INotification, EmailNotification>();
+-        builder.Services.AddSingleton<NotificationManager, NotificationManager>();
+-        builder.Services.AddHostedService<RabbitMqListener>();
+-        builder.Services.AddHttpClient();
+-
+-
+-        builder.Services.AddEndpointsApiExplorer();
+-        builder.Services.AddSwaggerGen();
+-
+-        var app = builder.Build();
+-
+-        if (app.Environment.IsDevelopment())
+-        {
+-            app.UseSwagger();
+-            app.UseSwaggerUI();
+-        }
+-
+-        var service = app.Services.GetService<NotificationManager>();
+-        service!.Subscribe(app.Services.GetService<EmailNotification>()!);
+-
+-        app.UseHttpsRedirection();
+-
+-
+-        app.Run();
+-    }
+-}
+Index: Notification.Api/Services/RabbitMqListener.cs
+===================================================================
+diff --git a/Notification.Api/Services/RabbitMqListener.cs b/Notification.Api/Services/RabbitMqListener.cs
+deleted file mode 100644
+--- a/Notification.Api/Services/RabbitMqListener.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,49 +0,0 @@
+-using System.Diagnostics;
+-using System.Text;
+-using RabbitMQ.Client;
+-using RabbitMQ.Client.Events;
+-
+-namespace Notification.Api.Services;
+-
+-public class RabbitMqListener : BackgroundService
+-{
+-    private readonly string _notificationQueue;
+-
+-    private readonly IConnection _connection;
+-    private readonly IChannel _channel;
+-
+-    public RabbitMqListener(IConfiguration configuration)
+-    {
+-        _notificationQueue = configuration.GetConnectionString("RabbitMQMain-Notification")!;
+-
+-        var factory = new ConnectionFactory { HostName = "localhost" };
+-        _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
+-        _channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
+-        _channel.QueueDeclareAsync(queue: _notificationQueue, durable: false, exclusive: false, autoDelete: false,
+-            arguments: null).GetAwaiter().GetResult();
+-    }
+-
+-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+-    {
+-        stoppingToken.ThrowIfCancellationRequested();
+-
+-        var consumer = new AsyncEventingBasicConsumer(_channel);
+-        consumer.ReceivedAsync += async (ch, ea) =>
+-        {
+-            string? content = Encoding.UTF8.GetString(ea.Body.ToArray());
+-
+-            Debug.WriteLine($"Получено сообщение: {content}");
+-
+-            await _channel.BasicAckAsync(ea.DeliveryTag, false, stoppingToken);
+-        };
+-
+-        await _channel.BasicConsumeAsync(_notificationQueue, false, consumer, cancellationToken: stoppingToken);
+-    }
+-
+-    public override void Dispose()
+-    {
+-        _channel.CloseAsync().GetAwaiter().GetResult();
+-        _connection.CloseAsync().GetAwaiter().GetResult();
+-        base.Dispose();
+-    }
+-}
+Index: Test.Auth.Service/Test.Auth.Service.csproj
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Test.Auth.Service/Test.Auth.Service.csproj b/Test.Auth.Service/Test.Auth.Service.csproj
+deleted file mode 100644
+--- a/Test.Auth.Service/Test.Auth.Service.csproj	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ /dev/null	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
+@@ -1,28 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk">
+-
+-    <PropertyGroup>
+-        <TargetFramework>net8.0</TargetFramework>
+-        <ImplicitUsings>enable</ImplicitUsings>
+-        <Nullable>enable</Nullable>
+-
+-        <IsPackable>false</IsPackable>
+-        <IsTestProject>true</IsTestProject>
+-    </PropertyGroup>
+-
+-    <ItemGroup>
+-        <PackageReference Include="coverlet.collector" Version="6.0.0"/>
+-        <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
+-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
+-        <PackageReference Include="xunit" Version="2.5.3"/>
+-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3"/>
+-    </ItemGroup>
+-
+-    <ItemGroup>
+-        <Using Include="Xunit"/>
+-    </ItemGroup>
+-
+-    <ItemGroup>
+-      <ProjectReference Include="..\MRSTW.Api\MRSTW.Api.csproj" />
+-    </ItemGroup>
+-
+-</Project>
+Index: frontend/package.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{\n  \"name\": \"frontend\",\n  \"version\": \"0.0.0\",\n  \"scripts\": {\n    \"ng\": \"ng\",\n    \"start\": \"ng serve\",\n    \"build\": \"ng build\",\n    \"watch\": \"ng build --watch --configuration development\",\n    \"test\": \"ng test\"\n  },\n  \"private\": true,\n  \"dependencies\": {\n    \"@angular/animations\": \"^19.1.0\",\n    \"@angular/common\": \"^19.1.0\",\n    \"@angular/compiler\": \"^19.1.0\",\n    \"@angular/core\": \"^19.1.0\",\n    \"@angular/forms\": \"^19.1.0\",\n    \"@angular/platform-browser\": \"^19.1.0\",\n    \"@angular/platform-browser-dynamic\": \"^19.1.0\",\n    \"@angular/router\": \"^19.1.0\",\n    \"@ngx-translate/core\": \"^16.0.4\",\n    \"@ngx-translate/http-loader\": \"^16.0.1\",\n    \"bootstrap\": \"^5.3.3\",\n    \"ngx-bootstrap\": \"^19.0.2\",\n    \"rxjs\": \"~7.8.0\",\n    \"tslib\": \"^2.3.0\",\n    \"zone.js\": \"~0.15.0\"\n  },\n  \"devDependencies\": {\n    \"@angular-devkit/build-angular\": \"^19.1.6\",\n    \"@angular/cli\": \"^19.1.6\",\n    \"@angular/compiler-cli\": \"^19.1.0\",\n    \"@types/jasmine\": \"~5.1.0\",\n    \"jasmine-core\": \"~5.5.0\",\n    \"karma\": \"~6.4.0\",\n    \"karma-chrome-launcher\": \"~3.2.0\",\n    \"karma-coverage\": \"~2.2.0\",\n    \"karma-jasmine\": \"~5.1.0\",\n    \"karma-jasmine-html-reporter\": \"~2.1.0\",\n    \"typescript\": \"~5.7.2\"\n  }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/package.json b/frontend/package.json
+--- a/frontend/package.json	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ b/frontend/package.json	(date 1746703648372)
+@@ -22,6 +22,7 @@
+     "@ngx-translate/http-loader": "^16.0.1",
+     "bootstrap": "^5.3.3",
+     "ngx-bootstrap": "^19.0.2",
++    "ngx-toastr": "^19.0.0",
+     "rxjs": "~7.8.0",
+     "tslib": "^2.3.0",
+     "zone.js": "~0.15.0"
+Index: MRSTW.sln.DotSettings.user
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><wpf:ResourceDictionary xml:space=\"preserve\" xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\" xmlns:s=\"clr-namespace:System;assembly=mscorlib\" xmlns:ss=\"urn:shemas-jetbrains-com:settings-storage-xaml\" xmlns:wpf=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\">\n\t<s:String x:Key=\"/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AControllerBase_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003F1b445ceb1c5ab1d07b7b55412b10a5e21169ec87228ca8ad8a18a6982f3278_003FControllerBase_002Ecs/@EntryIndexedValue\">ForceIncluded</s:String>\n\t<s:String x:Key=\"/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AIValidator_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003Fdb6edd8bce6af26cfa378ba0cc1c5ec76bbd4a05f242b76bd21db74a91384_003FIValidator_002Ecs/@EntryIndexedValue\">ForceIncluded</s:String>\n\t<s:String x:Key=\"/Default/Environment/Hierarchy/Build/BuildTool/CustomBuildToolPath/@EntryValue\">/usr/share/dotnet/sdk/8.0.114/MSBuild.dll</s:String>\n\t\n\t<s:String x:Key=\"/Default/Environment/UnitTesting/CreateUnitTestDialog/TestProjectMapping/=4CFA424D_002D4CA5_002D47C9_002D8A49_002D15DEA75276FC/@EntryIndexedValue\">6E56AD70-ADCD-4CF2-8693-94D4AE713DC2</s:String>\n\t<s:String x:Key=\"/Default/Environment/UnitTesting/CreateUnitTestDialog/TestTemplateMapping/=xUnit/@EntryIndexedValue\">33ff99d8-b1ad-4ed5-a4fd-376b97c2c841</s:String></wpf:ResourceDictionary>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/MRSTW.sln.DotSettings.user b/MRSTW.sln.DotSettings.user
+--- a/MRSTW.sln.DotSettings.user	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ b/MRSTW.sln.DotSettings.user	(date 1746009668308)
+@@ -1,5 +1,6 @@
+ <wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+ 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AControllerBase_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003F1b445ceb1c5ab1d07b7b55412b10a5e21169ec87228ca8ad8a18a6982f3278_003FControllerBase_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
++	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AIValidator_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2025_002E1_003Fresharper_002Dhost_003FSourcesCache_003Fdb6edd8bce6af26cfa378ba0cc1c5ec76bbd4a05f242b76bd21db74a91384_003FIValidator_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+ 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AIValidator_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003Fdb6edd8bce6af26cfa378ba0cc1c5ec76bbd4a05f242b76bd21db74a91384_003FIValidator_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+ 	<s:String x:Key="/Default/Environment/Hierarchy/Build/BuildTool/CustomBuildToolPath/@EntryValue">/usr/share/dotnet/sdk/8.0.114/MSBuild.dll</s:String>
+ 	
+Index: MRSTW.sln
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\nMicrosoft Visual Studio Solution File, Format Version 12.00\nProject(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"MRSTW.Api\", \"MRSTW.Api\\MRSTW.Api.csproj\", \"{4CFA424D-4CA5-47C9-8A49-15DEA75276FC}\"\nEndProject\nProject(\"{2150E333-8FDC-42A3-9474-1A3956D46DE8}\") = \"Solution Items\", \"Solution Items\", \"{341C06F8-490F-4D72-9998-5B7A1C80E789}\"\n\tProjectSection(SolutionItems) = preProject\n\t\tdocker-compose.yml = docker-compose.yml\n\tEndProjectSection\nEndProject\nProject(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"MRSTW.BusinessLogicLayer\", \"MRSTW.BusinessLogicLayer\\MRSTW.BusinessLogicLayer.csproj\", \"{FCF93B51-ACC8-45CF-8A16-AE2BAFA3B9FF}\"\nEndProject\nProject(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"MRSTW.DataAccessLayer\", \"MRSTW.DataAccessLayer\\MRSTW.DataAccessLayer.csproj\", \"{6E4AA3E5-7454-4DC0-A4BF-702F4EDDFDD2}\"\nEndProject\nProject(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"Test.MRSTW.Service\", \"Test.MRSTW.Service\\Test.MRSTW.Service.csproj\", \"{9A1CCD6F-8757-487F-A966-71F337304B23}\"\nEndProject\nProject(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"Auth.Api\", \"Auth.Api\\Auth.Api.csproj\", \"{8C5BF092-92F8-4C1B-8643-113D663ABFA8}\"\nEndProject\nProject(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"Auth.BusinessLogicLayer\", \"Auth.BusinessLogicLayer\\Auth.BusinessLogicLayer.csproj\", \"{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}\"\nEndProject\nProject(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"Auth.DataAccessLayer\", \"Auth.DataAccessLayer\\Auth.DataAccessLayer.csproj\", \"{8188D3F9-3B18-495A-8BC0-F7235ABF7190}\"\nEndProject\nProject(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"Test.Auth.Service\", \"Test.Auth.Service\\Test.Auth.Service.csproj\", \"{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}\"\n\tProjectSection(ProjectDependencies) = postProject\n\t\t{65C2EF8F-5E0C-400F-ABB5-5953FD92C852} = {65C2EF8F-5E0C-400F-ABB5-5953FD92C852}\n\tEndProjectSection\nEndProject\nProject(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"Notification.Api\", \"Notification.Api\\Notification.Api.csproj\", \"{C0976FFA-055B-4BCB-9AA9-360631F95C4C}\"\nEndProject\nProject(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"Test.Notification.Service\", \"Test.Notification.Service\\Test.Notification.Service.csproj\", \"{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}\"\nEndProject\nProject(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}\") = \"Domain\", \"Domain\\Domain.csproj\", \"{F1822CDA-2965-4F2F-87CE-666E75B9E78C}\"\nEndProject\nGlobal\n\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n\t\tDebug|Any CPU = Debug|Any CPU\n\t\tRelease|Any CPU = Release|Any CPU\n\tEndGlobalSection\n\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n\t\t{4CFA424D-4CA5-47C9-8A49-15DEA75276FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n\t\t{4CFA424D-4CA5-47C9-8A49-15DEA75276FC}.Debug|Any CPU.Build.0 = Debug|Any CPU\n\t\t{4CFA424D-4CA5-47C9-8A49-15DEA75276FC}.Release|Any CPU.ActiveCfg = Release|Any CPU\n\t\t{4CFA424D-4CA5-47C9-8A49-15DEA75276FC}.Release|Any CPU.Build.0 = Release|Any CPU\n\t\t{FCF93B51-ACC8-45CF-8A16-AE2BAFA3B9FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n\t\t{FCF93B51-ACC8-45CF-8A16-AE2BAFA3B9FF}.Debug|Any CPU.Build.0 = Debug|Any CPU\n\t\t{FCF93B51-ACC8-45CF-8A16-AE2BAFA3B9FF}.Release|Any CPU.ActiveCfg = Release|Any CPU\n\t\t{FCF93B51-ACC8-45CF-8A16-AE2BAFA3B9FF}.Release|Any CPU.Build.0 = Release|Any CPU\n\t\t{6E4AA3E5-7454-4DC0-A4BF-702F4EDDFDD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n\t\t{6E4AA3E5-7454-4DC0-A4BF-702F4EDDFDD2}.Debug|Any CPU.Build.0 = Debug|Any CPU\n\t\t{6E4AA3E5-7454-4DC0-A4BF-702F4EDDFDD2}.Release|Any CPU.ActiveCfg = Release|Any CPU\n\t\t{6E4AA3E5-7454-4DC0-A4BF-702F4EDDFDD2}.Release|Any CPU.Build.0 = Release|Any CPU\n\t\t{9A1CCD6F-8757-487F-A966-71F337304B23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n\t\t{9A1CCD6F-8757-487F-A966-71F337304B23}.Debug|Any CPU.Build.0 = Debug|Any CPU\n\t\t{9A1CCD6F-8757-487F-A966-71F337304B23}.Release|Any CPU.ActiveCfg = Release|Any CPU\n\t\t{9A1CCD6F-8757-487F-A966-71F337304B23}.Release|Any CPU.Build.0 = Release|Any CPU\n\t\t{8C5BF092-92F8-4C1B-8643-113D663ABFA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n\t\t{8C5BF092-92F8-4C1B-8643-113D663ABFA8}.Debug|Any CPU.Build.0 = Debug|Any CPU\n\t\t{8C5BF092-92F8-4C1B-8643-113D663ABFA8}.Release|Any CPU.ActiveCfg = Release|Any CPU\n\t\t{8C5BF092-92F8-4C1B-8643-113D663ABFA8}.Release|Any CPU.Build.0 = Release|Any CPU\n\t\t{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n\t\t{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}.Debug|Any CPU.Build.0 = Debug|Any CPU\n\t\t{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}.Release|Any CPU.ActiveCfg = Release|Any CPU\n\t\t{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}.Release|Any CPU.Build.0 = Release|Any CPU\n\t\t{8188D3F9-3B18-495A-8BC0-F7235ABF7190}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n\t\t{8188D3F9-3B18-495A-8BC0-F7235ABF7190}.Debug|Any CPU.Build.0 = Debug|Any CPU\n\t\t{8188D3F9-3B18-495A-8BC0-F7235ABF7190}.Release|Any CPU.ActiveCfg = Release|Any CPU\n\t\t{8188D3F9-3B18-495A-8BC0-F7235ABF7190}.Release|Any CPU.Build.0 = Release|Any CPU\n\t\t{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n\t\t{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}.Debug|Any CPU.Build.0 = Debug|Any CPU\n\t\t{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}.Release|Any CPU.ActiveCfg = Release|Any CPU\n\t\t{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}.Release|Any CPU.Build.0 = Release|Any CPU\n\t\t{C0976FFA-055B-4BCB-9AA9-360631F95C4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n\t\t{C0976FFA-055B-4BCB-9AA9-360631F95C4C}.Debug|Any CPU.Build.0 = Debug|Any CPU\n\t\t{C0976FFA-055B-4BCB-9AA9-360631F95C4C}.Release|Any CPU.ActiveCfg = Release|Any CPU\n\t\t{C0976FFA-055B-4BCB-9AA9-360631F95C4C}.Release|Any CPU.Build.0 = Release|Any CPU\n\t\t{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n\t\t{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}.Debug|Any CPU.Build.0 = Debug|Any CPU\n\t\t{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}.Release|Any CPU.ActiveCfg = Release|Any CPU\n\t\t{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}.Release|Any CPU.Build.0 = Release|Any CPU\n\t\t{F1822CDA-2965-4F2F-87CE-666E75B9E78C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n\t\t{F1822CDA-2965-4F2F-87CE-666E75B9E78C}.Debug|Any CPU.Build.0 = Debug|Any CPU\n\t\t{F1822CDA-2965-4F2F-87CE-666E75B9E78C}.Release|Any CPU.ActiveCfg = Release|Any CPU\n\t\t{F1822CDA-2965-4F2F-87CE-666E75B9E78C}.Release|Any CPU.Build.0 = Release|Any CPU\n\tEndGlobalSection\nEndGlobal\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/MRSTW.sln b/MRSTW.sln
+--- a/MRSTW.sln	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ b/MRSTW.sln	(date 1746009172463)
+@@ -13,21 +13,6 @@
+ EndProject
+ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.MRSTW.Service", "Test.MRSTW.Service\Test.MRSTW.Service.csproj", "{9A1CCD6F-8757-487F-A966-71F337304B23}"
+ EndProject
+-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Api", "Auth.Api\Auth.Api.csproj", "{8C5BF092-92F8-4C1B-8643-113D663ABFA8}"
+-EndProject
+-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.BusinessLogicLayer", "Auth.BusinessLogicLayer\Auth.BusinessLogicLayer.csproj", "{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}"
+-EndProject
+-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.DataAccessLayer", "Auth.DataAccessLayer\Auth.DataAccessLayer.csproj", "{8188D3F9-3B18-495A-8BC0-F7235ABF7190}"
+-EndProject
+-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Auth.Service", "Test.Auth.Service\Test.Auth.Service.csproj", "{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}"
+-	ProjectSection(ProjectDependencies) = postProject
+-		{65C2EF8F-5E0C-400F-ABB5-5953FD92C852} = {65C2EF8F-5E0C-400F-ABB5-5953FD92C852}
+-	EndProjectSection
+-EndProject
+-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Api", "Notification.Api\Notification.Api.csproj", "{C0976FFA-055B-4BCB-9AA9-360631F95C4C}"
+-EndProject
+-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Notification.Service", "Test.Notification.Service\Test.Notification.Service.csproj", "{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}"
+-EndProject
+ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{F1822CDA-2965-4F2F-87CE-666E75B9E78C}"
+ EndProject
+ Global
+@@ -52,30 +37,6 @@
+ 		{9A1CCD6F-8757-487F-A966-71F337304B23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+ 		{9A1CCD6F-8757-487F-A966-71F337304B23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+ 		{9A1CCD6F-8757-487F-A966-71F337304B23}.Release|Any CPU.Build.0 = Release|Any CPU
+-		{8C5BF092-92F8-4C1B-8643-113D663ABFA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+-		{8C5BF092-92F8-4C1B-8643-113D663ABFA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+-		{8C5BF092-92F8-4C1B-8643-113D663ABFA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+-		{8C5BF092-92F8-4C1B-8643-113D663ABFA8}.Release|Any CPU.Build.0 = Release|Any CPU
+-		{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+-		{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}.Debug|Any CPU.Build.0 = Debug|Any CPU
+-		{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}.Release|Any CPU.ActiveCfg = Release|Any CPU
+-		{65C2EF8F-5E0C-400F-ABB5-5953FD92C852}.Release|Any CPU.Build.0 = Release|Any CPU
+-		{8188D3F9-3B18-495A-8BC0-F7235ABF7190}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+-		{8188D3F9-3B18-495A-8BC0-F7235ABF7190}.Debug|Any CPU.Build.0 = Debug|Any CPU
+-		{8188D3F9-3B18-495A-8BC0-F7235ABF7190}.Release|Any CPU.ActiveCfg = Release|Any CPU
+-		{8188D3F9-3B18-495A-8BC0-F7235ABF7190}.Release|Any CPU.Build.0 = Release|Any CPU
+-		{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+-		{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+-		{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+-		{6E56AD70-ADCD-4CF2-8693-94D4AE713DC2}.Release|Any CPU.Build.0 = Release|Any CPU
+-		{C0976FFA-055B-4BCB-9AA9-360631F95C4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+-		{C0976FFA-055B-4BCB-9AA9-360631F95C4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+-		{C0976FFA-055B-4BCB-9AA9-360631F95C4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+-		{C0976FFA-055B-4BCB-9AA9-360631F95C4C}.Release|Any CPU.Build.0 = Release|Any CPU
+-		{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+-		{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+-		{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+-		{BE1B3A5A-2782-4CAB-B706-95E68F1669DC}.Release|Any CPU.Build.0 = Release|Any CPU
+ 		{F1822CDA-2965-4F2F-87CE-666E75B9E78C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+ 		{F1822CDA-2965-4F2F-87CE-666E75B9E78C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+ 		{F1822CDA-2965-4F2F-87CE-666E75B9E78C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+Index: frontend/package-lock.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/package-lock.json b/frontend/package-lock.json
+--- a/frontend/package-lock.json	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ b/frontend/package-lock.json	(date 1746703648706)
+@@ -20,6 +20,7 @@
+         "@ngx-translate/http-loader": "^16.0.1",
+         "bootstrap": "^5.3.3",
+         "ngx-bootstrap": "^19.0.2",
++        "ngx-toastr": "^19.0.0",
+         "rxjs": "~7.8.0",
+         "tslib": "^2.3.0",
+         "zone.js": "~0.15.0"
+@@ -10475,6 +10476,20 @@
+         "rxjs": "^6.5.3 || ^7.4.0"
+       }
+     },
++    "node_modules/ngx-toastr": {
++      "version": "19.0.0",
++      "resolved": "https://registry.npmjs.org/ngx-toastr/-/ngx-toastr-19.0.0.tgz",
++      "integrity": "sha512-6pTnktwwWD+kx342wuMOWB4+bkyX9221pAgGz3SHOJH0/MI9erLucS8PeeJDFwbUYyh75nQ6AzVtolgHxi52dQ==",
++      "license": "MIT",
++      "dependencies": {
++        "tslib": "^2.3.0"
++      },
++      "peerDependencies": {
++        "@angular/common": ">=16.0.0-0",
++        "@angular/core": ">=16.0.0-0",
++        "@angular/platform-browser": ">=16.0.0-0"
++      }
++    },
+     "node_modules/node-addon-api": {
+       "version": "6.1.0",
+       "resolved": "https://registry.npmjs.org/node-addon-api/-/node-addon-api-6.1.0.tgz",
