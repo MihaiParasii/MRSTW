@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtdamDarom.Web", "OtdamDarom.Web\OtdamDarom.Web.csproj", "{557851E5-EF2E-44A6-B5EC-39EB671BE53A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtdamDarom.BusinessLogic", "OtdamDarom.BusinessLogic\OtdamDarom.BusinessLogic.csproj", "{1F508429-8E9E-40A8-A253-F19B4879B460}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtdamDarom.Domain", "OtdamDarom.Domain\OtdamDarom.Domain.csproj", "{ED90D12D-A51A-4F14-ABD9-33CCAE698FD3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{557851E5-EF2E-44A6-B5EC-39EB671BE53A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{557851E5-EF2E-44A6-B5EC-39EB671BE53A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{557851E5-EF2E-44A6-B5EC-39EB671BE53A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{557851E5-EF2E-44A6-B5EC-39EB671BE53A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F508429-8E9E-40A8-A253-F19B4879B460}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F508429-8E9E-40A8-A253-F19B4879B460}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F508429-8E9E-40A8-A253-F19B4879B460}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F508429-8E9E-40A8-A253-F19B4879B460}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED90D12D-A51A-4F14-ABD9-33CCAE698FD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED90D12D-A51A-4F14-ABD9-33CCAE698FD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED90D12D-A51A-4F14-ABD9-33CCAE698FD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED90D12D-A51A-4F14-ABD9-33CCAE698FD3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

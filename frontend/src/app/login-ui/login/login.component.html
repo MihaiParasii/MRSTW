@@ -1,9 +1,0 @@
-<h2 class="auth-title">{{ "AUTH.MAIN" | translate }}</h2>
-<form>
-	<input type="text" [formControl]="email" placeholder="{{ 'AUTH.EMAIL' | translate }}" class="auth-input" required>
-	<input type="password" [formControl]="password" placeholder="{{ 'AUTH.PASSWORD' | translate }}" class="auth-input"
-		   required>
-	<button class="auth-button" (click)="onClicked()">{{ 'AUTH.AUTHENTICATION_BUTTON' | translate }}</button>
-</form>
-<p class="auth-footer">{{ 'AUTH.LABEL_REGISTER' | translate }} <a
-		routerLink="/auth/register">{{ 'AUTH.REGISTER_LINK' | translate }}</a></p>

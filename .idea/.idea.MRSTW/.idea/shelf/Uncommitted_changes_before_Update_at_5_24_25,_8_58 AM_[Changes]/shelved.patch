@@ -1,0 +1,783 @@
+Index: Auth.Api/appsettings.Development.json
+===================================================================
+diff --git a/Auth.Api/appsettings.Development.json b/Auth.Api/appsettings.Development.json
+deleted file mode 100644
+--- a/Auth.Api/appsettings.Development.json	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,8 +0,0 @@
+-{
+-  "Logging": {
+-    "LogLevel": {
+-      "Default": "Information",
+-      "Microsoft.AspNetCore": "Warning"
+-    }
+-  }
+-}
+Index: Notification.Api/Services/EmailNotification.cs
+===================================================================
+diff --git a/Notification.Api/Services/EmailNotification.cs b/Notification.Api/Services/EmailNotification.cs
+deleted file mode 100644
+--- a/Notification.Api/Services/EmailNotification.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,21 +0,0 @@
+-using Notification.Api.Models;
+-
+-namespace Notification.Api.Services;
+-
+-public class EmailNotification(IEmailService emailService) : INotification
+-{
+-    public async Task NotifyAsync(SendNotificationRequest request)
+-    {
+-        var emailRequest = new SendEmailRequest
+-        {
+-            DealAuthorName = request.DealAuthorName,
+-            DealAuthorPhoneNumber = request.DealAuthorPhoneNumber,
+-            RecipientName = request.RecipientName,
+-            RecipientEmail = request.RecipientEmail,
+-            Subject = request.Subject,
+-            Message = request.Message
+-        };
+-        
+-        await emailService.SendEmailAsync(emailRequest);
+-    }
+-}
+Index: Notification.Api/Properties/launchSettings.json
+===================================================================
+diff --git a/Notification.Api/Properties/launchSettings.json b/Notification.Api/Properties/launchSettings.json
+deleted file mode 100644
+--- a/Notification.Api/Properties/launchSettings.json	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,41 +0,0 @@
+-{
+-  "$schema": "http://json.schemastore.org/launchsettings.json",
+-  "iisSettings": {
+-    "windowsAuthentication": false,
+-    "anonymousAuthentication": true,
+-    "iisExpress": {
+-      "applicationUrl": "http://localhost:14973",
+-      "sslPort": 44300
+-    }
+-  },
+-  "profiles": {
+-    "http": {
+-      "commandName": "Project",
+-      "dotnetRunMessages": true,
+-      "launchBrowser": true,
+-      "launchUrl": "swagger",
+-      "applicationUrl": "http://localhost:5078",
+-      "environmentVariables": {
+-        "ASPNETCORE_ENVIRONMENT": "Development"
+-      }
+-    },
+-    "https": {
+-      "commandName": "Project",
+-      "dotnetRunMessages": true,
+-      "launchBrowser": true,
+-      "launchUrl": "swagger",
+-      "applicationUrl": "https://localhost:7094;http://localhost:5078",
+-      "environmentVariables": {
+-        "ASPNETCORE_ENVIRONMENT": "Development"
+-      }
+-    },
+-    "IIS Express": {
+-      "commandName": "IISExpress",
+-      "launchBrowser": true,
+-      "launchUrl": "swagger",
+-      "environmentVariables": {
+-        "ASPNETCORE_ENVIRONMENT": "Development"
+-      }
+-    }
+-  }
+-}
+Index: Notification.Api/Services/IEmailService.cs
+===================================================================
+diff --git a/Notification.Api/Services/IEmailService.cs b/Notification.Api/Services/IEmailService.cs
+deleted file mode 100644
+--- a/Notification.Api/Services/IEmailService.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,8 +0,0 @@
+-using Notification.Api.Models;
+-
+-namespace Notification.Api.Services;
+-
+-public interface IEmailService
+-{
+-    Task SendEmailAsync(SendEmailRequest request);
+-}
+Index: Auth.BusinessLogicLayer/DependencyInjection.cs
+===================================================================
+diff --git a/Auth.BusinessLogicLayer/DependencyInjection.cs b/Auth.BusinessLogicLayer/DependencyInjection.cs
+deleted file mode 100644
+--- a/Auth.BusinessLogicLayer/DependencyInjection.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,12 +0,0 @@
+-namespace Auth.BusinessLogicLayer;
+-
+-public static class DependencyInjection
+-{
+-    // public static IServiceCollection AddAuthApplication(this IServiceCollection services)
+-    // {
+-    //     services.AddScoped<IUserService, UserService>();
+-    //     services.AddScoped<ITokenService, TokenService>();
+-    //
+-    //     return services;
+-    // }
+-}
+Index: Auth.Api/Program.cs
+===================================================================
+diff --git a/Auth.Api/Program.cs b/Auth.Api/Program.cs
+deleted file mode 100644
+--- a/Auth.Api/Program.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,34 +0,0 @@
+-namespace Auth.Api;
+-
+-public class Program
+-{
+-    public static void Main(string[] args)
+-    {
+-        var builder = WebApplication.CreateBuilder(args);
+-
+-        // Add services to the container.
+-
+-        builder.Services.AddControllers();
+-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+-        builder.Services.AddEndpointsApiExplorer();
+-        builder.Services.AddSwaggerGen();
+-
+-        var app = builder.Build();
+-
+-        // Configure the HTTP request pipeline.
+-        if (app.Environment.IsDevelopment())
+-        {
+-            app.UseSwagger();
+-            app.UseSwaggerUI();
+-        }
+-
+-        app.UseHttpsRedirection();
+-
+-        app.UseAuthorization();
+-
+-
+-        app.MapControllers();
+-
+-        app.Run();
+-    }
+-}
+Index: Auth.Api/appsettings.json
+===================================================================
+diff --git a/Auth.Api/appsettings.json b/Auth.Api/appsettings.json
+deleted file mode 100644
+--- a/Auth.Api/appsettings.json	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,9 +0,0 @@
+-{
+-  "Logging": {
+-    "LogLevel": {
+-      "Default": "Information",
+-      "Microsoft.AspNetCore": "Warning"
+-    }
+-  },
+-  "AllowedHosts": "*"
+-}
+Index: Test.Notification.Service/Test.Notification.Service.csproj
+===================================================================
+diff --git a/Test.Notification.Service/Test.Notification.Service.csproj b/Test.Notification.Service/Test.Notification.Service.csproj
+deleted file mode 100644
+--- a/Test.Notification.Service/Test.Notification.Service.csproj	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,23 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk">
+-
+-    <PropertyGroup>
+-        <TargetFramework>net8.0</TargetFramework>
+-        <ImplicitUsings>enable</ImplicitUsings>
+-        <Nullable>enable</Nullable>
+-
+-        <IsPackable>false</IsPackable>
+-        <IsTestProject>true</IsTestProject>
+-    </PropertyGroup>
+-
+-    <ItemGroup>
+-        <PackageReference Include="coverlet.collector" Version="6.0.0"/>
+-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
+-        <PackageReference Include="xunit" Version="2.5.3"/>
+-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3"/>
+-    </ItemGroup>
+-
+-    <ItemGroup>
+-        <Using Include="Xunit"/>
+-    </ItemGroup>
+-
+-</Project>
+Index: Notification.Api/Services/INotification.cs
+===================================================================
+diff --git a/Notification.Api/Services/INotification.cs b/Notification.Api/Services/INotification.cs
+deleted file mode 100644
+--- a/Notification.Api/Services/INotification.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,8 +0,0 @@
+-using Notification.Api.Models;
+-
+-namespace Notification.Api.Services;
+-
+-public interface INotification
+-{
+-    Task NotifyAsync(SendNotificationRequest request);
+-}
+Index: Notification.Api/Models/SendNotificationRequest.cs
+===================================================================
+diff --git a/Notification.Api/Models/SendNotificationRequest.cs b/Notification.Api/Models/SendNotificationRequest.cs
+deleted file mode 100644
+--- a/Notification.Api/Models/SendNotificationRequest.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,11 +0,0 @@
+-namespace Notification.Api.Models;
+-
+-public class SendNotificationRequest
+-{
+-    public required string DealAuthorName { get; set; }
+-    public required string DealAuthorPhoneNumber { get; set; }
+-    public required string RecipientName { get; set; }
+-    public required string RecipientEmail { get; set; }
+-    public required string Subject { get; set; }
+-    public required string Message { get; set; }
+-}
+\ No newline at end of file
+Index: Auth.Api/Properties/launchSettings.json
+===================================================================
+diff --git a/Auth.Api/Properties/launchSettings.json b/Auth.Api/Properties/launchSettings.json
+deleted file mode 100644
+--- a/Auth.Api/Properties/launchSettings.json	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,41 +0,0 @@
+-{
+-  "$schema": "http://json.schemastore.org/launchsettings.json",
+-  "iisSettings": {
+-    "windowsAuthentication": false,
+-    "anonymousAuthentication": true,
+-    "iisExpress": {
+-      "applicationUrl": "http://localhost:35009",
+-      "sslPort": 44316
+-    }
+-  },
+-  "profiles": {
+-    "http": {
+-      "commandName": "Project",
+-      "dotnetRunMessages": true,
+-      "launchBrowser": true,
+-      "launchUrl": "swagger",
+-      "applicationUrl": "http://localhost:5219",
+-      "environmentVariables": {
+-        "ASPNETCORE_ENVIRONMENT": "Development"
+-      }
+-    },
+-    "https": {
+-      "commandName": "Project",
+-      "dotnetRunMessages": true,
+-      "launchBrowser": true,
+-      "launchUrl": "swagger",
+-      "applicationUrl": "https://localhost:7023;http://localhost:5219",
+-      "environmentVariables": {
+-        "ASPNETCORE_ENVIRONMENT": "Development"
+-      }
+-    },
+-    "IIS Express": {
+-      "commandName": "IISExpress",
+-      "launchBrowser": true,
+-      "launchUrl": "swagger",
+-      "environmentVariables": {
+-        "ASPNETCORE_ENVIRONMENT": "Development"
+-      }
+-    }
+-  }
+-}
+Index: Notification.Api/Services/EmailService.cs
+===================================================================
+diff --git a/Notification.Api/Services/EmailService.cs b/Notification.Api/Services/EmailService.cs
+deleted file mode 100644
+--- a/Notification.Api/Services/EmailService.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,29 +0,0 @@
+-using Notification.Api.Models;
+-
+-namespace Notification.Api.Services;
+-
+-public class EmailService(IConfiguration configuration) : IEmailService
+-{
+-    public async Task SendEmailAsync(SendEmailRequest request)
+-    {
+-        string? sendgridApiKey = configuration["SendGridSettings:ApiKey"];
+-        string? senderEmail = configuration["SendGridSettings:FromEmail"];
+-        string? senderName = configuration["SendGridSettings:FromName"];
+-
+-         throw new NotImplementedException();
+-         /*
+-         var client = new SendGridClient(sendgridApiKey);
+-         var from = new EmailAddress(senderEmail, senderName);
+-         var to = new EmailAddress(toEmail);
+-         var msg = MailHelper.CreateSingleEmail(from, to, subject, body, body);
+-         var response = await client.SendEmailAsync(msg);
+-
+-         if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
+-         {
+-             // Handle error
+-             var responseBody = await response.Body.ReadAsStringAsync();
+-             throw new Exception($"Failed to send email: {response.StatusCode}, {responseBody}");
+-         }
+-         */
+-    }
+-}
+Index: Auth.DataAccessLayer/DependencyInjection.cs
+===================================================================
+diff --git a/Auth.DataAccessLayer/DependencyInjection.cs b/Auth.DataAccessLayer/DependencyInjection.cs
+deleted file mode 100644
+--- a/Auth.DataAccessLayer/DependencyInjection.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,6 +0,0 @@
+-// namespace Auth.DataAccessLayer;
+-//
+-// public static class DependencyInjection
+-// {
+-//     
+-// }
+Index: Auth.Api/Auth.Api.csproj
+===================================================================
+diff --git a/Auth.Api/Auth.Api.csproj b/Auth.Api/Auth.Api.csproj
+deleted file mode 100644
+--- a/Auth.Api/Auth.Api.csproj	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,20 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk.Web">
+-
+-    <PropertyGroup>
+-        <TargetFramework>net8.0</TargetFramework>
+-        <Nullable>enable</Nullable>
+-        <ImplicitUsings>enable</ImplicitUsings>
+-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+-    </PropertyGroup>
+-
+-    <ItemGroup>
+-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
+-    </ItemGroup>
+-
+-    <ItemGroup>
+-      <Content Include="..\.dockerignore">
+-        <Link>.dockerignore</Link>
+-      </Content>
+-    </ItemGroup>
+-
+-</Project>
+Index: Auth.Api/Dockerfile
+===================================================================
+diff --git a/Auth.Api/Dockerfile b/Auth.Api/Dockerfile
+deleted file mode 100644
+--- a/Auth.Api/Dockerfile	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,23 +0,0 @@
+-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+-USER $APP_UID
+-WORKDIR /app
+-EXPOSE 8080
+-EXPOSE 8081
+-
+-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+-ARG BUILD_CONFIGURATION=Release
+-WORKDIR /src
+-COPY ["Auth.Api/Auth.Api.csproj", "Auth.Api/"]
+-RUN dotnet restore "Auth.Api/Auth.Api.csproj"
+-COPY . .
+-WORKDIR "/src/Auth.Api"
+-RUN dotnet build "Auth.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+-
+-FROM build AS publish
+-ARG BUILD_CONFIGURATION=Release
+-RUN dotnet publish "Auth.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+-
+-FROM base AS final
+-WORKDIR /app
+-COPY --from=publish /app/publish .
+-ENTRYPOINT ["dotnet", "Auth.Api.dll"]
+Index: Notification.Api/Notification.Api.http
+===================================================================
+diff --git a/Notification.Api/Notification.Api.http b/Notification.Api/Notification.Api.http
+deleted file mode 100644
+--- a/Notification.Api/Notification.Api.http	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,6 +0,0 @@
+-@Notification.Api_HostAddress = http://localhost:5078
+-
+-GET {{Notification.Api_HostAddress}}/weatherforecast/
+-Accept: application/json
+-
+-###
+Index: Notification.Api/Services/NotificationManager.cs
+===================================================================
+diff --git a/Notification.Api/Services/NotificationManager.cs b/Notification.Api/Services/NotificationManager.cs
+deleted file mode 100644
+--- a/Notification.Api/Services/NotificationManager.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,26 +0,0 @@
+-using Notification.Api.Models;
+-
+-namespace Notification.Api.Services;
+-
+-public class NotificationManager
+-{
+-    private readonly List<INotification> _notifications = [];
+-
+-    public void Subscribe(INotification notification)
+-    {
+-        _notifications.Add(notification);
+-    }
+-
+-    public void Unsubscribe(INotification notification)
+-    {
+-        _notifications.Remove(notification);
+-    }
+-
+-    public async Task Notify(SendNotificationRequest request)
+-    {
+-        foreach (var notification in _notifications)
+-        {
+-            await notification.NotifyAsync(request);
+-        }
+-    }
+-}
+Index: Auth.BusinessLogicLayer/Auth.BusinessLogicLayer.csproj
+===================================================================
+diff --git a/Auth.BusinessLogicLayer/Auth.BusinessLogicLayer.csproj b/Auth.BusinessLogicLayer/Auth.BusinessLogicLayer.csproj
+deleted file mode 100644
+--- a/Auth.BusinessLogicLayer/Auth.BusinessLogicLayer.csproj	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,14 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk">
+-
+-    <PropertyGroup>
+-        <TargetFramework>net8.0</TargetFramework>
+-        <ImplicitUsings>enable</ImplicitUsings>
+-        <Nullable>enable</Nullable>
+-    </PropertyGroup>
+-
+-    <ItemGroup>
+-      <Folder Include="Common\Interfaces\" />
+-      <Folder Include="Common\Mappings\" />
+-    </ItemGroup>
+-
+-</Project>
+Index: Notification.Api/Notification.Api.csproj
+===================================================================
+diff --git a/Notification.Api/Notification.Api.csproj b/Notification.Api/Notification.Api.csproj
+deleted file mode 100644
+--- a/Notification.Api/Notification.Api.csproj	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,27 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk.Web">
+-
+-    <PropertyGroup>
+-        <TargetFramework>net8.0</TargetFramework>
+-        <Nullable>enable</Nullable>
+-        <ImplicitUsings>enable</ImplicitUsings>
+-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+-    </PropertyGroup>
+-
+-    <ItemGroup>
+-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+-        <PackageReference Include="RabbitMQ.Client" Version="7.1.1" />
+-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
+-    </ItemGroup>
+-
+-    <ItemGroup>
+-      <Content Include="..\.dockerignore">
+-        <Link>.dockerignore</Link>
+-      </Content>
+-    </ItemGroup>
+-
+-    <ItemGroup>
+-      <Folder Include="Controllers\" />
+-    </ItemGroup>
+-
+-</Project>
+Index: Auth.DataAccessLayer/Auth.DataAccessLayer.csproj
+===================================================================
+diff --git a/Auth.DataAccessLayer/Auth.DataAccessLayer.csproj b/Auth.DataAccessLayer/Auth.DataAccessLayer.csproj
+deleted file mode 100644
+--- a/Auth.DataAccessLayer/Auth.DataAccessLayer.csproj	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,13 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk">
+-
+-    <PropertyGroup>
+-        <TargetFramework>net8.0</TargetFramework>
+-        <ImplicitUsings>enable</ImplicitUsings>
+-        <Nullable>enable</Nullable>
+-    </PropertyGroup>
+-
+-    <ItemGroup>
+-      <ProjectReference Include="..\Domain\Domain.csproj" />
+-    </ItemGroup>
+-
+-</Project>
+Index: Notification.Api/appsettings.Development.json
+===================================================================
+diff --git a/Notification.Api/appsettings.Development.json b/Notification.Api/appsettings.Development.json
+deleted file mode 100644
+--- a/Notification.Api/appsettings.Development.json	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,12 +0,0 @@
+-{
+-  "Logging": {
+-    "LogLevel": {
+-      "Default": "Information",
+-      "Microsoft.AspNetCore": "Warning"
+-    }
+-  },
+-  "ConnectionStrings": {
+-    "NotificationMicroservice": "",
+-    "RabbitMQMain-Notification": "notification-queue"
+-  }
+-}
+Index: Notification.Api/Models/SendEmailRequest.cs
+===================================================================
+diff --git a/Notification.Api/Models/SendEmailRequest.cs b/Notification.Api/Models/SendEmailRequest.cs
+deleted file mode 100644
+--- a/Notification.Api/Models/SendEmailRequest.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,11 +0,0 @@
+-namespace Notification.Api.Models;
+-
+-public class SendEmailRequest
+-{
+-    public required string DealAuthorName { get; set; }
+-    public required string DealAuthorPhoneNumber { get; set; }
+-    public required string RecipientName { get; set; }
+-    public required string RecipientEmail { get; set; }
+-    public required string Subject { get; set; }
+-    public required string Message { get; set; }
+-}
+Index: Auth.BusinessLogicLayer/Services/TokenService.cs
+===================================================================
+diff --git a/Auth.BusinessLogicLayer/Services/TokenService.cs b/Auth.BusinessLogicLayer/Services/TokenService.cs
+deleted file mode 100644
+--- a/Auth.BusinessLogicLayer/Services/TokenService.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,6 +0,0 @@
+-namespace Auth.BusinessLogicLayer.Services;
+-
+-public class TokenService
+-{
+-    
+-}
+Index: Notification.Api/Dockerfile
+===================================================================
+diff --git a/Notification.Api/Dockerfile b/Notification.Api/Dockerfile
+deleted file mode 100644
+--- a/Notification.Api/Dockerfile	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,23 +0,0 @@
+-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+-USER $APP_UID
+-WORKDIR /app
+-EXPOSE 8080
+-EXPOSE 8081
+-
+-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+-ARG BUILD_CONFIGURATION=Release
+-WORKDIR /src
+-COPY ["Notification.Api/Notification.Api.csproj", "Notification.Api/"]
+-RUN dotnet restore "Notification.Api/Notification.Api.csproj"
+-COPY . .
+-WORKDIR "/src/Notification.Api"
+-RUN dotnet build "Notification.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+-
+-FROM build AS publish
+-ARG BUILD_CONFIGURATION=Release
+-RUN dotnet publish "Notification.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+-
+-FROM base AS final
+-WORKDIR /app
+-COPY --from=publish /app/publish .
+-ENTRYPOINT ["dotnet", "Notification.Api.dll"]
+Index: Auth.Api/Auth.Api.http
+===================================================================
+diff --git a/Auth.Api/Auth.Api.http b/Auth.Api/Auth.Api.http
+deleted file mode 100644
+--- a/Auth.Api/Auth.Api.http	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,6 +0,0 @@
+-@Auth.Api_HostAddress = http://localhost:5219
+-
+-GET {{Auth.Api_HostAddress}}/weatherforecast/
+-Accept: application/json
+-
+-###
+Index: Auth.DataAccessLayer/Data/AuthDbContext.cs
+===================================================================
+diff --git a/Auth.DataAccessLayer/Data/AuthDbContext.cs b/Auth.DataAccessLayer/Data/AuthDbContext.cs
+deleted file mode 100644
+--- a/Auth.DataAccessLayer/Data/AuthDbContext.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,9 +0,0 @@
+-// using Domain.Models.Auth;
+-// using Microsoft.EntityFrameworkCore;
+-//
+-// namespace Auth.DataAccessLayer.Data;
+-//
+-// public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(options)
+-// {
+-//     public DbSet<Admin> Admins { get; set; }
+-// }
+Index: Notification.Api/appsettings.json
+===================================================================
+diff --git a/Notification.Api/appsettings.json b/Notification.Api/appsettings.json
+deleted file mode 100644
+--- a/Notification.Api/appsettings.json	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,9 +0,0 @@
+-{
+-  "Logging": {
+-    "LogLevel": {
+-      "Default": "Information",
+-      "Microsoft.AspNetCore": "Warning"
+-    }
+-  },
+-  "AllowedHosts": "*"
+-}
+Index: Notification.Api/Program.cs
+===================================================================
+diff --git a/Notification.Api/Program.cs b/Notification.Api/Program.cs
+deleted file mode 100644
+--- a/Notification.Api/Program.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,39 +0,0 @@
+-using Notification.Api.Services;
+-
+-namespace Notification.Api;
+-
+-public static class Program
+-{
+-    public static void Main(string[] args)
+-    {
+-        var builder = WebApplication.CreateBuilder(args);
+-
+-        builder.Services.AddControllers();
+-
+-        builder.Services.AddSingleton<IEmailService, EmailService>();
+-        builder.Services.AddScoped<INotification, EmailNotification>();
+-        builder.Services.AddSingleton<NotificationManager, NotificationManager>();
+-        builder.Services.AddHostedService<RabbitMqListener>();
+-        builder.Services.AddHttpClient();
+-
+-
+-        builder.Services.AddEndpointsApiExplorer();
+-        builder.Services.AddSwaggerGen();
+-
+-        var app = builder.Build();
+-
+-        if (app.Environment.IsDevelopment())
+-        {
+-            app.UseSwagger();
+-            app.UseSwaggerUI();
+-        }
+-
+-        var service = app.Services.GetService<NotificationManager>();
+-        service!.Subscribe(app.Services.GetService<EmailNotification>()!);
+-
+-        app.UseHttpsRedirection();
+-
+-
+-        app.Run();
+-    }
+-}
+Index: Notification.Api/Services/RabbitMqListener.cs
+===================================================================
+diff --git a/Notification.Api/Services/RabbitMqListener.cs b/Notification.Api/Services/RabbitMqListener.cs
+deleted file mode 100644
+--- a/Notification.Api/Services/RabbitMqListener.cs	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,49 +0,0 @@
+-using System.Diagnostics;
+-using System.Text;
+-using RabbitMQ.Client;
+-using RabbitMQ.Client.Events;
+-
+-namespace Notification.Api.Services;
+-
+-public class RabbitMqListener : BackgroundService
+-{
+-    private readonly string _notificationQueue;
+-
+-    private readonly IConnection _connection;
+-    private readonly IChannel _channel;
+-
+-    public RabbitMqListener(IConfiguration configuration)
+-    {
+-        _notificationQueue = configuration.GetConnectionString("RabbitMQMain-Notification")!;
+-
+-        var factory = new ConnectionFactory { HostName = "localhost" };
+-        _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
+-        _channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
+-        _channel.QueueDeclareAsync(queue: _notificationQueue, durable: false, exclusive: false, autoDelete: false,
+-            arguments: null).GetAwaiter().GetResult();
+-    }
+-
+-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+-    {
+-        stoppingToken.ThrowIfCancellationRequested();
+-
+-        var consumer = new AsyncEventingBasicConsumer(_channel);
+-        consumer.ReceivedAsync += async (ch, ea) =>
+-        {
+-            string? content = Encoding.UTF8.GetString(ea.Body.ToArray());
+-
+-            Debug.WriteLine($"Получено сообщение: {content}");
+-
+-            await _channel.BasicAckAsync(ea.DeliveryTag, false, stoppingToken);
+-        };
+-
+-        await _channel.BasicConsumeAsync(_notificationQueue, false, consumer, cancellationToken: stoppingToken);
+-    }
+-
+-    public override void Dispose()
+-    {
+-        _channel.CloseAsync().GetAwaiter().GetResult();
+-        _connection.CloseAsync().GetAwaiter().GetResult();
+-        base.Dispose();
+-    }
+-}
+Index: Test.Auth.Service/Test.Auth.Service.csproj
+===================================================================
+diff --git a/Test.Auth.Service/Test.Auth.Service.csproj b/Test.Auth.Service/Test.Auth.Service.csproj
+deleted file mode 100644
+--- a/Test.Auth.Service/Test.Auth.Service.csproj	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
++++ /dev/null	(revision b13e57431d7d8a09fdda271016d8b1157f8490cf)
+@@ -1,28 +0,0 @@
+-<Project Sdk="Microsoft.NET.Sdk">
+-
+-    <PropertyGroup>
+-        <TargetFramework>net8.0</TargetFramework>
+-        <ImplicitUsings>enable</ImplicitUsings>
+-        <Nullable>enable</Nullable>
+-
+-        <IsPackable>false</IsPackable>
+-        <IsTestProject>true</IsTestProject>
+-    </PropertyGroup>
+-
+-    <ItemGroup>
+-        <PackageReference Include="coverlet.collector" Version="6.0.0"/>
+-        <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
+-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
+-        <PackageReference Include="xunit" Version="2.5.3"/>
+-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3"/>
+-    </ItemGroup>
+-
+-    <ItemGroup>
+-        <Using Include="Xunit"/>
+-    </ItemGroup>
+-
+-    <ItemGroup>
+-      <ProjectReference Include="..\MRSTW.Api\MRSTW.Api.csproj" />
+-    </ItemGroup>
+-
+-</Project>

@@ -1,0 +1,31 @@
+Index: MRSTW.BusinessLogicLayer/Validators/CategoryValidator.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>using Domain.Models.Main;\nusing FluentValidation;\nusing MRSTW.BusinessLogicLayer.Common.Interfaces;\n\nnamespace MRSTW.BusinessLogicLayer.Validators;\n\npublic class CategoryValidator : AbstractValidator<CategoryModel>\n{\n    private readonly ICategoryRepository _categoryRepository;\n\n    public CategoryValidator(ICategoryRepository categoryRepository)\n    {\n        _categoryRepository = categoryRepository;\n\n        RuleFor(x => x.Name).NotEmpty().Length(1, 100)\n            .WithMessage(\"Category name must not be empty!\");\n\n        RuleFor(x => x).Must(IsUniqueCategoryName)\n            .WithMessage(\"Category name must be unique!\");\n\n        RuleFor(x => x.Name).Must(IsValidName)\n            .WithMessage(\"Category name can only contain letters and white spaces!\");\n    }\n\n    private bool IsUniqueCategoryName(CategoryModel categoryModel)\n    {\n        if (string.IsNullOrWhiteSpace(categoryModel.Name))\n        {\n            return false;\n        }\n\n        if (categoryModel.Id <= 0)\n        {\n            return false;\n        }\n\n        var categories = _categoryRepository.GetAllAsync().GetAwaiter().GetResult();\n\n        return categories.All(\n            x => !string.Equals(x.Name, categoryModel.Name, StringComparison.CurrentCultureIgnoreCase));\n    }\n\n    private static bool IsValidName(string name)\n    {\n        return name.All(c => char.IsLetter(c) || c == ' ');\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/MRSTW.BusinessLogicLayer/Validators/CategoryValidator.cs b/MRSTW.BusinessLogicLayer/Validators/CategoryValidator.cs
+--- a/MRSTW.BusinessLogicLayer/Validators/CategoryValidator.cs	(revision 745549af759c1311c7f46c28d9cb5f2a2512d247)
++++ b/MRSTW.BusinessLogicLayer/Validators/CategoryValidator.cs	(date 1746010083146)
+@@ -12,14 +12,14 @@
+     {
+         _categoryRepository = categoryRepository;
+ 
+-        RuleFor(x => x.Name).NotEmpty().Length(1, 100)
+-            .WithMessage("Category name must not be empty!");
++        // RuleFor(x => x.Name).NotEmpty().Length(1, 100)
++        //     .WithMessage("Category name must not be empty!");
+ 
+-        RuleFor(x => x).Must(IsUniqueCategoryName)
+-            .WithMessage("Category name must be unique!");
++        // RuleFor(x => x).Must(IsUniqueCategoryName)
++        //     .WithMessage("Category name must be unique!");
+ 
+-        RuleFor(x => x.Name).Must(IsValidName)
+-            .WithMessage("Category name can only contain letters and white spaces!");
++        // RuleFor(x => x.Name).Must(IsValidName)
++            // .WithMessage("Category name can only contain letters and white spaces!");
+     }
+ 
+     private bool IsUniqueCategoryName(CategoryModel categoryModel)
