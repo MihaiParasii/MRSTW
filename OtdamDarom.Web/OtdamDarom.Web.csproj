@@ -136,6 +136,8 @@
         <Compile Include="Requests\UpdateSubcategoryRequest.cs" />
         <Compile Include="Requests\UpdateUserRequest.cs" />
         <Compile Include="Requests\UserResponse.cs" />
+        <Content Include="Views\Auth\Login.cshtml" />
+        <Content Include="Views\Auth\Register.cshtml" />
         <Content Include="Views\Shared\_Footer.cshtml" />
         <Content Include="Views\Shared\_Header.cshtml" />
     </ItemGroup>
