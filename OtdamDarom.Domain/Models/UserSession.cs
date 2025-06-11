@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OtdamDarom.Domain.Models
 {
+    [Table("UserSessions")]
     public class UserSession
     {
         [Key]

@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OtdamDarom.Domain.Models
 {
+    [Table("Categories")]
     public class CategoryModel : BaseEntity
     {
         public string Name { get; set; }
-        public List<int> SubcategoryIds { get; set; } = new List<int>();
-        public List<SubcategoryModel> Subcategories { get; set; } = new List<SubcategoryModel>();
+        public virtual ICollection<SubcategoryModel> Subcategories { get; set; } = new List<SubcategoryModel>();
     }
 }

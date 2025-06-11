@@ -1,5 +1,7 @@
-﻿using OtdamDarom.BusinessLogic.Interfaces;
-using OtdamDarom.BusinessLogic.Services;
+﻿// OtdamDarom.BusinessLogic/BusinessLogic.cs
+using OtdamDarom.BusinessLogic.EntityBL; // Asigură-te că acest using este prezent
+using OtdamDarom.BusinessLogic.Interfaces;
+using OtdamDarom.BusinessLogic.Services; // Dacă CategoryService e aici, e posibil să nu mai fie folosit pentru categorii
 
 namespace OtdamDarom.BusinessLogic
 {
@@ -12,7 +14,7 @@ namespace OtdamDarom.BusinessLogic
 
         public ICategory GetCategoryBL()
         {
-            return new CategoryService();
+            return new CategoryBl(); // <<--- AICI SCHIMBĂ SĂ RETURN EZI NOUA INSTANȚĂ CategoryBl()
         }
 
         public IDeal GetDealBL()
@@ -23,11 +25,6 @@ namespace OtdamDarom.BusinessLogic
         public ISession GetSessionBL()
         {
             return new SessionService();
-        }
-
-        public ISubcategory GetSubcategoryBL()
-        {
-            return new SubcategoryService();
         }
 
         public IUser GetUserBl()

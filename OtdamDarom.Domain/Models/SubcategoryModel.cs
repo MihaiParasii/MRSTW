@@ -1,9 +1,13 @@
-﻿namespace OtdamDarom.Domain.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace OtdamDarom.Domain.Models
 {
+    [Table("Subcategories")]
     public class SubcategoryModel : BaseEntity
     {
         public string Name { get; set; }
         public int CategoryId { get; set; }
-        public CategoryModel Category { get; set; }
+        public virtual CategoryModel Category { get; set; }
+        
     }
 }

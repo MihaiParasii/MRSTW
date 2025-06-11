@@ -1,11 +1,108 @@
-﻿<!-- Sidebar -->
+﻿@model IEnumerable<OtdamDarom.Web.Requests.CategoryResponse>
+
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-    <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-hand-holding-heart"></i>
         </div>
         <div class="sidebar-brand-text mx-3">OtdamDarom</div>
     </a>
+
+    <hr class="sidebar-divider my-0">
+
+    <li class="nav-item active">
+        <a class="nav-link" href="@Url.Action("Index", "Home")">
+            <i class="fas fa-home"></i>
+            <span>Toate Anunțurile</span>
+        </a>
+    </li>
+
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
+        Categorii
+    </div>
+
+    @if (Model != null)
+    {
+        // <<--- NOU: Definim maparea iconițelor aici
+        var categoryIcons = new Dictionary<string, string>
+        {
+            // Acestea sunt categoriile tale exacte din baza de date și iconițele dorite.
+            // Asigură-te că fiecare nume de categorie (cheia) este unic.
+            { "Cărți", "fas fa-book" },
+            { "Electrocasnice", "fas fa-blender" },
+            { "Haine", "fas fa-tshirt" },
+            { "Jucării", "fas fa-gamepad" },
+            { "Mobilier", "fas fa-couch" },
+            // Dacă ai alte categorii, adaugă-le aici, dar nu duplica cele de mai sus.
+            // Exemplu de alte categorii generice sau specifice, dacă le vei adăuga în viitor:
+            { "Tehnologie", "fas fa-laptop" },
+            { "Articole Sportive", "fas fa-dumbbell" },
+            { "Animale de companie", "fas fa-paw" },
+            { "Servicii", "fas fa-handshake" },
+            { "Altele", "fas fa-ellipsis-h" }
+        };
+        // <<--- SFÂRȘIT NOU
+
+        foreach (var category in Model.OrderBy(c => c.Name))
+        {
+            // <<--- MODIFICARE AICI: Aplicăm iconița personalizată sau una implicită
+            string iconClass = categoryIcons.ContainsKey(category.Name) ? categoryIcons[category.Name] : "fas fa-fw fa-folder";
+            // <<--- SFÂRȘIT MODIFICARE
+
+            <li class="nav-item">
+                <a class="nav-link @(category.Subcategories != null && category.Subcategories.Any() ? "collapsed" : "")" 
+                   href="@(category.Subcategories != null && category.Subcategories.Any() ? "#collapse" + category.Id : Url.Action("DealsByCategory", "Home", new { categoryId = category.Id }))"
+                   data-toggle="collapse" 
+                   aria-expanded="true" 
+                   aria-controls="collapse@(category.Id)">
+                    <i class="@iconClass"></i> @* <<--- Folosim variabila iconClass aici *@
+                    <span>@category.Name</span>
+                </a>
+                @if (category.Subcategories != null && category.Subcategories.Any())
+                {
+                    <div id="collapse@(category.Id)" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <h6 class="collapse-header">Subcategorii:</h6>
+                            @foreach (var subcategory in category.Subcategories.OrderBy(s => s.Name))
+                            {
+                                <a class="collapse-item" href="@Url.Action("DealsBySubcategory", "Home", new { subcategoryId = subcategory.Id })">@subcategory.Name</a> @* Notă: Am schimbat param-ul la subcategoryId *@
+                            }
+                        </div>
+                    </div>
+                }
+            </li>
+        }
+    }
+
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-heading">
+        Alte Pagini
+    </div>
+
+    <li class="nav-item">
+        <a class="nav-link" href="@Url.Action("About", "Home")">
+            <i class="fas fa-info-circle"></i>
+            <span>Despre Noi</span>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="@Url.Action("Privacy", "Home")">
+            <i class="fas fa-user-secret"></i>
+            <span>Politica de confidențialitate</span>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="@Url.Action("Contact", "Home")">
+            <i class="fas fa-envelope"></i>
+            <span>Contacte</span>
+        </a>
+    </li>
+
+    <hr class="sidebar-divider d-none d-md-block">
+
 </ul>
-<!-- End of Sidebar -->

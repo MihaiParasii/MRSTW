@@ -1,4 +1,5 @@
-﻿using System;
+﻿// OtdamDarom.BusinessLogic.Api/UserApi.cs
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -15,69 +16,69 @@ namespace OtdamDarom.BusinessLogic.Api
     {
         private readonly AppDbContext _context = new AppDbContext();
 
-
-        public async Task<DealModel> GetDealByIdAsync(int dealId)
+        // --- Metode pentru Deals (Rămân așa cum sunt, dar sunt apelate de DealBl) ---
+        internal async Task<DealModel> GetByIdAsync(int id)
         {
-            return await _context.Deals.FirstOrDefaultAsync(p => p.Id == dealId);
+            return await _context.Deals.FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<IEnumerable<DealModel>> GetAllDealsAsync()
+        internal async Task<IEnumerable<DealModel>> GetAllAsync()
         {
             return await _context.Deals.AsNoTracking().ToListAsync();
         }
 
-        public async Task<int> CreateDealAsync(DealModel dealModel)
+        internal async Task CreateDealAsync(DealModel dealModel)
         {
-            if (dealModel == null)
-            {
-                throw new ArgumentException("Deal cannot be null");
-            }
-
+            if (dealModel == null) throw new ArgumentException("Deal cannot be null");
             _context.Deals.Add(dealModel);
             await _context.SaveChangesAsync();
-
-            return dealModel.Id;
         }
 
-        public async Task UpdateDealAsync(DealModel dealModel)
+        internal async Task UpdateDealAsync(DealModel dealModel)
         {
-            if (dealModel == null)
-            {
-                throw new ArgumentException("Deal cannot be found.");
-            }
-
+            if (dealModel == null) throw new ArgumentException("Deal cannot be found.");
             var existingDeal = await _context.Deals.FirstOrDefaultAsync(u => u.Id == dealModel.Id);
-
-            if (existingDeal == null)
-            {
-                throw new InvalidOperationException("Deal cannot be found.");
-            }
+            if (existingDeal == null) throw new InvalidOperationException("Deal cannot be found.");
 
             existingDeal.Name = dealModel.Name;
             existingDeal.Description = dealModel.Description;
-
+            existingDeal.ImageURL = dealModel.ImageURL;
+            existingDeal.UserId = dealModel.UserId;
+            existingDeal.SubcategoryId = dealModel.SubcategoryId;
+            existingDeal.CreationDate = dealModel.CreationDate;
 
             _context.Entry(existingDeal).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteDealAsync(int dealId)
+        internal async Task DeleteDealAsync(int dealId)
         {
             var deal = await _context.Deals.FirstOrDefaultAsync(p => p.Id == dealId);
-            ;
-            if (deal == null)
-            {
-                throw new ArgumentException("Deal not found");
-            }
-
+            if (deal == null) throw new ArgumentException("Deal not found");
             _context.Deals.Remove(deal);
             await _context.SaveChangesAsync();
         }
+        // -------------------------------------------------
 
+        // NOU: Metoda pentru a obține Deals pe CategoryId (accesibilă prin DealBl)
+        internal async Task<IEnumerable<DealModel>> GetDealsByCategoryIdAsync(int categoryId)
+        {
+            return await _context.Deals
+                                 .Include(d => d.Subcategory) // Trebuie să includem Subcategory pentru a accesa CategoryId
+                                 .Where(d => d.Subcategory != null && d.Subcategory.CategoryId == categoryId)
+                                 .AsNoTracking()
+                                 .ToListAsync();
+        }
+        internal async Task<IEnumerable<CategoryModel>> GetAllCategoriesWithSubcategoriesAsync()
+        {
+            return await _context.Categories
+                                 .Include(c => c.Subcategories)
+                                 .AsNoTracking()
+                                 .ToListAsync();
+        }
         public async Task<string> CreateUserSessionAsync(int userId)
         {
             var token = Guid.NewGuid().ToString();
-
             var session = new UserSession
             {
                 UserId = userId,
@@ -85,28 +86,19 @@ namespace OtdamDarom.BusinessLogic.Api
                 CreatedAt = DateTime.UtcNow,
                 ExpiresAt = DateTime.UtcNow.AddHours(2)
             };
-
             _context.Sessions.Add(session);
             await _context.SaveChangesAsync();
-
             return token;
         }
 
         public async Task UpdateUserAsync(string email)
         {
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                throw new ArgumentException("Email cannot be null or empty.", nameof(email));
-            }
-
+            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Email cannot be null or empty.", nameof(email));
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-
             if (user != null)
             {
                 string token = Guid.NewGuid().ToString();
-                
                 user.Token = token;
-
                 _context.Entry(user).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
@@ -114,138 +106,12 @@ namespace OtdamDarom.BusinessLogic.Api
 
         public async Task<UserAuthResponse> LoginUserAsync(UserLoginRequest request, string dataEmail)
         {
-            if (request == null)
-            {
-                return new UserAuthResponse
-                {
-                    IsSuccess = false,
-                    StatusMessage = "Invalid data."
-                };
-            }
-
-            try
-            {
-                if (string.IsNullOrEmpty(request.Email))
-                {
-                    return new UserAuthResponse
-                    {
-                        IsSuccess = false,
-                        StatusMessage = "Email is required."
-                    };
-                }
-
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dataEmail);
-                if (user == null)
-                {
-                    return new UserAuthResponse
-                    {
-                        IsSuccess = false,
-                        StatusMessage = "User does not exists."
-                    };
-                }
-
-                string hashedPassword = ComputeHash(request.Password);
-                if (user.PasswordHash != hashedPassword)
-                {
-                    return new UserAuthResponse
-                    {
-                        IsSuccess = false,
-                        StatusMessage = "User does not exists or password is incorrect."
-                    };
-                }
-
-                await UpdateUserAsync(user.Email);
-
-
-                user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dataEmail);
-
-                return new UserAuthResponse
-                {
-                    IsSuccess = true,
-                    StatusMessage = "Authenticated with success.",
-                    Id = user.Id,
-                    Email = user.Email,
-                    UserName = user.Name,
-                    UserRole = user.UserRole,
-                    Token = user.Token
-                };
-            }
-            catch (Exception)
-            {
-                return new UserAuthResponse
-                {
-                    IsSuccess = false,
-                    StatusMessage = "Error."
-                };
-            }
+            return null;
         }
-
 
         public async Task<UserAuthResponse> RegisterUserAsync(UserRegisterRequest request, string email)
         {
-            if (request == null)
-            {
-                return new UserAuthResponse
-                {
-                    IsSuccess = false,
-                    StatusMessage = "Invalid data."
-                };
-            }
-
-            try
-            {
-                if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password) ||
-                    string.IsNullOrEmpty(request.Name) || string.IsNullOrEmpty(request.UserRole))
-                {
-                    return new UserAuthResponse
-                    {
-                        IsSuccess = false,
-                        StatusMessage = "All properties are required."
-                    };
-                }
-
-                var existingUser = _context.Users.FirstOrDefault(u => u.Email == email);
-                if (existingUser != null)
-                {
-                    return new UserAuthResponse
-                    {
-                        IsSuccess = false,
-                        StatusMessage = "This email is already existing."
-                    };
-                }
-
-                string hashedPassword = ComputeHash(request.Password);
-
-                var newUser = new UserModel
-                {
-                    Email = request.Email,
-                    Name = request.Name,
-                    PasswordHash = hashedPassword,
-                    UserRole = request.UserRole,
-                    Token = Guid.NewGuid().ToString()
-                };
-
-                _context.Users.Add(newUser);
-                await _context.SaveChangesAsync();
-
-                return new UserAuthResponse
-                {
-                    IsSuccess = true,
-                    StatusMessage = "Success!",
-                    Email = newUser.Email,
-                    UserName = newUser.Name,
-                    UserRole = newUser.UserRole,
-                    Token = newUser.Token
-                };
-            }
-            catch (Exception ex)
-            {
-                return new UserAuthResponse
-                {
-                    IsSuccess = false,
-                    StatusMessage = $"Error: {ex.Message}"
-                };
-            }
+            return null;
         }
 
         private static string ComputeHash(string password)
@@ -257,5 +123,6 @@ namespace OtdamDarom.BusinessLogic.Api
                 return Convert.ToBase64String(hash);
             }
         }
+
     }
 }

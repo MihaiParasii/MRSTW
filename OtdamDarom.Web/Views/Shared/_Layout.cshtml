@@ -1,41 +1,27 @@
 ﻿<!DOCTYPE html>
 <html lang="ro">
 <head>
-    @Html.Partial("_Header")  <!-- Aici trebuie să fie head-ul, meta, CSS -->
-</head>
+    @Html.Partial("_Header")  </head>
 <body id="page-top">
 
-<!-- Page Wrapper -->
 <div id="wrapper">
-    @Html.Partial("_Sidebar")
-    <!-- Content Wrapper -->
+    @{
+        Html.RenderAction("_Sidebar", "Home"); 
+    }
     <div id="content-wrapper" class="d-flex flex-column">
 
-        <!-- Main Content -->
         <div id="content">
 
-            @Html.Partial("_Navbar")
+            @{
+            }
+            @Html.Partial("_Navbar") 
             
-            <!-- Begin Page Content -->
             <div class="container-fluid">
                 @RenderBody()
             </div>
-            <!-- End Page Content -->
-
         </div>
-        <!-- End Main Content -->
-
-        <!-- Footer -->
-        @Html.Partial("_Footer")
-        <!-- End Footer -->
-
-    </div>
-    <!-- End Content Wrapper -->
-
+        @Html.Partial("_Footer") </div>
 </div>
-<!-- End Page Wrapper -->
-
-<!-- Scripts JS trebuie să fie după tot conținutul pentru încărcare optimă -->
 <script src="/Content/vendor/jquery/jquery.min.js"></script>
 <script src="/Content/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/Content/vendor/jquery-easing/jquery.easing.min.js"></script>

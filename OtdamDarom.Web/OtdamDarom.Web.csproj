@@ -42,6 +42,10 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="EntityFramework" Version="6.5.1" />
+        <PackageReference Include="EntityFramework.SqlServer" Version="6.5.1" />
+    </ItemGroup>
+    <ItemGroup>
         <Reference Include="AutoMapper, Version=6.0.2.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
           <HintPath>..\packages\AutoMapper.6.0.2\lib\net45\AutoMapper.dll</HintPath>
         </Reference>
@@ -116,10 +120,8 @@
         <Compile Include="App_Start\RouteConfig.cs" />
         <Compile Include="Controllers\AdminController.cs" />
         <Compile Include="Controllers\AuthController.cs" />
-        <Compile Include="Controllers\CategoryController.cs" />
         <Compile Include="Controllers\DealController.cs" />
         <Compile Include="Controllers\HomeController.cs" />
-        <Compile Include="Controllers\SubcategoryController.cs" />
         <Compile Include="Global.asax.cs">
             <DependentUpon>Global.asax</DependentUpon>
         </Compile>
@@ -136,8 +138,21 @@
         <Compile Include="Requests\UpdateSubcategoryRequest.cs" />
         <Compile Include="Requests\UpdateUserRequest.cs" />
         <Compile Include="Requests\UserResponse.cs" />
+        <Content Include="Content\Images\adventure_books.jpg" />
+        <Content Include="Content\Images\armchair.jpg" />
+        <Content Include="Content\Images\baby_rattles.jpg" />
+        <Content Include="Content\Images\book_prince.jpg" />
+        <Content Include="Content\Images\chandelier.jpg" />
+        <Content Include="Content\Images\console.jpg" />
+        <Content Include="Content\Images\default.png" />
+        <Content Include="Content\Images\mini_fridge.jpg" />
+        <Content Include="Content\Images\refrigerator.jpg" />
+        <Content Include="Content\Images\tumble_dryer.jpg" />
+        <Content Include="Content\Images\wardrobe.jpg" />
+        <Content Include="Content\Images\womens_jeans.jpg" />
         <Content Include="Views\Auth\Login.cshtml" />
         <Content Include="Views\Auth\Register.cshtml" />
+        <Content Include="Views\Deal\Details.cshtml" />
         <Content Include="Views\Shared\_Footer.cshtml" />
         <Content Include="Views\Shared\_Header.cshtml" />
     </ItemGroup>

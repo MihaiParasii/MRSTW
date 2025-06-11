@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿// OtdamDarom.BusinessLogic.Interfaces/IDeal.cs
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using OtdamDarom.Domain.Models;
 
@@ -6,10 +7,12 @@ namespace OtdamDarom.BusinessLogic.Interfaces
 {
     public interface IDeal
     {
-        Task<DealModel> GetDealByIdAsync(int id);
-        Task<IEnumerable<DealModel>> GetAllDealsAsync();
-        Task<int> CreateDealAsync(DealModel newDeal);
-        Task UpdateDealAsync(DealModel newDeal);
-        Task DeleteDealAsync(int id);
+        Task<DealModel> GetById(int id);
+        Task<IEnumerable<DealModel>> GetAll();
+        Task Create(DealModel dealData);
+        Task Update(DealModel dealData);
+        Task Delete(int dealId);
+        
+        Task<IEnumerable<DealModel>> GetDealsByCategoryId(int categoryId); 
     }
 }

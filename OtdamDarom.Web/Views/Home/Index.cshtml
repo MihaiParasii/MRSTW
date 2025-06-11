@@ -1,29 +1,50 @@
-﻿@{
+﻿@using OtdamDarom.Web.Requests
+@model IEnumerable<DealResponse>
+
+@{
     ViewBag.Title = "Anunțuri recente";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <title>Pagina principală</title>
-<div class="container-fluid">
-    <div class="row">
-        <!-- Anunțuri -->
-        <div class="col-md-9">
+
+<div class="container"> 
+    <div class="row justify-content-center">
+        <div class="col-12">
             <h4 class="mb-3">Anunțuri recente</h4>
+            @* --- ELIMINĂ SAU COMENTEAZĂ ACEST BUTON DACĂ NU VREI SĂ APARĂ ACUM ---
+            <div class="mb-3">
+                @Html.ActionLink("Adaugă un Anunț Nou", "Create", "Deal", null, new { @class = "btn btn-success" })
+            </div>
+            *@
 
             <div class="row">
-                <!-- Repetă acest card pentru fiecare anunț -->
-                <div class="col-md-6 mb-4">
-                    <div class="card shadow h-100">
-                        <div class="card-body d-flex">
-                            <img src="~/img/sweater.png" class="mr-3" style="height:60px;" />
-                            <div>
-                                <h5 class="card-title mb-1">Pulover</h5>
-                                <p class="card-text text-muted mb-2">Ușor purtat, mărime M</p>
-                                <a href="#" class="btn btn-sm btn-outline-success">Solicită</a>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var deal in Model.OrderByDescending(d => d.CreationDate).Take(12))
+                    {
+                        <div class="col-12 col-sm-6 col-md-4 mb-4">
+                            <div class="card shadow h-100">
+                                @if (!string.IsNullOrEmpty(deal.ImageURL))
+                                {
+                                    <img src="@Url.Content(deal.ImageURL)" class="card-img-top" alt="@deal.Name" style="height: 200px; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <img src="@Url.Content("Content/Images/default.png")" class="card-img-top" alt="Imagine implicită" style="height: 200px; object-fit: cover;">
+                                }
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title mb-1">@deal.Name</h5>
+                                    <p class="card-text text-muted mb-2">@deal.Description</p>
+                                    <a href="@Url.Action("Details", "Deal", new { id = deal.Id })" class="btn btn-sm btn-outline-success mt-auto">Solicită</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <!-- ... alte carduri ... -->
+                    }
+                }
+                else
+                {
+                    <p class="col-12">Nu există anunțuri de afișat.</p>
+                }
             </div>
         </div>
     </div>

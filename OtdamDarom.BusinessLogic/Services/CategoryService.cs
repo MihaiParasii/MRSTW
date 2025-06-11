@@ -1,36 +1,31 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using OtdamDarom.BusinessLogic.Api;
+﻿// OtdamDarom.BusinessLogic.Services/CategoryService.cs
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq; // Păstrăm pentru .Include() și .ToList()
+// Eliminăm 'using System.Threading.Tasks;' dacă nu mai sunt metode async
+
+using OtdamDarom.BusinessLogic.Data;
 using OtdamDarom.BusinessLogic.Interfaces;
 using OtdamDarom.Domain.Models;
 
 namespace OtdamDarom.BusinessLogic.Services
 {
-    public class CategoryService : AdminApi,  ICategory
+    public class CategoryService : ICategory
     {
-        public new async Task<CategoryModel> GetCategoryByIdAsync(int id)
+        private readonly AppDbContext _context;
+
+        public CategoryService()
         {
-            return await base.GetCategoryByIdAsync(id);
+            _context = new AppDbContext();
         }
 
-        public new async Task<IEnumerable<CategoryModel>> GetAllCategoriesAsync()
+        // Metoda este acum complet sincronă
+        public IEnumerable<CategoryModel> GetAllCategoriesWithSubcategories()
         {
-            return await base.GetAllCategoriesAsync();
-        }
-
-        public new async Task<int> CreateCategoryAsync(CategoryModel category)
-        {
-            return await base.CreateCategoryAsync(category);
-        }
-
-        public new async Task UpdateCategoryAsync(CategoryModel newCategory)
-        {
-            await base.UpdateCategoryAsync(newCategory);
-        }
-
-        public new async Task DeleteCategoryAsync(int id)
-        {
-            await base.DeleteCategoryAsync(id);
+            return _context.Categories
+                .Include(c => c.Subcategories)
+                .AsNoTracking() // AsNoTracking este o bună practică pentru citire
+                .ToList(); // <<--- Apelăm ToList() (sincron) în loc de ToListAsync()
         }
     }
 }

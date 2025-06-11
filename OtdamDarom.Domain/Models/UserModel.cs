@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OtdamDarom.Domain.Models
 {
+    [Table("Users")]
     public class UserModel
     {
         [Key]

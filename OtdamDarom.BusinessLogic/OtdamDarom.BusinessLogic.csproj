@@ -56,6 +56,8 @@
         <Compile Include="Dtos\UserAuthResponse.cs" />
         <Compile Include="Dtos\UserLoginRequest.cs" />
         <Compile Include="Dtos\UserRegisterRequest.cs" />
+        <Compile Include="EntityBL\CategoryBl.cs" />
+        <Compile Include="EntityBL\DealBl.cs" />
         <Compile Include="Interfaces\IAuth.cs" />
         <Compile Include="Interfaces\ICategory.cs" />
         <Compile Include="Interfaces\IDeal.cs" />

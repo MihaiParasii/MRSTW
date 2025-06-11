@@ -1,0 +1,53 @@
+﻿@model OtdamDarom.Web.Requests.DealResponse
+
+@{
+    ViewBag.Title = Model.Name;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<title>@Model.Name - Detalii Anunț</title>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h1 class="card-title text-center mb-4">@Model.Name</h1>
+                    <hr />
+
+                    @if (!string.IsNullOrEmpty(Model.ImageURL))
+                    {
+                        <div class="text-center mb-4">
+                            <img src="@Url.Content(Model.ImageURL)" class="img-fluid rounded" alt="@Model.Name" style="max-height: 400px; object-fit: contain;">
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center mb-4">
+                            <img src="@Url.Content("~/Content/img/default.png")" class="img-fluid rounded" alt="Imagine implicită" style="max-height: 400px; object-fit: contain;">
+                        </div>
+                    }
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Descriere:</strong></div>
+                        <div class="col-sm-9">@Model.Description</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Data Publicării:</strong></div>
+                        <div class="col-sm-9">@Model.CreationDate.ToString("dd MMMM, HH:mm")</div>
+                    </div>
+
+                    @* FĂRĂ AFISARE DE USER, CATEGORY, SUBCATEGORY AICI ACUM *@
+
+                    <div class="text-center mt-4">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">Înapoi la lista de anunțuri</a>
+                        @* --- ELIMINĂ SAU COMENTEAZĂ ACEST BUTON DACĂ NU VREI SĂ APARĂ ACUM ---
+                        <a href="@Url.Action("EditDeal", "Deal", new { id = Model.Id })" class="btn btn-warning ml-2">Editează Anunțul</a>
+                        *@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

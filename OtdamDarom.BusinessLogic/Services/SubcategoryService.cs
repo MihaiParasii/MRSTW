@@ -1,36 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Threading.Tasks;
-using OtdamDarom.BusinessLogic.Api;
+using OtdamDarom.BusinessLogic.Data;
 using OtdamDarom.BusinessLogic.Interfaces;
 using OtdamDarom.Domain.Models;
 
 namespace OtdamDarom.BusinessLogic.Services
 {
-    public class SubcategoryService : AdminApi, ISubcategory
+    public class SubcategoryService : ISubcategory
     {
-        public new async Task<SubcategoryModel> GetSubcategoryByIdAsync(int id)
-        {
-            return await base.GetSubcategoryByIdAsync(id);
-        }
+        private readonly AppDbContext _context;
 
-        public new async Task<IEnumerable<SubcategoryModel>> GetAllSubcategoriesAsync()
+        public SubcategoryService()
         {
-            return await base.GetAllSubcategoriesAsync();
-        }
-
-        public new async Task<int> CreateSubcategoryAsync(SubcategoryModel newSubcategory)
-        {
-            return await base.CreateSubcategoryAsync(newSubcategory);
-        }
-
-        public new async Task UpdateSubcategoryAsync(SubcategoryModel subcategory)
-        {
-            await base.UpdateSubcategoryAsync(subcategory);
-        }
-
-        public new async Task DeleteSubcategoryAsync(int id)
-        {
-            await base.DeleteSubcategoryAsync(id);
+            _context = new AppDbContext();
         }
     }
 }
