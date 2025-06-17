@@ -1,9 +1,13 @@
-﻿using System;
+﻿// OtdamDarom.Web/Controllers/AuthController.cs
+using System;
+using System.Collections.Generic; 
+using System.Linq; 
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using OtdamDarom.BusinessLogic.Dtos;
+using OtdamDarom.BusinessLogic.Dtos; 
 using OtdamDarom.BusinessLogic.Interfaces;
+using OtdamDarom.Domain.Models; 
 
 namespace OtdamDarom.Web.Controllers
 {
@@ -11,105 +15,108 @@ namespace OtdamDarom.Web.Controllers
     {
         private readonly IAuth _auth;
         private readonly ISession _session;
+        private readonly IUser _user;
 
         public AuthController()
         {
             var bl = new BusinessLogic.BusinessLogic();
             _auth = bl.GetAuthBL();
             _session = bl.GetSessionBL();
+            _user = bl.GetUserBL();
         }
 
-        public ActionResult Login()
+        [AllowAnonymous]
+        public ActionResult Login(string returnUrl)
         {
-            return View();
-        }
-
-        public ActionResult Register()
-        {
+            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> LoginAction(UserLoginRequest request)
+        [AllowAnonymous]
+        public async Task<ActionResult> LoginAction(UserLoginRequest request, string returnUrl)
         {
             if (!ModelState.IsValid)
             {
-                return Json(new { success = false, message = "Invalid data." });
+                ViewBag.ReturnUrl = returnUrl;
+                return View("Login", request);
             }
 
-            string dataEmail = request.Email;
-            UserAuthResponse response = await _auth.LoginActionAsync(request, dataEmail);
+            var response = await _auth.Login(request); 
 
             if (!response.IsSuccess)
             {
-                return Json(new { success = false, message = response.StatusMessage });
+                ModelState.AddModelError("", response.StatusMessage);
+                ViewBag.ReturnUrl = returnUrl;
+                return View("Login", request);
             }
 
-
-            var token = await _session.CreateUserSessionAsync(response.Id);
+            SetAuthCookie(response.AuthToken, request.RememberMe);
 
             Session["UserId"] = response.Id;
             Session["UserEmail"] = response.Email;
             Session["Username"] = response.UserName;
             Session["UserRole"] = response.UserRole;
-            Session["Token"] = token;
+            // AICI ESTE MODIFICAREA CRITICĂ: Preluarea URL-ului imaginii de profil din răspuns
+            Session["UserProfilePicUrl"] = response.ProfilePictureUrl; 
+            
+            TempData["SuccessMessage"] = "Autentificare reușită!";
 
-            var cookie = new HttpCookie("AuthToken", token)
+            if (Url.IsLocalUrl(returnUrl))
             {
-                HttpOnly = true,
-                Expires = DateTime.Now.AddHours(2)
-            };
-            Response.Cookies.Add(cookie);
-
+                return Redirect(returnUrl);
+            }
 
             switch (response.UserRole)
             {
                 case "Admin":
                     return RedirectToAction("Dashboard", "Admin");
-                case "Artist":
+                case "Artist": 
+                    return RedirectToAction("Index", "Home");
+                case "User":
                     return RedirectToAction("Index", "Home");
                 default:
                     return RedirectToAction("Index", "Home");
             }
         }
 
+        [AllowAnonymous]
+        public ActionResult Register()
+        {
+            return View(new UserRegisterRequest { UserRole = "User" });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<ActionResult> RegisterAction(UserRegisterRequest request)
         {
             if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Invalid Data.";
-                return Json(new { success = false, message = "Invalid Data." });
+                return View("Register", request);
             }
 
-            string dataEmail = request.Email;
-            var response = await _auth.RegisterActionAsync(request, dataEmail);
+            request.UserRole = "User"; 
+
+            var response = await _auth.Register(request);
 
             if (!response.IsSuccess)
             {
-                TempData["ErrorMessage"] = response.StatusMessage;
-                return Json(new { success = false, message = response.StatusMessage });
+                ModelState.AddModelError("", response.StatusMessage);
+                return View("Register", request);
             }
 
-
-            var token = await _session.CreateUserSessionAsync(response.Id);
+            SetAuthCookie(response.AuthToken, false); 
 
             Session["UserId"] = response.Id;
             Session["UserEmail"] = response.Email;
             Session["Username"] = response.UserName;
             Session["UserRole"] = response.UserRole;
-            Session["Token"] = token;
+            // AICI ESTE MODIFICAREA CRITICĂ: Preluarea URL-ului imaginii de profil din răspuns
+            Session["UserProfilePicUrl"] = response.ProfilePictureUrl;
 
-            var cookie = new HttpCookie("AuthToken", token)
-            {
-                HttpOnly = true,
-                Expires = DateTime.Now.AddHours(2)
-            };
-            Response.Cookies.Add(cookie);
-
-            TempData["SuccessMessage"] = "Account created successfully!";
+            TempData["SuccessMessage"] = "Contul a fost creat cu succes! Te-ai autentificat.";
 
             switch (response.UserRole)
             {
@@ -121,24 +128,91 @@ namespace OtdamDarom.Web.Controllers
                     return RedirectToAction("Index", "Home");
             }
         }
-
+        
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Logout()
+        // [ValidateAntiForgeryToken] // Lăsat comentat conform discuției anterioare pentru Logout
+        public async Task<ActionResult> Logout()
         {
-            Session.Clear();
-
+            var authToken = Request.Cookies["AuthToken"]?.Value;
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                await _auth.Logout(authToken);
+            }
+            
             if (Request.Cookies["AuthToken"] != null)
             {
                 var cookie = new HttpCookie("AuthToken")
                 {
-                    Expires = DateTime.Now.AddDays(-1)
+                    Expires = DateTime.Now.AddDays(-1),
+                    HttpOnly = true, 
+                    Secure = Request.IsSecureConnection, 
+                    SameSite = SameSiteMode.Lax 
                 };
                 Response.Cookies.Add(cookie);
             }
 
-            return RedirectToAction("Login");
+            Session.Clear();
+            Session.Abandon();
 
+            TempData["SuccessMessage"] = "Ai fost deconectat cu succes.";
+            return RedirectToAction("Index", "Home"); 
+        }
+
+        private void SetAuthCookie(string token, bool rememberMe)
+        {
+            var cookie = new HttpCookie("AuthToken", token)
+            {
+                HttpOnly = true,
+                Secure = Request.IsSecureConnection,
+                SameSite = SameSiteMode.Lax 
+            };
+
+            if (rememberMe)
+            {
+                cookie.Expires = DateTime.Now.AddDays(30);
+            }
+            else
+            {
+                cookie.Expires = DateTime.Now.AddHours(2);
+            }
+
+            Response.Cookies.Add(cookie);
+        }
+
+        [ChildActionOnly]
+        public async Task<ActionResult> GetLoggedInUser()
+        {
+            var authToken = Request.Cookies["AuthToken"]?.Value;
+            UserModel currentUser = null;
+
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                currentUser = await _auth.GetCurrentUser(authToken);
+                if (currentUser != null)
+                {
+                    Session["UserId"] = currentUser.Id;
+                    Session["UserEmail"] = currentUser.Email;
+                    Session["Username"] = currentUser.Name;
+                    Session["UserRole"] = currentUser.UserRole;
+                    // AICI ESTE CORECT: Preia ProfilePictureUrl din UserModel returnat de GetCurrentUser
+                    Session["UserProfilePicUrl"] = currentUser.ProfilePictureUrl; 
+                } else {
+                    Response.Cookies["AuthToken"].Expires = DateTime.Now.AddDays(-1);
+                    var expiredCookie = new HttpCookie("AuthToken") 
+                    { 
+                        Expires = DateTime.Now.AddDays(-1), 
+                        HttpOnly = true, 
+                        Secure = Request.IsSecureConnection, 
+                        SameSite = SameSiteMode.Lax,
+                        Path = "/" 
+                    };
+                    Response.Cookies.Add(expiredCookie);
+
+                    Session.Clear();
+                    Session.Abandon();
+                }
+            }
+            return PartialView("_LoggedInUserPartial", currentUser);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿// OtdamDarom.BusinessLogic.Interfaces/IDeal.cs
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using OtdamDarom.Domain.Models;
 
@@ -14,5 +13,7 @@ namespace OtdamDarom.BusinessLogic.Interfaces
         Task Delete(int dealId);
         
         Task<IEnumerable<DealModel>> GetDealsByCategoryId(int categoryId); 
+        Task<IEnumerable<DealModel>> GetDealsBySubcategoryIds(List<int> subcategoryIds);
+        Task<IEnumerable<DealModel>> SearchDeals(string query);
     }
 }

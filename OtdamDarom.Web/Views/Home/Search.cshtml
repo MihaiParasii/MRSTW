@@ -1,0 +1,55 @@
+﻿@using OtdamDarom.Web.Requests
+@model IEnumerable<DealResponse>
+
+@{
+ViewBag.Title = ViewBag.SearchQuery != null ? $"Rezultate căutare: '{ViewBag.SearchQuery}'" : "Rezultate căutare";
+Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<title>@ViewBag.Title</title>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <h4 class="mb-3">
+                @if (ViewBag.SearchQuery != null && !string.IsNullOrWhiteSpace(ViewBag.SearchQuery))
+                {
+                <span>Rezultate căutare pentru: <strong>"@ViewBag.SearchQuery"</strong></span>
+                }
+                else
+                {
+                <span>Toate Anunțurile</span> @* Afișează toate anunțurile dacă nu e termen de căutare, sau o notă de eroare *@
+                }
+            </h4>
+
+            <div class="row">
+                @if (Model != null && Model.Any())
+                {
+                foreach (var deal in Model.OrderByDescending(d => d.CreationDate))
+                {
+                <div class="col-12 col-sm-6 col-md-4 mb-4">
+                    <div class="card shadow h-100">
+                        @if (!string.IsNullOrEmpty(deal.ImageURL))
+                        {
+                        <img src="@Url.Content(deal.ImageURL)" class="card-img-top" alt="@deal.Name" style="height: 200px; object-fit: cover;">
+                        }
+                        else
+                        {
+                        <img src="@Url.Content("Content/Images/default.png")" class="card-img-top" alt="Imagine implicită" style="height: 200px; object-fit: cover;">
+                        }
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title mb-1">@deal.Name</h5>
+                            <p class="card-text text-muted mb-2">@deal.Description</p>
+                            <a href="@Url.Action("Details", "Deal", new { id = deal.Id })" class="btn btn-sm btn-outline-success mt-auto">Solicită</a>
+                        </div>
+                    </div>
+                </div>
+                }
+                }
+                else
+                {
+                <p class="col-12">Nu s-au găsit anunțuri care să corespundă căutării dvs.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

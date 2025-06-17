@@ -1,155 +1,155 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
+﻿using System.Threading.Tasks;
 using System.Web.Mvc;
-using AutoMapper;
-using OtdamDarom.BusinessLogic.Interfaces;
-using OtdamDarom.BusinessLogic.Services;
-using OtdamDarom.Domain.Models;
-using OtdamDarom.Web.Requests;
+using OtdamDarom.Domain.Models; // Pentru UserModel, dacă este folosit direct
+using OtdamDarom.BusinessLogic.Interfaces; // Asigură-te că ai această directivă using
 
 namespace OtdamDarom.Web.Controllers
 {
+    [Authorize(Roles = "Admin")] // Asigură-te că doar administratorii pot accesa acest controler
     public class AdminController : Controller
     {
-        private readonly IUser _user;
+        private readonly BusinessLogic.BusinessLogic _businessLogic;
+        private readonly IUser _userBl; // Utilizăm interfața IUser
 
         public AdminController()
         {
-            var bl = new BusinessLogic.BusinessLogic();
-            _user = bl.GetUserBl();
+            _businessLogic = new BusinessLogic.BusinessLogic();
+            _userBl = _businessLogic.GetUserBL(); // ATENȚIE AICI: Numele metodei este GetUserBL() (cu BL mare)
         }
 
-        public async Task<ActionResult> Index()
-        {
-            var users = await _user.GetAllUsersAsync();
-            var userDtos = users.Select(Mapper.Map<UserResponse>).ToList();
-            
-            return View(userDtos);
-        }
-
-        public async Task<ActionResult> UserDetails(int id)
-        {
-            var user = await _user.GetUserByIdAsync(id);
-            if (user == null)
-            {
-                return HttpNotFound();
-            }
-
-            var dto = Mapper.Map<UserResponse>(user);
-            return View(dto);
-        }
-
-        public ActionResult CreateUser()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateUser(CreateUserRequest request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(request);
-            }
-
-            var user = Mapper.Map<UserModel>(request);
-            await _user.CreateUserAsync(user);
-            return RedirectToAction("Index");
-        }
-
-        public async Task<ActionResult> EditUser(int id)
-        {
-            var user = await _user.GetUserByIdAsync(id);
-            if (user == null)
-            {
-                return HttpNotFound();
-            }
-
-            var dto = Mapper.Map<UpdateUserRequest>(user);
-            return View(dto);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditUser(int id, UpdateUserRequest request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(request);
-            }
-
-            var existing = await _user.GetUserByIdAsync(id);
-            if (existing == null)
-            {
-                return HttpNotFound();
-            }
-
-            var updated = Mapper.Map<UserModel>(request);
-            updated.Id = id;
-
-            await _user.UpdateUserAsync(updated);
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost, ActionName("DeleteUser")]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmed(int id)
-        {
-            await _user.DeleteUserAsync(id);
-            return RedirectToAction("Index");
-        }
-
-        public async Task<ActionResult> ChangeRole(string email, string newRole)
-        {
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(newRole))
-            {
-                return new HttpStatusCodeResult(400, "Invalid input.");
-            }
-
-            await _user.UpdateUserRoleAsync(email, newRole);
-            return RedirectToAction("Index");
-        }
-
+        // GET: Admin/Dashboard
         public ActionResult Dashboard()
         {
             return View();
         }
 
-        public async Task<ActionResult> ManageUsers()
+        // GET: Admin/Users
+        public async Task<ActionResult> Users()
         {
-            var users = await _user.GetAllUsersAsync();
+            // Apelează GetAllUsers() fără Async la sfârșit
+            var users = await _userBl.GetAllUsers(); 
             return View(users);
         }
 
-        public ActionResult AddUser()
+        // GET: Admin/UserDetails/5
+        public async Task<ActionResult> UserDetails(int id)
         {
+            // Apelează GetUserById() fără Async la sfârșit
+            var user = await _userBl.GetUserById(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+            return View(user);
+        }
+
+        // GET: Admin/CreateUser
+        public ActionResult CreateUser()
+        {
+            return View(new UserModel()); // Sau un DTO specific pentru creare
+        }
+
+        // POST: Admin/CreateUser
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CreateUser(UserModel user) // Sau un DTO
+        {
+            if (ModelState.IsValid)
+            {
+                // Apelează CreateUser() fără Async la sfârșit
+                await _userBl.CreateUser(user); 
+                TempData["SuccessMessage"] = "Utilizatorul a fost creat cu succes!";
+                return RedirectToAction("Users");
+            }
+            TempData["ErrorMessage"] = "Eroare la crearea utilizatorului. Verificați datele introduse.";
+            return View(user);
+        }
+
+        // GET: Admin/EditUser/5
+        public async Task<ActionResult> EditUser(int id)
+        {
+            // Apelează GetUserById() fără Async la sfârșit
+            var user = await _userBl.GetUserById(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+            return View(user);
+        }
+
+        // POST: Admin/EditUser
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> EditUser(UserModel newUser) // Sau un DTO
+        {
+            if (ModelState.IsValid)
+            {
+                // Apelează UpdateUser() fără Async la sfârșit
+                await _userBl.UpdateUser(newUser); 
+                TempData["SuccessMessage"] = "Utilizatorul a fost actualizat cu succes!";
+                return RedirectToAction("Users");
+            }
+            TempData["ErrorMessage"] = "Eroare la actualizarea utilizatorului. Verificați datele introduse.";
+            return View(newUser);
+        }
+
+        // POST: Admin/DeleteUser/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> DeleteUser(int id)
+        {
+            // Apelează DeleteUser() fără Async la sfârșit
+            await _userBl.DeleteUser(id); 
+            TempData["SuccessMessage"] = "Utilizatorul a fost șters cu succes!";
+            return RedirectToAction("Users");
+        }
+
+        // GET: Admin/EditUserRole/email
+        public async Task<ActionResult> EditUserRole(string email)
+        {
+            // Apelează GetAllUsers() fără Async la sfârșit pentru a popula dropdown-ul
+            ViewBag.Users = new SelectList(await _userBl.GetAllUsers(), "Email", "Email"); // Afișează email ca text și valoare
             return View();
         }
 
-
+        // POST: Admin/UpdateUserRole
         [HttpPost]
-        public async Task<ActionResult> DeleteUser(int id)
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UpdateUserRole(string email, string newRole)
         {
-            await _user.DeleteUserAsync(id);
-            return RedirectToAction("ManageUsers");
-        }
-
-        [HttpPost]
-        public async Task<ActionResult> UpdateUserRole(int id, string role)
-        {
-            var user = await _user.GetUserByIdAsync(id);
-            if (user != null)
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(newRole))
             {
-                user.UserRole = role;
-                await _user.UpdateUserRoleAsync(user.Email, role);
-                return Json(new { success = true });
+                TempData["ErrorMessage"] = "Emailul și rolul nou sunt obligatorii.";
+                // Apelează GetAllUsers() fără Async la sfârșit pentru a repopula dropdown-ul în caz de eroare
+                ViewBag.Users = new SelectList(await _userBl.GetAllUsers(), "Email", "Email");
+                return View("EditUserRole");
             }
 
-            return Json(new { success = false });
+            // Apelează UpdateUserRole() fără Async la sfârșit
+            await _userBl.UpdateUserRole(email, newRole);
+            TempData["SuccessMessage"] = $"Rolul utilizatorului {email} a fost actualizat la {newRole} cu succes!";
+            return RedirectToAction("Users");
+        }
+
+        // POST: Admin/DeleteSelectedUsers (Exemplu pentru ștergere multiplă)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> DeleteSelectedUsers(int[] selectedUserIds)
+        {
+            if (selectedUserIds != null && selectedUserIds.Length > 0)
+            {
+                foreach (var id in selectedUserIds)
+                {
+                    // Apelează DeleteUser() fără Async la sfârșit
+                    await _userBl.DeleteUser(id);
+                }
+                TempData["SuccessMessage"] = $"{selectedUserIds.Length} utilizatori au fost șterși cu succes!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Niciun utilizator nu a fost selectat pentru ștergere.";
+            }
+            return RedirectToAction("Users");
         }
     }
 }

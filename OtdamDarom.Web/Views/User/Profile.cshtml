@@ -1,0 +1,166 @@
+﻿@model OtdamDarom.BusinessLogic.Dtos.UserProfileDto
+
+@{
+ViewBag.Title = (ViewContext.RouteData.Values["action"].ToString() == "EditProfile") ? "Editează Profilul" : "Profilul Meu";
+Layout = "~/Views/Shared/_Layout.cshtml";
+
+string defaultProfilePicPath = Url.Content("~/Content/Images/default-user.png");
+string currentProfilePicUrl = Model.ProfilePictureUrl;
+
+bool profilePicExists = !string.IsNullOrEmpty(currentProfilePicUrl) && System.IO.File.Exists(Server.MapPath(currentProfilePicUrl));
+
+if (!profilePicExists)
+{
+currentProfilePicUrl = defaultProfilePicPath;
+}
+}
+
+<div class="container-fluid">
+
+    <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
+
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Detalii Profil</h6>
+                </div>
+                <div class="card-body">
+
+                    @using (Html.BeginForm("EditProfile", "User", FormMethod.Post, new { enctype = "multipart/form-data", @class = "user" }))
+                    {
+                    @Html.AntiForgeryToken()
+
+                    @* Afișează toate erorile de validare la nivel de model, inclusiv cele adăugate manual *@
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.HiddenFor(model => model.ProfilePictureUrl)
+                    @Html.HiddenFor(model => model.CreationDate)
+                    @Html.HiddenFor(model => model.UserRole)
+
+                    <div class="text-center mb-4">
+                        <img id="profilePicturePreview" class="img-profile rounded-circle mb-3"
+                             src="@currentProfilePicUrl"
+                             alt="Imagine de Profil"
+                             style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #ddd;">
+
+                        <div class="form-group mt-3 mx-auto" style="max-width: 350px;">
+                            <label for="NewProfilePicture" class="sr-only">@Html.DisplayNameFor(model => model.NewProfilePicture)</label>
+                            @Html.TextBoxFor(model => model.NewProfilePicture, new { type = "file", @class = "form-control-file d-none", @id = "NewProfilePicture", accept = "image/*" })
+
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="fileNameDisplay" placeholder="Nicio imagine selectată" readonly>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-primary" id="selectPictureButton">
+                                        <i class="fas fa-upload mr-2"></i> Selectează
+                                    </button>
+                                </div>
+                            </div>
+                            @Html.ValidationMessageFor(model => model.NewProfilePicture, "", new { @class = "text-danger d-block mt-2" })
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-6 mb-3 mb-sm-0">
+                            <label for="Name">@Html.DisplayNameFor(model => model.Name)</label>
+                            @Html.TextBoxFor(model => model.Name, new { @class = "form-control form-control-user", @id = "Name", placeholder = Html.DisplayNameFor(model => model.Name) })
+                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="Email">@Html.DisplayNameFor(model => model.Email)</label>
+                            @Html.TextBoxFor(model => model.Email, new { @class = "form-control form-control-user", @id = "Email", placeholder = Html.DisplayNameFor(model => model.Email), type = "email" })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.UserRole):</label>
+                        <input type="text" class="form-control" value="@Model.UserRole" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.CreationDate):</label>
+                        <input type="text" class="form-control" value="@Model.CreationDate.ToString("dd MMMM HH:mm")" readonly />
+                    </div>
+
+                    <hr class="my-4"> @* Separator vizual *@
+
+                    <h6 class="m-0 font-weight-bold text-primary mb-3">Schimbă Parola</h6>
+                    <div class="form-group">
+                        <label for="CurrentPassword">@Html.DisplayNameFor(model => model.CurrentPassword)</label>
+                        @Html.PasswordFor(model => model.CurrentPassword, new { @class = "form-control form-control-user", @id = "CurrentPassword", placeholder = Html.DisplayNameFor(model => model.CurrentPassword) })
+                        @Html.ValidationMessageFor(model => model.CurrentPassword, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        <label for="NewPassword">@Html.DisplayNameFor(model => model.NewPassword)</label>
+                        @Html.PasswordFor(model => model.NewPassword, new { @class = "form-control form-control-user", @id = "NewPassword", placeholder = Html.DisplayNameFor(model => model.NewPassword) })
+                        @Html.ValidationMessageFor(model => model.NewPassword, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ConfirmNewPassword">@Html.DisplayNameFor(model => model.ConfirmNewPassword)</label>
+                        @Html.PasswordFor(model => model.ConfirmNewPassword, new { @class = "form-control form-control-user", @id = "ConfirmNewPassword", placeholder = Html.DisplayNameFor(model => model.ConfirmNewPassword) })
+                        @Html.ValidationMessageFor(model => model.ConfirmNewPassword, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <button type="submit" class="btn btn-primary mr-2">Salvează Modificările</button>
+                        <a href="@Url.Action("Profile", "User")" class="btn btn-secondary">Anulează</a>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+@Scripts.Render("~/bundles/jqueryval")
+<script>
+    $(document).ready(function () {
+        var defaultProfilePicUrl = '@defaultProfilePicPath';
+
+        function setPreviewImage(src) {
+            $('#profilePicturePreview').attr('src', src);
+        }
+
+        $('#fileNameDisplay').val("Nicio imagine selectată");
+
+        $('#selectPictureButton').on('click', function () {
+            $('#NewProfilePicture').click();
+        });
+
+        $('#NewProfilePicture').on('change', function () {
+            var input = this;
+            var fileName = $(input).val().split('\\').pop();
+
+            if (fileName) {
+                $('#fileNameDisplay').val(fileName);
+            } else {
+                $('#fileNameDisplay').val("Nicio imagine selectată");
+            }
+
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    setPreviewImage(e.target.result);
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                setPreviewImage('@(Model.ProfilePictureUrl ?? defaultProfilePicPath)');
+            }
+        });
+
+        $('#profilePicturePreview').on('error', function() {
+            $(this).attr('src', defaultProfilePicUrl);
+        });
+
+        // Afișează/ascunde secțiunea de parolă (opțional, dar bun pentru UX)
+        // Dacă vrei ca secțiunea de parolă să fie ascunsă inițial și afișată la click pe un buton,
+        // poți adăuga un buton și gestiona vizibilitatea aici.
+        // Pentru "cea mai simplă metodă", le lăsăm vizibile direct.
+    });
+</script>
+}

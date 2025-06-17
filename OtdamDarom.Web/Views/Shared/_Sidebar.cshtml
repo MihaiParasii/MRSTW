@@ -25,53 +25,30 @@
 
     @if (Model != null)
     {
-        // <<--- NOU: Definim maparea iconițelor aici
         var categoryIcons = new Dictionary<string, string>
         {
-            // Acestea sunt categoriile tale exacte din baza de date și iconițele dorite.
-            // Asigură-te că fiecare nume de categorie (cheia) este unic.
             { "Cărți", "fas fa-book" },
             { "Electrocasnice", "fas fa-blender" },
             { "Haine", "fas fa-tshirt" },
             { "Jucării", "fas fa-gamepad" },
             { "Mobilier", "fas fa-couch" },
-            // Dacă ai alte categorii, adaugă-le aici, dar nu duplica cele de mai sus.
-            // Exemplu de alte categorii generice sau specifice, dacă le vei adăuga în viitor:
             { "Tehnologie", "fas fa-laptop" },
             { "Articole Sportive", "fas fa-dumbbell" },
             { "Animale de companie", "fas fa-paw" },
             { "Servicii", "fas fa-handshake" },
             { "Altele", "fas fa-ellipsis-h" }
         };
-        // <<--- SFÂRȘIT NOU
 
         foreach (var category in Model.OrderBy(c => c.Name))
         {
-            // <<--- MODIFICARE AICI: Aplicăm iconița personalizată sau una implicită
             string iconClass = categoryIcons.ContainsKey(category.Name) ? categoryIcons[category.Name] : "fas fa-fw fa-folder";
-            // <<--- SFÂRȘIT MODIFICARE
-
+            
             <li class="nav-item">
-                <a class="nav-link @(category.Subcategories != null && category.Subcategories.Any() ? "collapsed" : "")" 
-                   href="@(category.Subcategories != null && category.Subcategories.Any() ? "#collapse" + category.Id : Url.Action("DealsByCategory", "Home", new { categoryId = category.Id }))"
-                   data-toggle="collapse" 
-                   aria-expanded="true" 
-                   aria-controls="collapse@(category.Id)">
-                    <i class="@iconClass"></i> @* <<--- Folosim variabila iconClass aici *@
+                <a class="nav-link" 
+                   href="@Url.RouteUrl("CategoryById", new { id = category.Id })"> @* <<--- ACUM ESTE CORECT! *@
+                    <i class="@iconClass"></i>
                     <span>@category.Name</span>
                 </a>
-                @if (category.Subcategories != null && category.Subcategories.Any())
-                {
-                    <div id="collapse@(category.Id)" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <h6 class="collapse-header">Subcategorii:</h6>
-                            @foreach (var subcategory in category.Subcategories.OrderBy(s => s.Name))
-                            {
-                                <a class="collapse-item" href="@Url.Action("DealsBySubcategory", "Home", new { subcategoryId = subcategory.Id })">@subcategory.Name</a> @* Notă: Am schimbat param-ul la subcategoryId *@
-                            }
-                        </div>
-                    </div>
-                }
             </li>
         }
     }

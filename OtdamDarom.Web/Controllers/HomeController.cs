@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks; // Păstrăm acest using pentru alte metode async (Index, DealsByCategory)
-using System.Web.Mvc;
+using System.Threading.Tasks;
+using System.Web.Mvc; // Important: asigură-te că acest using există pentru [AllowAnonymous]
 using AutoMapper;
-using OtdamDarom.BusinessLogic.Interfaces;
+using OtdamDarom.BusinessLogic.Interfaces; // Asigură-te că aceasta este interfața corectă pentru BL
 using OtdamDarom.Web.Requests;
-using OtdamDarom.Domain.Models;
+using OtdamDarom.Domain.Models; // Pentru DealModel, CategoryModel, SubcategoryModel etc.
 
 namespace OtdamDarom.Web.Controllers
 {
@@ -22,14 +22,14 @@ namespace OtdamDarom.Web.Controllers
             _category = bl.GetCategoryBL();
         }
 
-        // Acțiunea Index poate rămâne asincronă, nu este apelată de RenderAction
+        [AllowAnonymous] // Adăugat: Permite accesul neautentificat
         public async Task<ActionResult> Index()
         {
             IEnumerable<DealResponse> recentDeals = new List<DealResponse>();
 
             try
             {
-                var deals = await _deal.GetAll().ConfigureAwait(false); 
+                var deals = await _deal.GetAll().ConfigureAwait(false);
 
                 if (deals != null && deals.Any())
                 {
@@ -49,19 +49,18 @@ namespace OtdamDarom.Web.Controllers
                 }
                 recentDeals = new List<DealResponse>();
             }
-            
+
             return View(recentDeals);
         }
 
-        // <<--- ACȚIUNEA _Sidebar ESTE ACUM SINCROANĂ
-        [ChildActionOnly] 
-        public ActionResult _Sidebar() // <<-- Fără 'async' și 'Task<>'
+        [ChildActionOnly]
+        [AllowAnonymous] // Adăugat: Permite sidebar-ului să se randeze și pentru utilizatori neautentificați
+        public ActionResult _Sidebar()
         {
             IEnumerable<CategoryResponse> categoryResponses = new List<CategoryResponse>();
             try
             {
-                // Apelăm metoda sincronă din CategoryService, fără 'await'
-                var categories = _category.GetAllCategoriesWithSubcategories(); 
+                var categories = _category.GetAllCategoriesWithSubcategories();
                 if (categories != null && categories.Any())
                 {
                     categoryResponses = Mapper.Map<IEnumerable<CategoryResponse>>(categories);
@@ -76,27 +75,24 @@ namespace OtdamDarom.Web.Controllers
                 }
                 categoryResponses = new List<CategoryResponse>();
             }
-            
+
             return PartialView("_Sidebar", categoryResponses);
         }
 
-        // Acțiunea DealsByCategory poate rămâne asincronă, dar va apela metoda sincronă a categoriilor
+        // Fără [AllowAnonymous] aici, deoarece această acțiune necesită o categorie specifică
         public async Task<ActionResult> DealsByCategory(int categoryId)
         {
             try
             {
-                // Apelăm metoda sincronă, deci fără 'await' aici
-                var allCategoriesWithSubcategories = _category.GetAllCategoriesWithSubcategories();
-                var selectedCategory = allCategoriesWithSubcategories.FirstOrDefault(c => c.Id == categoryId);
-                
+                var selectedCategory = await _category.GetCategoryById(categoryId);
+
                 if (selectedCategory == null)
                 {
-                    return HttpNotFound(); 
+                    return HttpNotFound();
                 }
 
                 ViewBag.CategoryName = selectedCategory.Name;
 
-                // Aceasta este încă asincronă, presupunând că _deal.GetDealsByCategoryId() este async
                 var deals = await _deal.GetDealsByCategoryId(categoryId).ConfigureAwait(false);
                 var dealResponses = Mapper.Map<IEnumerable<DealResponse>>(deals);
                 return View("DealsList", dealResponses);
@@ -110,6 +106,98 @@ namespace OtdamDarom.Web.Controllers
                 }
                 return View("Error");
             }
+        }
+
+
+        // <<<<<<<<<<<<<<<<< CORECTARE: Acțiunea CategoryDetails >>>>>>>>>>>>>>>>>>>>>>
+        [AllowAnonymous] // Adăugat: Presupunem că detaliile categoriilor sunt publice
+        public async Task<ActionResult> CategoryDetails(int id)
+        {
+            IEnumerable<DealResponse> dealsForCategory = new List<DealResponse>();
+            try
+            {
+                var categoryModel = await _category.GetCategoryById(id); 
+
+                if (categoryModel == null)
+                {
+                    return HttpNotFound($"Categoria cu ID-ul {id} nu a fost găsită.");
+                }
+
+                ViewBag.CategoryName = categoryModel.Name;
+
+                List<int> subcategoryIds = new List<int>();
+                if (categoryModel.Subcategories != null)
+                {
+                    subcategoryIds = categoryModel.Subcategories.Select(s => s.Id).ToList();
+                }
+
+                var dealsFromBL = await _deal.GetDealsBySubcategoryIds(subcategoryIds).ConfigureAwait(false);
+                
+                if (dealsFromBL != null && dealsFromBL.Any())
+                {
+                    dealsForCategory = Mapper.Map<IEnumerable<DealResponse>>(dealsFromBL);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Eroare la obținerea anunțurilor pentru categoria {id}: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Detalii: {ex.InnerException.Message}");
+                }
+                dealsForCategory = new List<DealResponse>();
+            }
+
+            return View("Category", dealsForCategory);
+        }
+
+        [AllowAnonymous] // Adăugat: Căutarea este o funcționalitate publică
+        public async Task<ActionResult> Search(string query)
+        {
+            IEnumerable<DealResponse> searchResults = new List<DealResponse>();
+            ViewBag.SearchQuery = query;
+
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(query))
+                {
+                    var dealsFromBL = await _deal.SearchDeals(query).ConfigureAwait(false);
+
+                    if (dealsFromBL != null && dealsFromBL.Any())
+                    {
+                        searchResults = Mapper.Map<IEnumerable<DealResponse>>(dealsFromBL);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Eroare la căutarea anunțurilor pentru '{query}': {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Detalii: {ex.InnerException.Message}");
+                }
+                searchResults = new List<DealResponse>();
+            }
+
+            return View("Search", searchResults); 
+        }
+
+        [AllowAnonymous] // Adăugat: Pagina Despre Noi este publică
+        public ActionResult About()
+        {
+            return View();
+        }
+
+        [AllowAnonymous] // Adăugat: Pagina Politica de confidențialitate este publică
+        public ActionResult Privacy()
+        {
+            return View();
+        }
+
+        [AllowAnonymous] // Adăugat: Pagina Contact este publică
+        public ActionResult Contact()
+        {
+            return View();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic; // Adaugă acest using pentru ICollection
 
 namespace OtdamDarom.Domain.Models
 {
@@ -11,23 +12,36 @@ namespace OtdamDarom.Domain.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required] [Display(Name = "Name")] 
+        [Required]
+        [StringLength(100)] 
+        [Display(Name = "Nume")] 
         public string Name { get; set; }
         
-        public string Token { get; set; }
+        // Proprietate pentru URL-ul imaginii de profil - ACEASTA ESTE NOUA SI ESTE FOARTE BINE CA AI ADAUGAT-O!
+        [StringLength(500)] 
+        [Display(Name = "Imagine de Profil URL")]
+        public string ProfilePictureUrl { get; set; } // Poate fi null dacă utilizatorul nu are o imagine setată
 
         [Required]
         [Display(Name = "Email")]
         [DataType(DataType.EmailAddress)]
+        [StringLength(255)] 
         public string Email { get; set; }
 
         [Required]
-        [Display(Name = "Password")]
+        [Display(Name = "Parolă Hash")] 
         [DataType(DataType.Password)]
-        [StringLength(50, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long.")]
+        [StringLength(255)] 
         public string PasswordHash { get; set; }
 
-        [Display(Name = "User_Role")] 
+        [Required] 
+        [StringLength(50)] 
+        [Display(Name = "Rol Utilizator")]
         public string UserRole { get; set; }
+
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow; 
+
+        // Proprietate de navigare pentru sesiuni (opțional, dar bun pentru EF)
+        public virtual ICollection<UserSession> Sessions { get; set; }
     }
 }

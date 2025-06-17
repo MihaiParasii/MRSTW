@@ -1,16 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using OtdamDarom.Domain.Models;
+using OtdamDarom.Domain.Models; 
 
 namespace OtdamDarom.BusinessLogic.Interfaces
 {
     public interface IUser
     {
-        Task<UserModel> GetUserByIdAsync(int id);
-        Task<IEnumerable<UserModel>> GetAllUsersAsync();
-        Task<int> CreateUserAsync(UserModel user);
-        Task UpdateUserAsync(UserModel newUser);
-        Task DeleteUserAsync(int id);
-        Task UpdateUserRoleAsync(string email, string newRole);
+        Task<UserModel> GetUserById(int id);
+        Task<IEnumerable<UserModel>> GetAllUsers();
+        Task<int> CreateUser(UserModel user);
+        Task UpdateUser(UserModel newUser); 
+        Task DeleteUser(int id);
+        Task UpdateUserRole(string email, string newRole);
+        // NOU: Metoda pentru actualizarea parolei
+        Task<bool> UpdatePassword(int userId, string currentPassword, string newPassword);
     }
 }

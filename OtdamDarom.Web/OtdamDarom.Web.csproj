@@ -122,6 +122,8 @@
         <Compile Include="Controllers\AuthController.cs" />
         <Compile Include="Controllers\DealController.cs" />
         <Compile Include="Controllers\HomeController.cs" />
+        <Compile Include="Controllers\UserController.cs" />
+        <Compile Include="Filters\CustomAuthorizeAttribute.cs" />
         <Compile Include="Global.asax.cs">
             <DependentUpon>Global.asax</DependentUpon>
         </Compile>
@@ -144,6 +146,7 @@
         <Content Include="Content\Images\book_prince.jpg" />
         <Content Include="Content\Images\chandelier.jpg" />
         <Content Include="Content\Images\console.jpg" />
+        <Content Include="Content\Images\default-user.png" />
         <Content Include="Content\Images\default.png" />
         <Content Include="Content\Images\mini_fridge.jpg" />
         <Content Include="Content\Images\refrigerator.jpg" />
@@ -153,6 +156,8 @@
         <Content Include="Views\Auth\Login.cshtml" />
         <Content Include="Views\Auth\Register.cshtml" />
         <Content Include="Views\Deal\Details.cshtml" />
+        <Content Include="Views\Home\Category.cshtml" />
+        <Content Include="Views\Home\Search.cshtml" />
         <Content Include="Views\Shared\_Footer.cshtml" />
         <Content Include="Views\Shared\_Header.cshtml" />
     </ItemGroup>
@@ -2006,6 +2011,7 @@
         <Content Include="Scripts\modernizr-2.8.3.js" />
         <Content Include="Views\Shared\_Navbar.cshtml" />
         <Content Include="Views\Shared\_Sidebar.cshtml" />
+        <Content Include="Views\User\Profile.cshtml" />
         <Content Include="Web.config" />
         <Content Include="Web.Debug.config">
             <DependentUpon>Web.config</DependentUpon>

@@ -1,56 +1,67 @@
-﻿@{
-    ViewData["Title"] = "Register";
+﻿@model OtdamDarom.BusinessLogic.Dtos.UserRegisterRequest
+
+@{
+    ViewBag.Title = "Înregistrare";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container">
-
-    <div class="card o-hidden border-0 shadow-lg my-5">
+    
+    <div class="card o-hidden border-0 shadow-lg my-5 mx-auto" style="max-width: 550px;">
         <div class="card-body p-0">
-            <!-- Nested Row within Card Body -->
             <div class="row">
-                <div class="col-lg-5 d-none d-lg-block bg-register-image"></div>
-                <div class="col-lg-7">
+                <div class="col-lg-12"> 
                     <div class="p-5">
                         <div class="text-center">
-                            <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
+                            <h1 class="h4 text-gray-900 mb-4">Creează un cont!</h1>
                         </div>
-                        <form class="user">
+
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success text-center">@TempData["SuccessMessage"]</div>
+                        }
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger text-center">@TempData["ErrorMessage"]</div>
+                        }
+
+                        @using (Html.BeginForm("RegisterAction", "Auth", FormMethod.Post, new { @class = "user", role = "form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
                             <div class="form-group row">
-                                <div class="col-sm-6 mb-3 mb-sm-0">
-                                    <input type="text" class="form-control form-control-user" id="exampleFirstName"
-                                           placeholder="First Name">
-                                </div>
-                                <div class="col-sm-6">
-                                    <input type="text" class="form-control form-control-user" id="exampleLastName"
-                                           placeholder="Last Name">
+                                <div class="col-sm-12 mb-3 mb-sm-0">
+                                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control form-control-user", @id = "inputName", @placeholder = "Nume Complet" })
+                                    @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
                                 </div>
                             </div>
                             <div class="form-group">
-                                <input type="email" class="form-control form-control-user" id="exampleInputEmail"
-                                       placeholder="Email Address">
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-user", @id = "exampleInputEmail", @placeholder = "Adresa de email", @type = "email" })
+                                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group row">
                                 <div class="col-sm-6 mb-3 mb-sm-0">
-                                    <input type="password" class="form-control form-control-user"
-                                           id="exampleInputPassword" placeholder="Password">
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-user", @id = "exampleInputPassword", @placeholder = "Parolă" })
+                                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                                 </div>
                                 <div class="col-sm-6">
-                                    <input type="password" class="form-control form-control-user"
-                                           id="exampleRepeatPassword" placeholder="Repeat Password">
+                                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control form-control-user", @id = "exampleRepeatPassword", @placeholder = "Repetă Parola" })
+                                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
                                 </div>
                             </div>
-                            <a href="/Account/Login" class="btn btn-primary btn-user btn-block">
-                                Register Account
-                            </a>
-                            <hr>
-                        </form>
-                        <hr>
+                            
+                            @Html.HiddenFor(m => m.UserRole)
+
+                            <button type="submit" class="btn btn-primary btn-user btn-block">
+                                Înregistrează contul
+                            </button>
+                        }
                         <div class="text-center">
-                            <a class="small" href="/Account/ForgotPassword">Forgot Password?</a>
+                            <a class="small" href="@Url.Action("ForgotPassword", "Auth")">Ai uitat parola?</a>
                         </div>
                         <div class="text-center">
-                            <a class="small" href="/Account/Login">Already have an account? Login!</a>
+                            <a class="small" href="@Url.Action("Login", "Auth")">Ai deja un cont? Autentifică-te!</a>
                         </div>
                     </div>
                 </div>
@@ -58,3 +69,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
