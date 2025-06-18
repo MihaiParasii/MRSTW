@@ -1,12 +1,12 @@
-﻿using System; // Adăugat pentru System.DateTime
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Web; // Pentru HttpPostedFileBase
+using System.Web; 
 
 namespace OtdamDarom.BusinessLogic.Dtos
 {
     public class DealDto
     {
-        [Required] // Poate fi necesar, depinde dacă Id-ul este gestionat automat sau e o valoare existentă
+        [Required]
         public int Id { get; set; } 
 
         [Required(ErrorMessage = "Numele anunțului este obligatoriu.")]
@@ -28,20 +28,12 @@ namespace OtdamDarom.BusinessLogic.Dtos
 
         [Required(ErrorMessage = "Selectați o categorie.")]
         [Display(Name = "Categorie")]
-        public int? SelectedCategoryId { get; set; } // int? pentru a permite "Selectează o categorie"
+        public int? SelectedCategoryId { get; set; }
 
         [Required(ErrorMessage = "Selectați o subcategorie.")]
         [Display(Name = "Subcategorie")]
         public int SelectedSubcategoryId { get; set; } 
-        
-        // ************************************************************
-        // CORECTARE CRUCIALĂ: ADĂUGĂM UserId ȘI CreationDate ÎN DTO!
-        // FĂRĂ ACESTE PROPRIETĂȚI, ERAU EROARE "CANNOT RESOLVE SYMBOL".
-        // ************************************************************
         public int UserId { get; set; }
         public DateTime CreationDate { get; set; }
-
-        // Poți adăuga și alte proprietăți dacă sunt necesare în View/Controller, dar nu sunt modificate
-        // public int Views { get; set; } 
     }
 }

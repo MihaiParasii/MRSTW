@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Mvc; // Important: asigură-te că acest using există pentru [AllowAnonymous]
+using System.Web.Mvc;
 using AutoMapper;
-using OtdamDarom.BusinessLogic.Interfaces; // Asigură-te că aceasta este interfața corectă pentru BL
+using OtdamDarom.BusinessLogic.Interfaces;
 using OtdamDarom.Web.Requests;
-using OtdamDarom.Domain.Models; // Pentru DealModel, CategoryModel, SubcategoryModel etc.
 
 namespace OtdamDarom.Web.Controllers
 {
@@ -22,7 +21,7 @@ namespace OtdamDarom.Web.Controllers
             _category = bl.GetCategoryBL();
         }
 
-        [AllowAnonymous] // Adăugat: Permite accesul neautentificat
+        [AllowAnonymous]
         public async Task<ActionResult> Index()
         {
             IEnumerable<DealResponse> recentDeals = new List<DealResponse>();
@@ -54,7 +53,7 @@ namespace OtdamDarom.Web.Controllers
         }
 
         [ChildActionOnly]
-        [AllowAnonymous] // Adăugat: Permite sidebar-ului să se randeze și pentru utilizatori neautentificați
+        [AllowAnonymous]
         public ActionResult _Sidebar()
         {
             IEnumerable<CategoryResponse> categoryResponses = new List<CategoryResponse>();
@@ -78,8 +77,7 @@ namespace OtdamDarom.Web.Controllers
 
             return PartialView("_Sidebar", categoryResponses);
         }
-
-        // Fără [AllowAnonymous] aici, deoarece această acțiune necesită o categorie specifică
+        
         public async Task<ActionResult> DealsByCategory(int categoryId)
         {
             try
@@ -107,10 +105,8 @@ namespace OtdamDarom.Web.Controllers
                 return View("Error");
             }
         }
-
-
-        // <<<<<<<<<<<<<<<<< CORECTARE: Acțiunea CategoryDetails >>>>>>>>>>>>>>>>>>>>>>
-        [AllowAnonymous] // Adăugat: Presupunem că detaliile categoriilor sunt publice
+        
+        [AllowAnonymous]
         public async Task<ActionResult> CategoryDetails(int id)
         {
             IEnumerable<DealResponse> dealsForCategory = new List<DealResponse>();
@@ -151,7 +147,7 @@ namespace OtdamDarom.Web.Controllers
             return View("Category", dealsForCategory);
         }
 
-        [AllowAnonymous] // Adăugat: Căutarea este o funcționalitate publică
+        [AllowAnonymous]
         public async Task<ActionResult> Search(string query)
         {
             IEnumerable<DealResponse> searchResults = new List<DealResponse>();
@@ -182,19 +178,19 @@ namespace OtdamDarom.Web.Controllers
             return View("Search", searchResults); 
         }
 
-        [AllowAnonymous] // Adăugat: Pagina Despre Noi este publică
+        [AllowAnonymous]
         public ActionResult About()
         {
             return View();
         }
 
-        [AllowAnonymous] // Adăugat: Pagina Politica de confidențialitate este publică
+        [AllowAnonymous]
         public ActionResult Privacy()
         {
             return View();
         }
 
-        [AllowAnonymous] // Adăugat: Pagina Contact este publică
+        [AllowAnonymous]
         public ActionResult Contact()
         {
             return View();

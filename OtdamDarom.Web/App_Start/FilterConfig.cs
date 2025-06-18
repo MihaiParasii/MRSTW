@@ -1,7 +1,5 @@
-﻿// App_Start/FilterConfig.cs
-using System.Web;
-using System.Web.Mvc;
-using OtdamDarom.Web.Filters; // Păstrează acest using
+﻿using System.Web.Mvc;
+using OtdamDarom.Web.Filters;
 
 namespace OtdamDarom.Web
 {

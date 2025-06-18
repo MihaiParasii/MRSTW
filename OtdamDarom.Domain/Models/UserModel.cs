@@ -37,21 +37,13 @@ namespace OtdamDarom.Domain.Models
         [StringLength(50)] 
         [Display(Name = "Rol Utilizator")]
         public string UserRole { get; set; }
-
         public DateTime CreationDate { get; set; } = DateTime.UtcNow; 
-
         public virtual ICollection<UserSession> Sessions { get; set; }
-
-        // <<<<<<<<<<<<<<<<< ADAUGĂ ACEASTĂ LINIE >>>>>>>>>>>>>>>>>>>>>>
-        public virtual ICollection<DealModel> Deals { get; set; } // Un utilizator poate avea mai multe anunțuri
-        // <<<<<<<<<<<<<<<<< SFÂRȘIT ADĂUGARE >>>>>>>>>>>>>>>>>>>>>>
-
+        public virtual ICollection<DealModel> Deals { get; set; }
         public UserModel()
         {
-            // <<<<<<<<<<<<<<<<< INIȚIALIZEAZĂ ȘI ACEASTĂ COLECȚIE >>>>>>>>>>>>>>>>>>>>>>
             Sessions = new HashSet<UserSession>();
-            Deals = new HashSet<DealModel>(); // Asigură-te că este inițializată
-            // <<<<<<<<<<<<<<<<< SFÂRȘIT INIȚIALIZARE >>>>>>>>>>>>>>>>>>>>>>
+            Deals = new HashSet<DealModel>();
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity; // Asigură-te că este importat pentru ToListAsync, FirstOrDefaultAsync etc.
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -14,8 +14,7 @@ namespace OtdamDarom.BusinessLogic.Api
     public class UserApi
     {
         private readonly AppDbContext _context = new AppDbContext();
-
-        // --- Metode pentru Deals (Rămân așa cum sunt, acum accesate prin DealBl care folosește UserApi) ---
+        
         internal async Task<DealModel> GetByIdAsync(int id)
         {
             return await _context.Deals.FirstOrDefaultAsync(p => p.Id == id);
@@ -43,9 +42,7 @@ namespace OtdamDarom.BusinessLogic.Api
             existingDeal.Description = dealModel.Description;
             existingDeal.ImageURL = dealModel.ImageURL;
             existingDeal.UserId = dealModel.UserId;
-            // <<<<<<<<<<<<<<<<< FĂRĂ MODIFICARE AICI, CONVERSIA INT -> INT? E OK >>>>>>>>>>>>>>>>>>>>>>
             existingDeal.SubcategoryId = dealModel.SubcategoryId; 
-            // <<<<<<<<<<<<<<<<< SFÂRȘIT FĂRĂ MODIFICARE >>>>>>>>>>>>>>>>>>>>>>
             existingDeal.CreationDate = dealModel.CreationDate;
 
             _context.Entry(existingDeal).State = EntityState.Modified;
@@ -59,7 +56,6 @@ namespace OtdamDarom.BusinessLogic.Api
             _context.Deals.Remove(deal);
             await _context.SaveChangesAsync();
         }
-        // -------------------------------------------------
 
         internal async Task<IEnumerable<DealModel>> GetDealsByCategoryIdAsync(int categoryId)
         {
@@ -78,26 +74,19 @@ namespace OtdamDarom.BusinessLogic.Api
             }
 
             return await _context.Deals
-                                 // <<<<<<<<<<<<<<<<< CORECTAT AICI >>>>>>>>>>>>>>>>>>>>>>
-                                 // Asigură-te că SubcategoryId are o valoare înainte de a folosi Contains
                                  .Where(d => d.SubcategoryId.HasValue && subcategoryIds.Contains(d.SubcategoryId.Value))
-                                 // <<<<<<<<<<<<<<<<< SFÂRȘIT CORECTAT >>>>>>>>>>>>>>>>>>>>>>
                                  .AsNoTracking()
                                  .ToListAsync();
         }
 
-        // <<<<<<<<<<<<<<<<< NOU: ADAUGĂ ACEASTĂ IMPLEMENTARE PENTRU ANUNȚURILE UTILIZATORULUI >>>>>>>>>>>>>>>>>>>>>>
         internal async Task<IEnumerable<DealModel>> GetDealsByUserIdAsync(int userId)
         {
             return await _context.Deals
                                  .Where(d => d.UserId == userId)
-                                 .OrderByDescending(d => d.CreationDate) // Adăugat pentru a sorta după data creării
+                                 .OrderByDescending(d => d.CreationDate)
                                  .AsNoTracking()
                                  .ToListAsync();
         }
-        // <<<<<<<<<<<<<<<<< SFÂRȘIT NOU >>>>>>>>>>>>>>>>>>>>>>
-
-        // METODE PENTRU CATEGORII ȘI SUBCATEGORII (ACUM FOLOSITE ȘI DE DEALBL)
         internal async Task<IEnumerable<CategoryModel>> GetAllCategoriesWithSubcategoriesAsync()
         {
             return await _context.Categories
@@ -113,10 +102,7 @@ namespace OtdamDarom.BusinessLogic.Api
                                  .AsNoTracking()
                                  .FirstOrDefaultAsync(c => c.Id == id);
         }
-
-        // <<<<<<<<<<<<<<<<< METODE PENTRU AUTENTIFICARE ȘI SESIUNI - REFACTORIZATE >>>>>>>>>>>>>>>>>>>>>>
-
-        // Înregistrează un utilizator nou
+        
         internal async Task<UserAuthResponse> RegisterUserAsync(UserRegisterRequest request)
         {
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
@@ -151,8 +137,7 @@ namespace OtdamDarom.BusinessLogic.Api
                 ProfilePictureUrl = newUser.ProfilePictureUrl
             };
         }
-
-        // Loghează un utilizator existent
+        
         internal async Task<UserAuthResponse> LoginUserAsync(UserLoginRequest request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
@@ -179,8 +164,7 @@ namespace OtdamDarom.BusinessLogic.Api
                 ProfilePictureUrl = user.ProfilePictureUrl
             };
         }
-
-        // Creează o sesiune pentru un utilizator
+        
         internal async Task<UserSession> CreateUserSessionAsync(int userId, bool rememberMe)
         {
             var existingSessions = await _context.Sessions.Where(s => s.UserId == userId).ToListAsync();
@@ -199,8 +183,7 @@ namespace OtdamDarom.BusinessLogic.Api
             await _context.SaveChangesAsync();
             return session;
         }
-
-        // Găsește o sesiune activă după token
+        
         internal async Task<UserSession> GetActiveUserSessionByTokenAsync(string token)
         {
             if (string.IsNullOrEmpty(token)) return null;
@@ -209,8 +192,7 @@ namespace OtdamDarom.BusinessLogic.Api
                                  .Include(s => s.User)
                                  .FirstOrDefaultAsync(s => s.Token == token && s.ExpiresAt > DateTime.UtcNow);
         }
-
-        // Delogare - șterge sesiunea
+        
         internal async Task<bool> DeleteUserSessionAsync(string token)
         {
             var session = await _context.Sessions.FirstOrDefaultAsync(s => s.Token == token);
@@ -222,8 +204,7 @@ namespace OtdamDarom.BusinessLogic.Api
             }
             return false;
         }
-
-        // <<<<<<<<<<<<<<<<<<<<<<<< METODA DE HASHING UNIFICATĂ (păstrată internal) >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        
         internal string GetComputedHashForPassword(string password)
         {
             using (var sha256 = SHA256.Create())
@@ -233,7 +214,6 @@ namespace OtdamDarom.BusinessLogic.Api
                 return Convert.ToBase64String(hash);
             }
         }
-        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
         internal async Task<IEnumerable<DealModel>> SearchDealsAsync(string query)
         {
@@ -248,8 +228,7 @@ namespace OtdamDarom.BusinessLogic.Api
                                  .AsNoTracking()
                                  .ToListAsync();
         }
-
-        // NOU: Metode pentru UserService (din AdminApi)
+        
         internal async Task<UserModel> GetUserByIdAsync(int id)
         {
             return await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
@@ -269,7 +248,6 @@ namespace OtdamDarom.BusinessLogic.Api
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             
-            // Asigură-te că parola este hashedă DOAR dacă nu este deja (ex: la crearea manuală a unui user)
             if (!string.IsNullOrEmpty(user.PasswordHash) && user.PasswordHash.Length < 60)
             {
                 user.PasswordHash = GetComputedHashForPassword(user.PasswordHash);
@@ -298,8 +276,6 @@ namespace OtdamDarom.BusinessLogic.Api
             existingUser.UserRole = newUser.UserRole;
             existingUser.ProfilePictureUrl = newUser.ProfilePictureUrl; 
             
-            // Această logică ar trebui să fie gestionată de UpdatePassword din UserBl.
-            // Dacă newUser.PasswordHash vine aici, înseamnă că a fost deja hashed de UserBl.UpdatePassword.
             if (!string.IsNullOrEmpty(newUser.PasswordHash) && newUser.PasswordHash != existingUser.PasswordHash)
             {
                 existingUser.PasswordHash = newUser.PasswordHash; 

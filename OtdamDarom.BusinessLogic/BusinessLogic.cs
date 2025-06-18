@@ -1,5 +1,4 @@
-﻿// OtdamDarom.BusinessLogic/BusinessLogic.cs
-using OtdamDarom.BusinessLogic.EntityBL;
+﻿using OtdamDarom.BusinessLogic.EntityBL;
 using OtdamDarom.BusinessLogic.Interfaces;
 
 namespace OtdamDarom.BusinessLogic

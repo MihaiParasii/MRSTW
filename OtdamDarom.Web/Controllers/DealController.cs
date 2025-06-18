@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web; // Adaugă pentru HttpPostedFileBase
+using System.Web;
 using System.Web.Mvc;
-using System.Security.Claims; // Adaugă pentru ClaimsIdentity
+using System.Security.Claims;
 using AutoMapper;
 using OtdamDarom.BusinessLogic.Interfaces;
-using OtdamDarom.BusinessLogic.Dtos; // DTO pentru anunț (DealDto)
-using OtdamDarom.Domain.Models; // Pentru DealModel
-using OtdamDarom.Web.Filters; // Pentru [CustomAuthorize]
-using OtdamDarom.Web.Requests; // Asigură-te că DealResponse este aici
+using OtdamDarom.BusinessLogic.Dtos;
+using OtdamDarom.Domain.Models;
+using OtdamDarom.Web.Filters;
+using OtdamDarom.Web.Requests;
 
 namespace OtdamDarom.Web.Controllers
 {
@@ -89,9 +89,7 @@ namespace OtdamDarom.Web.Controllers
                 }
 
                 dealResponse = Mapper.Map<DealResponse>(dealModel);
-
-                // <<<<<<<<<<<<<<<<< CORECTAT AICI >>>>>>>>>>>>>>>>>>>>>>
-                // Aici era eroarea. dealModel.SubcategoryId este int?, deci trebuie verificat HasValue și folosit .Value
+                
                 if (dealModel.SubcategoryId.HasValue && dealModel.SubcategoryId.Value > 0) 
                 {
                     var dealsFromSameSubcategory = await _dealBl.GetDealsBySubcategoryIds(new List<int> { dealModel.SubcategoryId.Value });
@@ -106,7 +104,6 @@ namespace OtdamDarom.Web.Controllers
                                         .ToList();
                     }
                 }
-                // <<<<<<<<<<<<<<<<< SFÂRȘIT CORECTAT >>>>>>>>>>>>>>>>>>>>>>
             }
             catch (Exception ex)
             {
@@ -121,8 +118,7 @@ namespace OtdamDarom.Web.Controllers
             ViewBag.SimilarDeals = similarDeals;
             return View(dealResponse);
         }
-
-        // GET: Deal/Create - Afișează formularul pentru adăugarea unui anunț nou
+        
         [CustomAuthorize]
         public async Task<ActionResult> Create()
         {
@@ -143,8 +139,7 @@ namespace OtdamDarom.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
-
-        // POST: Deal/Create - Procesează trimiterea formularului unui anunț nou
+        
         [CustomAuthorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -195,12 +190,7 @@ namespace OtdamDarom.Web.Controllers
                         Description = model.Description,
                         ImageURL = imageUrl,
                         UserId = userId,
-                        // <<<<<<<<<<<<<<<<< CORECTAT AICI >>>>>>>>>>>>>>>>>>>>>>
-                        // La creare, SelectedSubcategoryId este int (non-nullable conform DTO)
-                        // SubcategoryId în DealModel este int? (nullable)
-                        // Conversia de la int la int? este implicită și sigură.
                         SubcategoryId = model.SelectedSubcategoryId, 
-                        // <<<<<<<<<<<<<<<<< SFÂRȘIT CORECTAT >>>>>>>>>>>>>>>>>>>>>>
                         CreationDate = DateTime.Now
                     };
 
@@ -224,8 +214,7 @@ namespace OtdamDarom.Web.Controllers
 
             return View(model);
         }
-
-        // GET: Deal/Edit - Afișează formularul pentru editarea unui anunț existent
+        
         [CustomAuthorize]
         public async Task<ActionResult> Edit(int id)
         {
@@ -239,18 +228,15 @@ namespace OtdamDarom.Web.Controllers
                     TempData["ErrorMessage"] = "Anunțul nu a fost găsit.";
                     return RedirectToAction("MyDeals");
                 }
-
-                // Verifică dacă utilizatorul curent este proprietarul anunțului
+                
                 if (dealModel.UserId != currentUserId)
                 {
                     TempData["ErrorMessage"] = "Nu ai permisiunea de a edita acest anunț.";
                     return RedirectToAction("MyDeals");
                 }
-
-                // Încarcă toate categoriile și subcategoriile
+                
                 var categories = await _userBl.GetAllCategoriesWithSubcategories();
                 
-                // Selectează categoria și subcategoria curentă a anunțului
                 int? currentCategoryId = null;
                 if (dealModel.SubcategoryId.HasValue)
                 {
@@ -263,28 +249,21 @@ namespace OtdamDarom.Web.Controllers
 
                 ViewBag.Categories = new SelectList(categories, "Id", "Name", currentCategoryId);
                 
-                // Încarcă subcategoriile pentru categoria selectată a anunțului
                 if (currentCategoryId.HasValue)
                 {
                     var currentCategory = categories.FirstOrDefault(c => c.Id == currentCategoryId.Value);
                     if (currentCategory != null && currentCategory.Subcategories != null)
                     {
-                        // <<<<<<<<<<<<<<<<< CORECTAT AICI >>>>>>>>>>>>>>>>>>>>>>
-                        // Aici era eroarea. dealModel.SubcategoryId este int?, deci trebuie folosit .Value dacă are.
-                        // Dar DropDownListFor acceptă int? pentru valoarea selectată, deci e ok să-l pasezi direct.
-                        // Totuși, este mai explicit să verifici dacă are valoare și să o pasezi.
                         ViewBag.Subcategories = new SelectList(currentCategory.Subcategories, "Id", "Name", dealModel.SubcategoryId);
-                        // <<<<<<<<<<<<<<<<< SFÂRȘIT CORECTAT >>>>>>>>>>>>>>>>>>>>>>
                     }
                 }
                 else
                 {
-                    ViewBag.Subcategories = new SelectList(new List<object>(), "Id", "Name"); // Lista goală dacă nu e categorie selectată
+                    ViewBag.Subcategories = new SelectList(new List<object>(), "Id", "Name");
                 }
                 
-                // Mapează DealModel la DealDto pentru formular
                 var model = Mapper.Map<DealDto>(dealModel);
-                model.SelectedCategoryId = currentCategoryId; // Setează ID-ul categoriei pentru a pre-selecta în dropdown
+                model.SelectedCategoryId = currentCategoryId;
 
                 return View(model);
             }
@@ -301,14 +280,12 @@ namespace OtdamDarom.Web.Controllers
                 return RedirectToAction("MyDeals");
             }
         }
-
-        // POST: Deal/Edit - Procesează trimiterea formularului de editare a anunțului
+        
         [CustomAuthorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(DealDto model, HttpPostedFileBase imageFile)
         {
-            // Reîncarcă categoriile și subcategoriile în caz de eroare de validare
             var categories = await _userBl.GetAllCategoriesWithSubcategories();
             ViewBag.Categories = new SelectList(categories, "Id", "Name", model.SelectedCategoryId);
 
@@ -337,15 +314,14 @@ namespace OtdamDarom.Web.Controllers
                         TempData["ErrorMessage"] = "Anunțul nu a fost găsit pentru actualizare.";
                         return RedirectToAction("MyDeals");
                     }
-
-                    // Verifică dacă utilizatorul curent este proprietarul anunțului
+                    
                     if (existingDeal.UserId != userId)
                     {
                         TempData["ErrorMessage"] = "Nu ai permisiunea de a edita acest anunț.";
                         return RedirectToAction("MyDeals");
                     }
 
-                    string imageUrl = existingDeal.ImageURL; // Păstrează imaginea existentă dacă nu se încarcă una nouă
+                    string imageUrl = existingDeal.ImageURL;
 
                     if (imageFile != null && imageFile.ContentLength > 0)
                     {
@@ -361,8 +337,7 @@ namespace OtdamDarom.Web.Controllers
                             ModelState.AddModelError("ImageFile", "Dimensiunea imaginii depășește limita de 5MB.");
                             return View(model);
                         }
-
-                        // Șterge imaginea veche dacă nu este cea implicită și dacă o nouă imagine este încărcată
+                        
                         if (!string.IsNullOrEmpty(existingDeal.ImageURL) && 
                             !existingDeal.ImageURL.Contains("default-deal.png"))
                         {
@@ -386,7 +361,7 @@ namespace OtdamDarom.Web.Controllers
                         imageFile.SaveAs(filePath);
                         imageUrl = Url.Content("~/Content/DealImages/" + uniqueFileName);
                     }
-                    else if (model.DeleteExistingImage) // Dacă utilizatorul a bifat ștergerea imaginii
+                    else if (model.DeleteExistingImage)
                     {
                         if (!string.IsNullOrEmpty(existingDeal.ImageURL) &&
                             !existingDeal.ImageURL.Contains("default-deal.png"))
@@ -397,21 +372,15 @@ namespace OtdamDarom.Web.Controllers
                                 System.IO.File.Delete(oldFilePath);
                             }
                         }
-                        imageUrl = "/Content/Images/default-deal.png"; // Setează imaginea implicită
+                        imageUrl = "/Content/Images/default-deal.png";
                     }
 
 
                     existingDeal.Name = model.Name;
                     existingDeal.Description = model.Description;
-                    existingDeal.ImageURL = imageUrl; // Actualizează URL-ul imaginii
-                    // <<<<<<<<<<<<<<<<< CORECTAT AICI >>>>>>>>>>>>>>>>>>>>>>
-                    // model.SelectedSubcategoryId este int, existingDeal.SubcategoryId este int?
-                    // Conversia de la int la int? este implicită și sigură.
+                    existingDeal.ImageURL = imageUrl;
                     existingDeal.SubcategoryId = model.SelectedSubcategoryId; 
-                    // <<<<<<<<<<<<<<<<< SFÂRȘIT CORECTAT >>>>>>>>>>>>>>>>>>>>>>
-                    // CreationDate rămâne neschimbată
-                    // UserId rămâne neschimbat
-
+                    
                     await _dealBl.Update(existingDeal);
 
                     TempData["SuccessMessage"] = "Anunțul a fost actualizat cu succes!";
@@ -432,9 +401,7 @@ namespace OtdamDarom.Web.Controllers
 
             return View(model);
         }
-
-
-        // GET: Deal/GetSubcategories - Acțiune AJAX pentru a prelua subcategoriile unei categorii
+        
         [HttpGet]
         public async Task<JsonResult> GetSubcategories(int categoryId)
         {
@@ -456,8 +423,7 @@ namespace OtdamDarom.Web.Controllers
             }
             return Json(new List<object>(), JsonRequestBehavior.AllowGet);
         }
-
-        // NOU: GET: Deal/MyDeals - Afișează anunțurile utilizatorului logat
+        
         [CustomAuthorize]
         public async Task<ActionResult> MyDeals()
         {
@@ -491,14 +457,9 @@ namespace OtdamDarom.Web.Controllers
             return View(userDeals);
         }
         
-        // În OtdamDarom.Web.Controllers/DealController.cs
-
-// ... (alte using-uri și codul controllerului) ...
-
-        // POST: Deal/Delete - Procesează cererea de ștergere a unui anunț
         [CustomAuthorize]
         [HttpPost]
-        [ValidateAntiForgeryToken] // Asigură-te că token-ul anti-forgery este validat
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(int id)
         {
             try
@@ -515,8 +476,7 @@ namespace OtdamDarom.Web.Controllers
                 {
                     return Json(new { success = false, message = "Nu ai permisiunea de a șterge acest anunț." });
                 }
-
-                // Opțional: Șterge imaginea veche de pe server, dacă nu este imaginea implicită
+                
                 if (!string.IsNullOrEmpty(dealToDelete.ImageURL) && 
                     !dealToDelete.ImageURL.Contains("default-deal.png")) 
                 {
@@ -545,7 +505,5 @@ namespace OtdamDarom.Web.Controllers
                 return Json(new { success = false, message = "A apărut o eroare la ștergerea anunțului. Vă rugăm să reîncărcați pagina și să încercați din nou." });
             }
         }
-
-// ... (restul codului controllerului) ...
     }
 }

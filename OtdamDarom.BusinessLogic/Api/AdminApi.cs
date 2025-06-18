@@ -5,9 +5,8 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web; // Adăugat pentru HttpPostedFileBase
+using System.Web;
 using OtdamDarom.BusinessLogic.Data;
-using OtdamDarom.BusinessLogic.Dtos; // DTOs-urile pot fi utile aici pentru mapări
 using OtdamDarom.Domain.Models;
 
 namespace OtdamDarom.BusinessLogic.Api
@@ -68,13 +67,10 @@ namespace OtdamDarom.BusinessLogic.Api
             {
                 throw new ArgumentException("Utilizatorul nu a fost găsit.");
             }
-
-            // Actualizează doar proprietățile permise pentru editare
+            
             existingUser.Name = userModel.Name;
             existingUser.Email = userModel.Email;
-            // existingUser.UserRole = userModel.UserRole; // Dacă rolul se editează separat, scoate linia aceasta
 
-            // Logica de gestionare a imaginii de profil
             if (deleteExistingImage)
             {
                 if (!string.IsNullOrEmpty(existingUser.ProfilePictureUrl) && !existingUser.ProfilePictureUrl.Contains("default-user.png"))
@@ -85,7 +81,7 @@ namespace OtdamDarom.BusinessLogic.Api
                         System.IO.File.Delete(oldPath);
                     }
                 }
-                existingUser.ProfilePictureUrl = null; // Setăm la null sau la imaginea implicită
+                existingUser.ProfilePictureUrl = null;
             }
             else if (imageFile != null && imageFile.ContentLength > 0)
             {
@@ -119,15 +115,13 @@ namespace OtdamDarom.BusinessLogic.Api
             {
                 throw new ArgumentException("User cannot be null");
             }
-
-            // Asigură-te că parola este hashed dacă este furnizată
-            if (!string.IsNullOrEmpty(userData.PasswordHash) && userData.PasswordHash.Length < 60) // Verificare simplă pentru a nu re-hash-ui un hash existent
+            
+            if (!string.IsNullOrEmpty(userData.PasswordHash) && userData.PasswordHash.Length < 60)
             {
                 userData.PasswordHash = GetComputedHashForPassword(userData.PasswordHash);
             }
             else if (string.IsNullOrEmpty(userData.PasswordHash))
             {
-                // Poate ar trebui să arunci o eroare sau să setezi o parolă implicită dacă e obligatorie
                 throw new ArgumentException("Parola este obligatorie pentru un utilizator nou.");
             }
 
@@ -151,8 +145,7 @@ namespace OtdamDarom.BusinessLogic.Api
             {
                 throw new ArgumentException("Utilizatorul nu a fost găsit.");
             }
-
-            // Șterge anunțurile utilizatorului și imaginile asociate
+            
             var userDeals = await _context.Deals.Where(d => d.UserId == userId).ToListAsync();
             if (userDeals.Any())
             {
@@ -169,8 +162,7 @@ namespace OtdamDarom.BusinessLogic.Api
                 }
                 _context.Deals.RemoveRange(userDeals);
             }
-
-            // Șterge imaginea de profil a utilizatorului
+            
             if (!string.IsNullOrEmpty(user.ProfilePictureUrl) && !user.ProfilePictureUrl.Contains("default-user.png"))
             {
                 var profilePicPath = System.Web.HttpContext.Current.Server.MapPath(user.ProfilePictureUrl);
@@ -191,8 +183,7 @@ namespace OtdamDarom.BusinessLogic.Api
             {
                 throw new ArgumentException("Anunțul nu a fost găsit.");
             }
-
-            // Șterge imaginea anunțului
+            
             if (!string.IsNullOrEmpty(deal.ImageURL) && !deal.ImageURL.Contains("default-deal.png"))
             {
                 var imagePath = System.Web.HttpContext.Current.Server.MapPath(deal.ImageURL);
@@ -286,18 +277,15 @@ namespace OtdamDarom.BusinessLogic.Api
             var subcategories = await _context.Subcategories.AsNoTracking().ToListAsync();
             return subcategories;
         }
-
-        // METODA CORECTATĂ: GetDealByIdAsync - Include Subcategory și Category pentru a accesa CategoryId
+        
         public async Task<DealModel> GetDealByIdAsync(int id)
         {
             return await _context.Deals
-                                 .Include(d => d.Subcategory.Category) // Include Category prin Subcategory
+                                 .Include(d => d.Subcategory.Category)
                                  .AsNoTracking()
                                  .FirstOrDefaultAsync(d => d.Id == id);
         }
-
-        // Metoda actualizată pentru UpdateDealAsync pentru a lucra cu DealModel (chiar dacă vine din DTO în Controller)
-        // Logica de actualizare a imaginii și a câmpurilor text este aici
+        
         public async Task UpdateDealAsync(DealModel dealModel, HttpPostedFileBase imageFile, bool deleteExistingImage)
         {
             if (dealModel == null)
@@ -313,9 +301,8 @@ namespace OtdamDarom.BusinessLogic.Api
 
             existingDeal.Name = dealModel.Name;
             existingDeal.Description = dealModel.Description;
-            existingDeal.SubcategoryId = dealModel.SubcategoryId; // Folosește SubcategoryId primit din model
-
-            // Logica de gestionare a imaginii anunțului
+            existingDeal.SubcategoryId = dealModel.SubcategoryId;
+            
             if (deleteExistingImage)
             {
                 if (!string.IsNullOrEmpty(existingDeal.ImageURL) && !existingDeal.ImageURL.Contains("default-deal.png"))
@@ -326,7 +313,7 @@ namespace OtdamDarom.BusinessLogic.Api
                         System.IO.File.Delete(oldPath);
                     }
                 }
-                existingDeal.ImageURL = null; // Setăm la null sau la imaginea implicită
+                existingDeal.ImageURL = null;
             }
             else if (imageFile != null && imageFile.ContentLength > 0)
             {
@@ -340,14 +327,14 @@ namespace OtdamDarom.BusinessLogic.Api
                 }
 
                 var fileName = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(imageFile.FileName);
-                var uploadPath = System.Web.HttpContext.Current.Server.MapPath("~/Content/Images/Uploads");
+                var uploadPath = System.Web.HttpContext.Current.Server.MapPath("~/Content/Images");
                 if (!System.IO.Directory.Exists(uploadPath))
                 {
                     System.IO.Directory.CreateDirectory(uploadPath);
                 }
                 var path = System.IO.Path.Combine(uploadPath, fileName);
                 imageFile.SaveAs(path);
-                existingDeal.ImageURL = "~/Content/Images/Uploads/" + fileName;
+                existingDeal.ImageURL = "~/Content/Images/" + fileName;
             }
 
             _context.Entry(existingDeal).State = EntityState.Modified;
@@ -379,7 +366,7 @@ namespace OtdamDarom.BusinessLogic.Api
             }
 
             existingSubcategory.Name = subcategory.Name;
-            existingSubcategory.CategoryId = subcategory.CategoryId; // Asigură-te că CategoryId este actualizat
+            existingSubcategory.CategoryId = subcategory.CategoryId;
 
             _context.Entry(existingSubcategory).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -392,10 +379,6 @@ namespace OtdamDarom.BusinessLogic.Api
             {
                 throw new ArgumentException("Subcategory not found");
             }
-
-            // TODO: Adaugă logică pentru a gestiona anunțurile asociate înainte de ștergere
-            // De exemplu, poți seta SubcategoryId la null pentru anunțurile aferente sau le poți șterge.
-            // Altfel, vei primi o eroare de cheie străină.
 
             _context.Subcategories.Remove(subcategory);
             await _context.SaveChangesAsync();

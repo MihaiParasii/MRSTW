@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using OtdamDarom.BusinessLogic.Api;
 using OtdamDarom.BusinessLogic.Interfaces;
 using OtdamDarom.Domain.Models;
-using OtdamDarom.BusinessLogic.Dtos; // Adaugă acest using pentru UserLoginRequest
+using OtdamDarom.BusinessLogic.Dtos;
 
 namespace OtdamDarom.BusinessLogic.EntityBL
 {
@@ -87,9 +87,7 @@ namespace OtdamDarom.BusinessLogic.EntityBL
                 return false;
             }
         }
-
-        // <<<<<<<<<<<<<<<<< IMPLEMENTARE AICI >>>>>>>>>>>>>>>>>>>>>>
-        // Implementarea metodelor pentru categorii și subcategorii, apelând UserApi
+        
         public async Task<IEnumerable<CategoryModel>> GetAllCategoriesWithSubcategories()
         {
             return await _userApi.GetAllCategoriesWithSubcategoriesAsync();
@@ -99,6 +97,5 @@ namespace OtdamDarom.BusinessLogic.EntityBL
         {
             return await _userApi.GetCategoryByIdAsync(id);
         }
-        // <<<<<<<<<<<<<<<<< SFÂRȘIT IMPLEMENTARE >>>>>>>>>>>>>>>>>>>>>>
     }
 }

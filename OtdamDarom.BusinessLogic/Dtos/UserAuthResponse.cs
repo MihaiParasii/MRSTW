@@ -1,8 +1,4 @@
-﻿// OtdamDarom.BusinessLogic/Dtos/UserAuthResponse.cs
-using System; 
-using System.ComponentModel.DataAnnotations; 
-
-namespace OtdamDarom.BusinessLogic.Dtos
+﻿namespace OtdamDarom.BusinessLogic.Dtos
 {
     public class UserAuthResponse
     {
@@ -13,6 +9,6 @@ namespace OtdamDarom.BusinessLogic.Dtos
         public string UserName { get; set; } 
         public string UserRole { get; set; }
         public string AuthToken { get; set; }
-        public string ProfilePictureUrl { get; set; } // NOU: Asigură-te că este inclus
+        public string ProfilePictureUrl { get; set; }
     }
 }

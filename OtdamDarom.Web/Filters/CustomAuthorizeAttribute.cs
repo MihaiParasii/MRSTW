@@ -8,7 +8,6 @@ using OtdamDarom.BusinessLogic.Interfaces;
 using OtdamDarom.Domain.Models;
 using System.Linq;
 using System.Security.Claims;
-using System.Reflection;
 
 namespace OtdamDarom.Web.Filters
 {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using OtdamDarom.BusinessLogic.Dtos;
 using OtdamDarom.Domain.Models;
 
 namespace OtdamDarom.BusinessLogic.Interfaces
@@ -15,10 +14,8 @@ namespace OtdamDarom.BusinessLogic.Interfaces
         Task DeleteUser(int id);
         Task UpdateUserRole(string email, string newRole);
         Task<bool> UpdatePassword(int userId, string currentPassword, string newPassword);
-
-        // <<<<<<<<<<<<<<<<< ADAUGATE AICI >>>>>>>>>>>>>>>>>>>>>>
+        
         Task<IEnumerable<CategoryModel>> GetAllCategoriesWithSubcategories();
         Task<CategoryModel> GetCategoryById(int id);
-        // <<<<<<<<<<<<<<<<< SFÂRȘIT ADAUGATE >>>>>>>>>>>>>>>>>>>>>>
     }
 }

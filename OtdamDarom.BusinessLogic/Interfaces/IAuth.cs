@@ -1,5 +1,4 @@
-﻿// OtdamDarom.BusinessLogic.Interfaces/IAuth.cs
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using OtdamDarom.BusinessLogic.Dtos;
 using OtdamDarom.Domain.Models; 
 
@@ -11,6 +10,5 @@ namespace OtdamDarom.BusinessLogic.Interfaces
         Task<UserAuthResponse> Login(UserLoginRequest request);
         Task<bool> Logout(string authToken);
         Task<UserModel> GetCurrentUser(string authToken); 
-        // NOU: Metoda pentru schimbarea parolei
     }
 }

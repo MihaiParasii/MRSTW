@@ -2,20 +2,17 @@
 using OtdamDarom.BusinessLogic.Interfaces;
 using System;
 using System.IO;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using OtdamDarom.Web.Filters;
 using System.Security.Claims;
 using System.Threading.Tasks; 
-using OtdamDarom.Domain.Models; 
 
 namespace OtdamDarom.Controllers
 {
     [CustomAuthorize]
     public class UserController : Controller
     {
-        private readonly IAuth _auth; // Poate ai nevoie de AuthBL pentru alte operațiuni, o păstrăm
+        private readonly IAuth _auth;
         private readonly IUser _user;
 
         public UserController()
@@ -57,11 +54,9 @@ namespace OtdamDarom.Controllers
                 UserRole = userModel.UserRole,
                 ProfilePictureUrl = userModel.ProfilePictureUrl, 
                 CreationDate = userModel.CreationDate
-                // Nu încărcăm câmpurile de parolă aici pentru GET
             };
         }
-
-        // Metodă helper pentru actualizarea profilului (fără parolă)
+        
         private async Task<bool> UpdateUserProfileDetails(UserProfileDto model)
         {
             var userModel = await _user.GetUserById(model.Id); 
@@ -82,8 +77,7 @@ namespace OtdamDarom.Controllers
                 return false;
             }
         }
-
-        // GET: User/Profile
+        
         public async Task<ActionResult> Profile()
         {
             try
@@ -96,7 +90,6 @@ namespace OtdamDarom.Controllers
                     TempData["ErrorMessage"] = "Profilul utilizatorului nu a fost găsit.";
                     return RedirectToAction("Index", "Home"); 
                 }
-                // Nu populăm câmpurile de parolă pentru GET
                 userProfile.CurrentPassword = null;
                 userProfile.NewPassword = null;
                 userProfile.ConfirmNewPassword = null;
@@ -115,8 +108,7 @@ namespace OtdamDarom.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
-
-        // GET: User/EditProfile (va folosi aceeași vizualizare Profile)
+        
         public async Task<ActionResult> EditProfile()
         {
             try
@@ -130,11 +122,10 @@ namespace OtdamDarom.Controllers
                     return RedirectToAction("Profile");
                 }
                 ViewBag.Title = "Editează Profilul"; 
-                // Nu populăm câmpurile de parolă pentru GET
                 userProfile.CurrentPassword = null;
                 userProfile.NewPassword = null;
                 userProfile.ConfirmNewPassword = null;
-                return View("Profile", userProfile); // Returnează aceeași vizualizare "Profile"
+                return View("Profile", userProfile);
             }
             catch (UnauthorizedAccessException)
             {
@@ -148,8 +139,7 @@ namespace OtdamDarom.Controllers
                 return RedirectToAction("Profile");
             }
         }
-
-        // POST: User/EditProfile
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditProfile(UserProfileDto model)
@@ -162,39 +152,30 @@ namespace OtdamDarom.Controllers
                 TempData["ErrorMessage"] = "Nu ești autorizat să editezi acest profil.";
                 return RedirectToAction("Profile");
             }
-
-            // Păstrăm un ModelState.IsValid inițial pentru validările de bază (Name, Email)
-            // dar vom face validări specifice pentru parolă mai jos.
-            bool isModelValid = ModelState.IsValid; // Verifică Name, Email, ProfilePictureUrl (dacă e cazul)
-
-            // Reîncarcă modelul original pentru a păstra datele non-editabile și a le afișa corect în caz de eroare
-            // sau pentru a asigura că proprietățile nu sunt null dacă nu au fost trimise de client (ex: UserRole, CreationDate)
+            
+            bool isModelValid = ModelState.IsValid;
+            
             var originalProfile = await GetUserProfileFromBL(currentUserId);
             if (originalProfile == null)
             {
                 TempData["ErrorMessage"] = "Profilul utilizatorului nu a fost găsit.";
                 return RedirectToAction("Profile");
             }
-
-            // Copiază proprietățile nemodificabile înapoi în modelul trimis pentru afișare corectă în View
+            
             model.UserRole = originalProfile.UserRole;
             model.CreationDate = originalProfile.CreationDate;
-            // ProfilePictureUrl va fi gestionat separat mai jos
 
-            // --- Logica pentru schimbarea parolei ---
             bool passwordFieldsFilled = !string.IsNullOrEmpty(model.CurrentPassword) ||
                                         !string.IsNullOrEmpty(model.NewPassword) ||
                                         !string.IsNullOrEmpty(model.ConfirmNewPassword);
 
             if (passwordFieldsFilled)
             {
-                // Validăm câmpurile de parolă doar dacă cel puțin unul a fost completat
-                // Clear validation errors for password fields initially, then re-validate specifically
+
                 ModelState.Remove("CurrentPassword");
                 ModelState.Remove("NewPassword");
                 ModelState.Remove("ConfirmNewPassword");
-
-                // Re-adaugăm validarea pentru câmpurile de parolă
+                
                 if (string.IsNullOrEmpty(model.CurrentPassword))
                 {
                     ModelState.AddModelError("CurrentPassword", "Parola actuală este obligatorie pentru a schimba parola.");
@@ -203,7 +184,6 @@ namespace OtdamDarom.Controllers
                 {
                     ModelState.AddModelError("NewPassword", "Parola nouă este obligatorie.");
                 }
-                // Validarea [Compare] este automată, nu trebuie să o faci manual aici
                 if (!string.IsNullOrEmpty(model.NewPassword) && !string.IsNullOrEmpty(model.ConfirmNewPassword) && model.NewPassword != model.ConfirmNewPassword)
                 {
                      ModelState.AddModelError("ConfirmNewPassword", "Parola nouă și confirmarea parolei nu se potrivesc.");
@@ -215,12 +195,10 @@ namespace OtdamDarom.Controllers
                 
                 if (ModelState.IsValidField("CurrentPassword") && ModelState.IsValidField("NewPassword") && ModelState.IsValidField("ConfirmNewPassword"))
                 {
-                    // Încercăm să actualizăm parola prin Business Logic
                     bool passwordUpdateSuccess = await _user.UpdatePassword(currentUserId, model.CurrentPassword, model.NewPassword);
                     if (passwordUpdateSuccess)
                     {
                         TempData["SuccessMessage"] = "Parola a fost actualizată cu succes!";
-                        // Clear password fields after successful update
                         model.CurrentPassword = null;
                         model.NewPassword = null;
                         model.ConfirmNewPassword = null;
@@ -232,19 +210,14 @@ namespace OtdamDarom.Controllers
                 }
             }
 
-
-            // --- Logica pentru actualizarea detaliilor de profil (Nume, Email, Imagine) ---
-            // Această logică se execută chiar dacă se încearcă doar o schimbare de parolă,
-            // dar va avea efect doar dacă datele sunt modificate.
-
-            string newRelativePictureUrl = originalProfile.ProfilePictureUrl; // Pornim de la URL-ul existent
+            string newRelativePictureUrl = originalProfile.ProfilePictureUrl;
 
             if (model.NewProfilePicture != null && model.NewProfilePicture.ContentLength > 0)
             {
                 if (!model.NewProfilePicture.ContentType.StartsWith("image/"))
                 {
                     ModelState.AddModelError("NewProfilePicture", "Fișierul selectat nu este o imagine.");
-                    isModelValid = false; // Marchează modelul ca nevalid pentru detalii de profil
+                    isModelValid = false;
                 }
                 else
                 {
@@ -281,26 +254,20 @@ namespace OtdamDarom.Controllers
                     {
                         ModelState.AddModelError("NewProfilePicture", $"Eroare la salvarea imaginii: {ex.Message}");
                         System.Diagnostics.Debug.WriteLine($"Eroare salvare imagine profil: {ex.Message}");
-                        isModelValid = false; // Marchează modelul ca nevalid
+                        isModelValid = false;
                     }
                 }
             }
-
-            // Setează URL-ul final al imaginii în model (pentru actualizarea BL și pentru a-l pasa înapoi în View)
+            
             model.ProfilePictureUrl = newRelativePictureUrl;
-
-
-            // Verifică dacă există erori de validare pentru detalii de profil (Name, Email, NewProfilePicture)
-            // sau dacă există erori de validare pentru parolă
-            if (!ModelState.IsValid) // ModelState.IsValid va fi false dacă s-au adăugat erori pentru parolă sau alte câmpuri
+            
+            if (!ModelState.IsValid)
             {
-                 // Dacă modelul nu este valid (după toate validările), reîntoarce view-ul cu erori
                 return View("Profile", model);
             }
-
-            // Încercăm să actualizăm detaliile profilului doar dacă nu au fost erori la imagine/nume/email
+            
             bool detailsUpdateSuccess = true;
-            if (isModelValid) // Dacă validările inițiale (Name, Email, NewProfilePicture) au trecut
+            if (isModelValid)
             {
                 detailsUpdateSuccess = await UpdateUserProfileDetails(model); 
                 if (!detailsUpdateSuccess) 
@@ -310,16 +277,14 @@ namespace OtdamDarom.Controllers
                 }
             }
             
-            // Actualizează datele în sesiune pentru a se reflecta imediat modificările în UI
             Session["Username"] = model.Name;
             Session["UserEmail"] = model.Email; 
             Session["UserProfilePicUrl"] = model.ProfilePictureUrl; 
-
-            // Reîncărcăm profilul după actualizare pentru a asigura consistența datelor afișate
+            
             UserProfileDto updatedProfile = await GetUserProfileFromBL(currentUserId);
-            TempData["SuccessMessage"] = TempData["SuccessMessage"] ?? "Profilul a fost actualizat cu succes!"; // Păstrează mesajul de la parolă sau setează un nou mesaj
+            TempData["SuccessMessage"] = TempData["SuccessMessage"] ?? "Profilul a fost actualizat cu succes!";
 
             return View("Profile", updatedProfile); 
-        } // <-- Aici se închide corect metoda EditProfile (POST)
-    } // <-- Aici se închide clasa UserController
-} // <-- Aici se închide namespace-ul OtdamDarom.Controllers
+        }
+    } 
+}

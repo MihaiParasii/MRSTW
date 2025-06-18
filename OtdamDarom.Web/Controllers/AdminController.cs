@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web; // Adăugat pentru HttpPostedFileBase
+using System.Web;
 using System.Web.Mvc;
 using OtdamDarom.Domain.Models;
 using OtdamDarom.BusinessLogic.Interfaces;
 using OtdamDarom.BusinessLogic.Api;
-using System.Linq; // Adăugat pentru .ToList() și alte operații LINQ
-using OtdamDarom.BusinessLogic.Dtos; // Adăugat pentru a folosi DealDto
+using System.Linq;
+using OtdamDarom.BusinessLogic.Dtos;
 
 namespace OtdamDarom.Web.Controllers
 {
@@ -84,7 +84,7 @@ namespace OtdamDarom.Web.Controllers
             return View(user);
         }
 
-        [HttpGet] // Adăugat explicit HttpGet pentru claritate
+        [HttpGet]
         public async Task<ActionResult> EditUser(int id)
         {
             ViewBag.Title = "Editează Utilizatorul";
@@ -207,29 +207,27 @@ namespace OtdamDarom.Web.Controllers
             ViewBag.Title = "Gestionează Anunțuri";
             return View();
         }
-
-        // GET: Admin/EditDeal/5
-        [HttpGet] // Adăugat explicit HttpGet pentru claritate
+        
+        [HttpGet]
         public async Task<ActionResult> EditDeal(int id)
         {
             ViewBag.Title = "Editează Anunțul";
-            var deal = await _adminApi.GetDealByIdAsync(id); // Obține DealModel
+            var deal = await _adminApi.GetDealByIdAsync(id);
             if (deal == null)
             {
                 return HttpNotFound();
             }
-
-            // Mapează DealModel la DealDto (aici aveai problema "Cannot resolve symbol")
+            
             var dealDto = new DealDto
             {
                 Id = deal.Id,
                 Name = deal.Name,
                 Description = deal.Description,
                 ImageURL = deal.ImageURL,
-                UserId = deal.UserId, // Această linie nu va mai da eroare după modificarea DealDto
-                CreationDate = deal.CreationDate, // Această linie nu va mai da eroare după modificarea DealDto
+                UserId = deal.UserId,
+                CreationDate = deal.CreationDate,
                 SelectedCategoryId = deal.Subcategory?.Category?.Id,
-                SelectedSubcategoryId = deal.Subcategory?.Id ?? 0 // Dacă SubcategoryId este int și poate fi 0, asigură-te că 0 este o valoare validă sau ajustează.
+                SelectedSubcategoryId = deal.Subcategory?.Id ?? 0
             };
 
             ViewBag.Categories = new SelectList(await _adminApi.GetAllCategoriesAsync(), "Id", "Name", dealDto.SelectedCategoryId);
@@ -241,15 +239,13 @@ namespace OtdamDarom.Web.Controllers
             }
             ViewBag.Subcategories = new SelectList(subcategoriesForCurrentCategory, "Id", "Name", dealDto.SelectedSubcategoryId);
 
-            return View(dealDto); // Trimite DTO-ul către view
+            return View(dealDto);
         }
-
-        // POST: Admin/EditDeal
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditDeal(DealDto dealDto) // Primește DealDto din formular
+        public async Task<ActionResult> EditDeal(DealDto dealDto)
         {
-            // Re-populează ViewBag-urile în caz de eroare de validare
             ViewBag.Categories = new SelectList(await _adminApi.GetAllCategoriesAsync(), "Id", "Name", dealDto.SelectedCategoryId);
 
             var subcategoriesForCurrentCategory = new List<SubcategoryModel>();
@@ -258,31 +254,22 @@ namespace OtdamDarom.Web.Controllers
                 subcategoriesForCurrentCategory = (await _adminApi.GetSubcategoriesByCategoryIdAsync(dealDto.SelectedCategoryId.Value))?.ToList();
             }
             ViewBag.Subcategories = new SelectList(subcategoriesForCurrentCategory, "Id", "Name", dealDto.SelectedSubcategoryId);
-
-            // Validăm modelul DealDto înainte de a încerca salvarea în baza de date
+            
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Obținem anunțul existent din baza de date pentru a actualiza proprietățile
                     var existingDeal = await _adminApi.GetDealByIdAsync(dealDto.Id);
                     if (existingDeal == null)
                     {
                         ModelState.AddModelError("", "Anunțul nu a fost găsit pentru actualizare.");
                         return View(dealDto);
                     }
-
-                    // Actualizăm doar proprietățile pe care utilizatorul le poate modifica prin DTO
+                    
                     existingDeal.Name = dealDto.Name;
                     existingDeal.Description = dealDto.Description;
                     existingDeal.SubcategoryId = dealDto.SelectedSubcategoryId;
-
-                    // UserId și CreationDate sunt preluate din DTO (unde ar trebui să ajungă prin HiddenFor în View)
-                    // Ele nu sunt modificate aici, doar re-confirmate.
-                    // existingDeal.UserId = dealDto.UserId; // Nu este necesar să le atribui aici dacă nu le modifici
-                    // existingDeal.CreationDate = dealDto.CreationDate; // Nu este necesar să le atribui aici
-
-                    // Apelează AdminApi pentru a actualiza anunțul, inclusiv gestionarea imaginilor
+                    
                     await _adminApi.UpdateDealAsync(existingDeal, dealDto.ImageFile, dealDto.DeleteExistingImage);
                     
                     TempData["SuccessMessage"] = "Anunțul a fost actualizat cu succes!";
@@ -294,13 +281,10 @@ namespace OtdamDarom.Web.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Aceasta este eroarea "An error occurred while updating the entries."
-                    // Prinde excepția și afișează un mesaj util.
                     System.Diagnostics.Debug.WriteLine($"Eroare detaliată la actualizarea anunțului: {ex.InnerException?.Message ?? ex.Message}");
-                    ModelState.AddModelError("", "A apărut o eroare la actualizarea anunțului: " + ex.Message); // Sau ex.InnerException?.Message pentru mai multe detalii
+                    ModelState.AddModelError("", "A apărut o eroare la actualizarea anunțului: " + ex.Message);
                 }
             }
-            // Dacă ModelState nu este valid sau a apărut o eroare la salvare, returnează DTO-ul la view.
             return View(dealDto);
         }
 

@@ -2,7 +2,7 @@
 using OtdamDarom.BusinessLogic.Api;
 using OtdamDarom.BusinessLogic.Dtos;
 using OtdamDarom.BusinessLogic.Interfaces;
-using OtdamDarom.Domain.Models; // Pentru UserModel
+using OtdamDarom.Domain.Models;
 
 namespace OtdamDarom.BusinessLogic.EntityBL
 {
@@ -19,7 +19,6 @@ namespace OtdamDarom.BusinessLogic.EntityBL
 
         public async Task<UserAuthResponse> Register(UserRegisterRequest request)
         {
-            // UserApi.RegisterUserAsync va gestiona hashing-ul parolei
             var response = await _userApi.RegisterUserAsync(request);
 
             if (response.IsSuccess)
@@ -32,8 +31,6 @@ namespace OtdamDarom.BusinessLogic.EntityBL
 
         public async Task<UserAuthResponse> Login(UserLoginRequest request)
         {
-            // UserApi.LoginUserAsync va gestiona verificarea parolei.
-            // Acum se bazează pe aceeași metodă de hashing ca UpdatePassword.
             var response = await _userApi.LoginUserAsync(request);
 
             if (response.IsSuccess)

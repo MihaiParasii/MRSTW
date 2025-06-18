@@ -1,7 +1,4 @@
-﻿// OtdamDarom.Web/Controllers/AuthController.cs
-using System;
-using System.Collections.Generic; 
-using System.Linq; 
+﻿using System;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -58,7 +55,6 @@ namespace OtdamDarom.Web.Controllers
             Session["UserEmail"] = response.Email;
             Session["Username"] = response.UserName;
             Session["UserRole"] = response.UserRole;
-            // AICI ESTE MODIFICAREA CRITICĂ: Preluarea URL-ului imaginii de profil din răspuns
             Session["UserProfilePicUrl"] = response.ProfilePictureUrl; 
             
             TempData["SuccessMessage"] = "Autentificare reușită!";
@@ -113,7 +109,6 @@ namespace OtdamDarom.Web.Controllers
             Session["UserEmail"] = response.Email;
             Session["Username"] = response.UserName;
             Session["UserRole"] = response.UserRole;
-            // AICI ESTE MODIFICAREA CRITICĂ: Preluarea URL-ului imaginii de profil din răspuns
             Session["UserProfilePicUrl"] = response.ProfilePictureUrl;
 
             TempData["SuccessMessage"] = "Contul a fost creat cu succes! Te-ai autentificat.";
@@ -130,7 +125,6 @@ namespace OtdamDarom.Web.Controllers
         }
         
         [HttpPost]
-        // [ValidateAntiForgeryToken] // Lăsat comentat conform discuției anterioare pentru Logout
         public async Task<ActionResult> Logout()
         {
             var authToken = Request.Cookies["AuthToken"]?.Value;
@@ -194,7 +188,6 @@ namespace OtdamDarom.Web.Controllers
                     Session["UserEmail"] = currentUser.Email;
                     Session["Username"] = currentUser.Name;
                     Session["UserRole"] = currentUser.UserRole;
-                    // AICI ESTE CORECT: Preia ProfilePictureUrl din UserModel returnat de GetCurrentUser
                     Session["UserProfilePicUrl"] = currentUser.ProfilePictureUrl; 
                 } else {
                     Response.Cookies["AuthToken"].Expires = DateTime.Now.AddDays(-1);

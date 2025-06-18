@@ -23,11 +23,10 @@ namespace OtdamDarom.BusinessLogic.Dtos
         [DataType(DataType.Password)]
         [Display(Name = "Confirmă Parola")]
         [Compare("Password", ErrorMessage = "Parola de confirmare nu se potrivește.")]
-        public string ConfirmPassword { get; set; } // Adăugat pentru confirmarea parolei
+        public string ConfirmPassword { get; set; }
 
         [Required(ErrorMessage = "Rolul utilizatorului este obligatoriu.")]
         [Display(Name = "Rol Utilizator")]
-        // Aici ar putea fi un DropDownList în UI, cu valori predefinite (User, Artist, Admin)
         public string UserRole { get; set; }
     }
 }

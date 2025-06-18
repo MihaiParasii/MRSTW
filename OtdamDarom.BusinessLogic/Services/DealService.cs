@@ -1,22 +1,16 @@
-﻿// OtdamDarom.BusinessLogic.Services/DealService.cs (sau calea corectă a fișierului)
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using OtdamDarom.BusinessLogic.Interfaces; // Asigură-te că IDeal este importat
-using OtdamDarom.Domain.Models; // Asigură-te că DealModel este importat
+using OtdamDarom.BusinessLogic.Interfaces;
+using OtdamDarom.Domain.Models;
 
-namespace OtdamDarom.BusinessLogic.Services // Sau namespace-ul corect
+namespace OtdamDarom.BusinessLogic.Services
 {
-    // Presupun că DealService folosește o instanță de IDeal sau un alt API
-    // Voi adăuga o instanță simplă a DealBl pentru exemplificare,
-    // dar ar trebui să folosești mecanismul tău de injectare a dependențelor.
     public class DealService : IDeal
     {
-        private readonly IDeal _dealBl; // Sau un alt tip, depinde cum e structura ta
+        private readonly IDeal _dealBl;
 
         public DealService() 
         {
-             // Aceasta este doar o modalitate simplă de a inițializa pentru a compila.
-             // În aplicații reale, se face prin Dependency Injection.
             _dealBl = new OtdamDarom.BusinessLogic.EntityBL.DealBl(); 
         }
 
@@ -59,12 +53,10 @@ namespace OtdamDarom.BusinessLogic.Services // Sau namespace-ul corect
         {
             return await _dealBl.SearchDeals(query);
         }
-
-        // <<<<<<<<<<<<<<<<< NOU: ADAUGĂ ACEASTĂ IMPLEMENTARE >>>>>>>>>>>>>>>>>>>>>>
+        
         public async Task<IEnumerable<DealModel>> GetDealsByUserId(int userId)
         {
             return await _dealBl.GetDealsByUserId(userId);
         }
-        // <<<<<<<<<<<<<<<<< SFÂRȘIT NOU >>>>>>>>>>>>>>>>>>>>>>
     }
 }
