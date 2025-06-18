@@ -57,6 +57,7 @@
         <Compile Include="Api\UserApi.cs" />
         <Compile Include="BusinessLogic.cs" />
         <Compile Include="Data\AppDbContext.cs" />
+        <Compile Include="Dtos\DealDto.cs" />
         <Compile Include="Dtos\UserAuthResponse.cs" />
         <Compile Include="Dtos\UserLoginRequest.cs" />
         <Compile Include="Dtos\UserProfileDto.cs" />

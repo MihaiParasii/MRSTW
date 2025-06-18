@@ -155,7 +155,10 @@
         <Content Include="Content\Images\womens_jeans.jpg" />
         <Content Include="Views\Auth\Login.cshtml" />
         <Content Include="Views\Auth\Register.cshtml" />
+        <Content Include="Views\Deal\Create.cshtml" />
         <Content Include="Views\Deal\Details.cshtml" />
+        <Content Include="Views\Deal\Edit.cshtml" />
+        <Content Include="Views\Deal\MyDeals.cshtml" />
         <Content Include="Views\Home\Category.cshtml" />
         <Content Include="Views\Home\Search.cshtml" />
         <Content Include="Views\Shared\_Footer.cshtml" />

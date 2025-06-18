@@ -15,5 +15,6 @@ namespace OtdamDarom.BusinessLogic.Interfaces
         Task<IEnumerable<DealModel>> GetDealsByCategoryId(int categoryId); 
         Task<IEnumerable<DealModel>> GetDealsBySubcategoryIds(List<int> subcategoryIds);
         Task<IEnumerable<DealModel>> SearchDeals(string query);
+        Task<IEnumerable<DealModel>> GetDealsByUserId(int userId);
     }
 }

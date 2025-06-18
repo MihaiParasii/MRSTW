@@ -1,0 +1,108 @@
+﻿@model OtdamDarom.BusinessLogic.Dtos.DealDto
+@{
+    ViewBag.Title = "Adaugă Anunț Nou";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Detalii Anunț</h6>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("Create", "Deal", FormMethod.Post, new { enctype = "multipart/form-data", @class = "user" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Name, "Nume Anunț")
+                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Description, "Descriere")
+                    @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 5 })
+                    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SelectedCategoryId, "Categorie")
+                    @Html.DropDownListFor(model => model.SelectedCategoryId, ViewBag.Categories as SelectList, "Selectează o categorie", new { @class = "form-control", id = "categoryId" })
+                    @Html.ValidationMessageFor(model => model.SelectedCategoryId, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SelectedSubcategoryId, "Subcategorie")
+                    <select id="subcategoryId" name="SelectedSubcategoryId" class="form-control">
+                        <option value="">Selectează o subcategorie</option>
+                    </select>
+                    @Html.ValidationMessageFor(model => model.SelectedSubcategoryId, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ImageFile, "Imagine Anunț")
+                    <input type="file" name="imageFile" id="imageFile" class="form-control-file" accept="image/*" />
+                    @Html.ValidationMessageFor(model => model.ImageFile, "", new { @class = "text-danger" })
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-user btn-block">
+                    Adaugă Anunț
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+            // Funcția pentru a încărca subcategoriile
+            function loadSubcategories(categoryId) {
+                $('#subcategoryId').empty(); // Golește subcategoriile existente
+                $('#subcategoryId').append('<option value="">Selectează o subcategorie</option>'); // Adaugă opțiunea implicită
+
+                if (categoryId) {
+                    $.ajax({
+                        url: '@Url.Action("GetSubcategories", "Deal")',
+                        type: 'GET',
+                        data: { categoryId: categoryId },
+                        success: function (data) {
+                            $.each(data, function (i, subcategory) {
+                                $('#subcategoryId').append($('<option></option>').val(subcategory.Id).text(subcategory.Name));
+                            });
+                            // Dacă model.SelectedSubcategoryId este setat (ex: după o eroare de validare)
+                            // selectează-l automat
+                            @if (Model != null && Model.SelectedSubcategoryId != 0)
+                            {
+                                <text>
+                                    $('#subcategoryId').val(@Model.SelectedSubcategoryId);
+                                </text>
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("Eroare la încărcarea subcategoriilor:", error);
+                            alert("A apărut o eroare la încărcarea subcategoriilor.");
+                        }
+                    });
+                }
+            }
+
+            // La schimbarea categoriei, încarcă subcategoriile
+            $('#categoryId').change(function () {
+                var selectedCategoryId = $(this).val();
+                loadSubcategories(selectedCategoryId);
+            });
+
+            // La încărcarea paginii, dacă există o categorie selectată (ex: după Postback), încarcă subcategoriile
+            var initialCategoryId = $('#categoryId').val();
+            if (initialCategoryId) {
+                loadSubcategories(initialCategoryId);
+            }
+        });
+    </script>
+}a

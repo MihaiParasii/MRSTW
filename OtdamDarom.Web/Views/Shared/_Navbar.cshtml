@@ -65,6 +65,18 @@
 
                 <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                      aria-labelledby="userDropdown">
+                    <a class="dropdown-item" href="@Url.Action("MyDeals", "Deal")"> 
+                        <i class="fas fa-clipboard-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                        Anunțurile mele
+                    </a>
+                    <div class="dropdown-divider"></div>
+
+                    <a class="dropdown-item" href="@Url.Action("Create", "Deal")"> 
+                        <i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>
+                        Adaugă Anunț Nou
+                    </a>
+                    <div class="dropdown-divider"></div>
+
                     <a class="dropdown-item" href="@Url.Action("Profile", "User")"> 
                         <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                         Profilul meu

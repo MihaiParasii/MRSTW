@@ -55,12 +55,16 @@ namespace OtdamDarom.BusinessLogic.Services // Sau namespace-ul corect
             return await _dealBl.GetDealsBySubcategoryIds(subcategoryIds);
         }
 
-        // <<<<<<<<<<<<<<<<< ADAUGĂ ACEASTĂ IMPLEMENTARE >>>>>>>>>>>>>>>>>>>>>>
-        // Rezolvă: "DealService" не реализует член интерфейса "IDeal.SearchDeals(string)".
         public async Task<IEnumerable<DealModel>> SearchDeals(string query)
         {
             return await _dealBl.SearchDeals(query);
         }
-        // <<<<<<<<<<<<<<<<< SFÂRȘIT ADAUGĂ >>>>>>>>>>>>>>>>>>>>>>
+
+        // <<<<<<<<<<<<<<<<< NOU: ADAUGĂ ACEASTĂ IMPLEMENTARE >>>>>>>>>>>>>>>>>>>>>>
+        public async Task<IEnumerable<DealModel>> GetDealsByUserId(int userId)
+        {
+            return await _dealBl.GetDealsByUserId(userId);
+        }
+        // <<<<<<<<<<<<<<<<< SFÂRȘIT NOU >>>>>>>>>>>>>>>>>>>>>>
     }
 }

@@ -1,0 +1,146 @@
+﻿@using OtdamDarom.BusinessLogic.Dtos
+@model DealDto
+
+@{
+ViewBag.Title = "Editează Anunțul";
+Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<title>@ViewBag.Title</title>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="font-weight-light my-4">Editează Anunțul</h3>
+                </div>
+                <div class="card-body p-4">
+                    @using (Html.BeginForm("Edit", "Deal", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+                    @Html.HiddenFor(model => model.Id) @* Asigură-te că Id-ul anunțului este trimis *@
+                    @Html.HiddenFor(model => model.ImageURL) @* Păstrează URL-ul imaginii existente *@
+
+                    <div class="form-group mb-3">
+                        @Html.LabelFor(model => model.Name, new { @class = "form-label" })
+                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "Titlul anunțului" })
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group mb-3">
+                        @Html.LabelFor(model => model.Description, new { @class = "form-label" })
+                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", placeholder = "Descrierea anunțului", rows = 4 })
+                        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group mb-3">
+                        @Html.LabelFor(model => model.SelectedCategoryId, "Categorie", new { @class = "form-label" })
+                        @Html.DropDownListFor(model => model.SelectedCategoryId, ViewBag.Categories as SelectList, "Selectează o categorie", new { @class = "form-control", id = "categoryDropdown" })
+                        @Html.ValidationMessageFor(model => model.SelectedCategoryId, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group mb-3">
+                        @Html.LabelFor(model => model.SelectedSubcategoryId, "Subcategorie", new { @class = "form-label" })
+                        @Html.DropDownListFor(model => model.SelectedSubcategoryId, ViewBag.Subcategories as SelectList, "Selectează o subcategorie", new { @class = "form-control", id = "subcategoryDropdown" })
+                        @Html.ValidationMessageFor(model => model.SelectedSubcategoryId, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group mb-3">
+                        @Html.Label("Imagine Curentă", new { @class = "form-label d-block" })
+                        @if (!string.IsNullOrEmpty(Model.ImageURL) && !Model.ImageURL.Contains("default-deal.png"))
+                        {
+                        <img src="@Url.Content(Model.ImageURL)" alt="Imagine Anunț Curent" class="img-thumbnail mb-2" style="max-width: 200px; height: auto;">
+                        <div class="form-check mb-2">
+                            @Html.CheckBoxFor(model => model.DeleteExistingImage, new { @class = "form-check-input" })
+                            @Html.LabelFor(model => model.DeleteExistingImage, "Șterge imaginea curentă", new { @class = "form-check-label" })
+                        </div>
+                        }
+                        else
+                        {
+                        <p class="text-muted">Nu există o imagine personalizată pentru acest anunț. Se utilizează imaginea implicită.</p>
+                        }
+
+                        @Html.Label("Încarcă Imagine Nouă", new { @class = "form-label mt-2" })
+                        <input type="file" name="imageFile" id="imageFile" class="form-control-file" />
+                        @Html.ValidationMessage("ImageFile", new { @class = "text-danger" })
+                        <small class="form-text text-muted">Max 5MB. Formate acceptate: JPG, PNG, GIF.</small>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-block">Salvează Modificările</button>
+                        @Html.ActionLink("Anulează", "MyDeals", "Deal", null, new { @class = "btn btn-secondary btn-block mt-2" })
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+<script>
+    $(document).ready(function () {
+        // Funcție pentru a încărca subcategoriile
+        function loadSubcategories(categoryId, selectedSubcategoryId) {
+            if (categoryId > 0) {
+                $.ajax({
+                    url: '@Url.Action("GetSubcategories", "Deal")',
+                    type: 'GET',
+                    data: { categoryId: categoryId },
+                    success: function (data) {
+                        $('#subcategoryDropdown').empty();
+                        $('#subcategoryDropdown').append($('<option></option>').val('').text('Selectează o subcategorie'));
+                        $.each(data, function (index, subcategory) {
+                            $('#subcategoryDropdown').append($('<option></option>').val(subcategory.Id).text(subcategory.Name));
+                        });
+                        // Selectează subcategoria existentă, dacă este cazul
+                        if (selectedSubcategoryId !== null && selectedSubcategoryId !== undefined && selectedSubcategoryId !== '') {
+                            $('#subcategoryDropdown').val(selectedSubcategoryId);
+                        }
+                    },
+                    error: function () {
+                        $('#subcategoryDropdown').empty();
+                        $('#subcategoryDropdown').append($('<option></option>').val('').text('Eroare la încărcarea subcategoriilor'));
+                    }
+                });
+            } else {
+                $('#subcategoryDropdown').empty();
+                $('#subcategoryDropdown').append($('<option></option>').val('').text('Selectează o categorie mai întâi'));
+            }
+        }
+
+        // Inițializează subcategoriile la încărcarea paginii dacă o categorie este deja selectată
+        var initialCategoryId = $('#categoryDropdown').val();
+        // <<<<<<<<<<<<<<<<< CORECTAT AICI >>>>>>>>>>>>>>>>>>>>>>
+        // Model.SelectedSubcategoryId este int (non-nullable), deci nu are nevoie de ?? 0
+        var initialSubcategoryId = '@Model.SelectedSubcategoryId';
+        // <<<<<<<<<<<<<<<<< SFÂRȘIT CORECTAT >>>>>>>>>>>>>>>>>>>>>>
+
+        if (initialCategoryId > 0) {
+            loadSubcategories(initialCategoryId, initialSubcategoryId);
+        }
+
+        // Eveniment de schimbare pentru dropdown-ul de categorii
+        $('#categoryDropdown').change(function () {
+            var categoryId = $(this).val();
+            loadSubcategories(categoryId, null); // Nu pre-selecta subcategorie la schimbarea categoriei
+        });
+
+        // Logica pentru checkbox-ul de ștergere imagine
+        $('#DeleteExistingImage').change(function() {
+            if ($(this).is(':checked')) {
+                $('#imageFile').val(''); // Golește inputul de fișier dacă se bifează ștergerea imaginii
+                $('#imageFile').prop('disabled', true); // Dezactivează inputul de fișier
+            } else {
+                $('#imageFile').prop('disabled', false); // Activează inputul de fișier
+            }
+        });
+        // Asigură-te că inputul de fișier este dezactivat la încărcarea paginii dacă checkbox-ul este bifat (în caz de eroare la POST)
+        if ($('#DeleteExistingImage').is(':checked')) {
+            $('#imageFile').prop('disabled', true);
+        }
+    });
+</script>
+}

@@ -17,15 +17,14 @@ namespace OtdamDarom.BusinessLogic.EntityBL
             _userApi = new UserApi();
         }
 
-        // <<<<<<<<<<<<<<<<<<<<<<<< AU FOST ELIMINATE DE AICI >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        // Metoda de hashing simplificată (HashPassword)
-        // Metoda de verificare a parolei (VerifyPassword)
-        // Acestea se află acum EXCLUSIV în UserApi.cs sub numele GetComputedHashForPassword.
-        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
         public async Task<UserModel> GetUserById(int id)
         {
             return await _userApi.GetUserByIdAsync(id);
+        }
+
+        public async Task<UserModel> GetUserByEmail(string email)
+        {
+            return await _userApi.GetUserByEmailAsync(email);
         }
 
         public async Task<IEnumerable<UserModel>> GetAllUsers()
@@ -35,9 +34,6 @@ namespace OtdamDarom.BusinessLogic.EntityBL
 
         public async Task<int> CreateUser(UserModel user)
         {
-            // IMPORTANT: UserApi.CreateUserAsync se ocupă de hashing-ul parolei.
-            // Asigură-te că 'user.PasswordHash' conține parola în text clar când ajunge aici.
-            // UserApi.CreateUserAsync va verifica dacă e deja hashedă sau o va hasha.
             return await _userApi.CreateUserAsync(user);
         }
 
@@ -56,48 +52,53 @@ namespace OtdamDarom.BusinessLogic.EntityBL
             await _userApi.UpdateUserRoleAsync(email, newRole);
         }
 
-        // NOU: Implementarea metodei de actualizare a parolei
         public async Task<bool> UpdatePassword(int userId, string currentPassword, string newPassword)
         {
-            // Pasul 1: Preluăm informațiile despre utilizator.
             var user = await _userApi.GetUserByIdAsync(userId);
             if (user == null)
             {
-                return false; // Utilizatorul nu a fost găsit.
+                return false;
             }
 
-            // Pasul 2: Verificăm parola actuală folosind logica de login din UserApi.
-            // Aceasta va asigura că folosim același algoritm de hashing (Base64)
-            // și aceeași logică de verificare ca la login.
             var loginRequest = new UserLoginRequest
             {
-                Email = user.Email,       // Folosim email-ul utilizatorului găsit
-                Password = currentPassword // Parola actuală în text clar, așa cum e introdusă de utilizator
+                Email = user.Email,
+                Password = currentPassword
             };
 
             var authResponse = await _userApi.LoginUserAsync(loginRequest);
 
             if (!authResponse.IsSuccess)
             {
-                // Parola actuală este incorectă (verificarea a eșuat în UserApi).
                 return false;
             }
 
-            // Pasul 3: Dacă parola actuală este corectă, hash-ezi noua parolă
-            // folosind metoda de hashing din UserApi și o salvezi.
             user.PasswordHash = _userApi.GetComputedHashForPassword(newPassword);
 
             try
             {
-                await _userApi.UpdateUserAsync(user); // Salvează modificările parolei în baza de date.
+                await _userApi.UpdateUserAsync(user);
                 return true;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Eroare la schimbarea parolei pentru utilizatorul {userId}: {ex.Message}");
-                // Poți loga excepția mai detaliat sau o poți arunca mai departe, dacă este necesar.
+                if (ex.InnerException != null) System.Diagnostics.Debug.WriteLine($"Inner Exception: {ex.InnerException.Message}");
                 return false;
             }
         }
+
+        // <<<<<<<<<<<<<<<<< IMPLEMENTARE AICI >>>>>>>>>>>>>>>>>>>>>>
+        // Implementarea metodelor pentru categorii și subcategorii, apelând UserApi
+        public async Task<IEnumerable<CategoryModel>> GetAllCategoriesWithSubcategories()
+        {
+            return await _userApi.GetAllCategoriesWithSubcategoriesAsync();
+        }
+
+        public async Task<CategoryModel> GetCategoryById(int id)
+        {
+            return await _userApi.GetCategoryByIdAsync(id);
+        }
+        // <<<<<<<<<<<<<<<<< SFÂRȘIT IMPLEMENTARE >>>>>>>>>>>>>>>>>>>>>>
     }
 }
