@@ -490,5 +490,62 @@ namespace OtdamDarom.Web.Controllers
 
             return View(userDeals);
         }
+        
+        // În OtdamDarom.Web.Controllers/DealController.cs
+
+// ... (alte using-uri și codul controllerului) ...
+
+        // POST: Deal/Delete - Procesează cererea de ștergere a unui anunț
+        [CustomAuthorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken] // Asigură-te că token-ul anti-forgery este validat
+        public async Task<ActionResult> Delete(int id)
+        {
+            try
+            {
+                int userId = GetCurrentUserId();
+                var dealToDelete = await _dealBl.GetById(id);
+
+                if (dealToDelete == null)
+                {
+                    return Json(new { success = false, message = "Anunțul nu a fost găsit." });
+                }
+                
+                if (dealToDelete.UserId != userId)
+                {
+                    return Json(new { success = false, message = "Nu ai permisiunea de a șterge acest anunț." });
+                }
+
+                // Opțional: Șterge imaginea veche de pe server, dacă nu este imaginea implicită
+                if (!string.IsNullOrEmpty(dealToDelete.ImageURL) && 
+                    !dealToDelete.ImageURL.Contains("default-deal.png")) 
+                {
+                    string filePath = Server.MapPath(dealToDelete.ImageURL);
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+
+                await _dealBl.Delete(id); 
+
+                return Json(new { success = true, message = "Anunțul a fost șters cu succes!" });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Json(new { success = false, message = "Sesiunea a expirat. Te rugăm să te autentifici din nou.", redirectTo = Url.Action("Login", "Auth") });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Eroare la ștergerea anunțului cu ID {id}: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Detalii: {ex.InnerException.Message}");
+                }
+                return Json(new { success = false, message = "A apărut o eroare la ștergerea anunțului. Vă rugăm să reîncărcați pagina și să încercați din nou." });
+            }
+        }
+
+// ... (restul codului controllerului) ...
     }
 }

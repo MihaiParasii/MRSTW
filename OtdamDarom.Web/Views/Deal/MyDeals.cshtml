@@ -12,35 +12,37 @@
         <div class="col-12">
             <h4 class="mb-3">@ViewBag.Title</h4> @* Utilizează ViewBag.Title pentru titlul H4 *@
             
-            @* Aici afișăm mesajele temporare (succes/eroare) *@
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["SuccessMessage"]
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            }
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @TempData["ErrorMessage"]
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            }
+            @* Zona pentru mesaje dinamice (succes/eroare) injectate de JavaScript *@
+            <div id="dynamicAlertArea">
+                @* Mesajele TempData de la redirecționări vor fi afișate aici.
+                   Mesajele AJAX vor fi injectate direct de funcția displayAlert. *@
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                }
+            </div>
 
-            <div class="row">
+            <div class="row" id="dealsContainer"> @* Adaugă un ID pentru rândul care conține anunțurile *@
                 @if (Model != null && Model.Any())
                 {
-                    @* Nu mai este nevoie de OrderByDescending și Take(12) aici,
-                       deoarece lista Model ar trebui să conțină deja doar anunțurile utilizatorului
-                       și le putem afișa pe toate. Ordinea ar trebui să fie deja gestionată în BL. *@
                     foreach (var deal in Model) 
                     {
-                        <div class="col-12 col-sm-6 col-md-4 mb-4">
+                        @* Adaugă un ID unic cardului pentru ștergere ușoară cu JavaScript *@
+                        <div class="col-12 col-sm-6 col-md-4 mb-4" id="dealCard_@deal.Id">
                             <div class="card shadow h-100">
                                 @if (!string.IsNullOrEmpty(deal.ImageURL))
                                 {
@@ -55,8 +57,6 @@
                                     <p class="card-text text-muted mb-2">@deal.Description</p>
                                     <a href="@Url.Action("Details", "Deal", new { id = deal.Id })" class="btn btn-sm btn-outline-success mt-auto">Vezi Detalii</a>
                                     
-                                    @* Butoanele pentru Editare și Ștergere ar putea fi adăugate aici.
-                                       Vom presupune că vei adăuga aceste acțiuni în DealController mai târziu. *@
                                     <div class="mt-2">
                                         <a href="@Url.Action("Edit", "Deal", new { id = deal.Id })" class="btn btn-sm btn-primary">Editare</a>
                                         <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteDealModal_@deal.Id">Ștergere</button>
@@ -75,15 +75,12 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        Ești sigur că vrei să ștergi anunțul "@deal.Name"? Această acțiune este ireversibilă.
+                                        Ești sigur că vrei să ștergi anunțul "<strong>@deal.Name</strong>"? Această acțiune este ireversibilă.
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Anulează</button>
-                                        @using (Html.BeginForm("Delete", "Deal", new { id = deal.Id }, FormMethod.Post, new { @class = "d-inline" }))
-                                        {
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-danger">Șterge</button>
-                                        }
+                                        @* BUTONUL MODIFICAT: Aici apelăm funcția JavaScript direct *@
+                                        <button type="button" class="btn btn-danger" onclick="deleteDeal(@deal.Id)">Șterge</button>
                                     </div>
                                 </div>
                             </div>
@@ -92,7 +89,7 @@
                 }
                 else
                 {
-                    <div class="col-12">
+                    <div class="col-12" id="noDealsMessage"> @* Adaugă un ID la acest div pentru a-l putea manipula *@
                         <div class="alert alert-info" role="alert">
                             Nu ai postat încă niciun anunț. <a href="@Url.Action("Create", "Deal")" class="alert-link">Adaugă un anunț nou acum!</a>
                         </div>
@@ -102,3 +99,69 @@
         </div>
     </div>
 </div>
+
+@section scripts {
+    @Html.AntiForgeryToken()
+
+    <script>
+        // Funcție ajutătoare pentru a afișa mesaje dinamice (succes/eroare)
+        function displayAlert(type, message) {
+            var alertHtml = '<div class="alert alert-' + type + ' alert-dismissible fade show mt-3" role="alert">' +
+                                message +
+                                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                                    '<span aria-hidden="true">&times;</span>' +
+                                '</button>' +
+                            '</div>';
+            $('#dynamicAlertArea').empty().append(alertHtml); // Golește zona și adaugă alerta
+            // Opțional: Alerta dispare automat după un timp (ex: 5 secunde)
+            // setTimeout(function() {
+            //     $('.alert').alert('close');
+            // }, 5000);
+        }
+        
+        function deleteDeal(dealId) {
+            // Închide modalul de confirmare imediat pentru o experiență fluidă
+            $('#deleteDealModal_' + dealId).modal('hide');
+
+            // Obține token-ul anti-forgery din input-ul ascuns generat de @Html.AntiForgeryToken()
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            $.ajax({
+                url: '@Url.Action("Delete", "Deal")', // URL-ul acțiunii Delete din DealController
+                type: 'POST', // Metoda HTTP
+                data: {
+                    id: dealId,
+                    __RequestVerificationToken: token // Include token-ul pentru securitate
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Șterge vizual cardul anunțului din DOM cu o animație de "fade out"
+                        $('#dealCard_' + dealId).fadeOut(300, function() {
+                            $(this).remove(); // Elimină elementul din DOM după animație
+
+                            // Verifică dacă mai există anunțuri după ștergere
+                            if ($('.col-12.col-sm-6.col-md-4.mb-4').length === 0) {
+                                // Dacă nu mai sunt anunțuri, afișează mesajul "nu ai postat încă niciun anunț"
+                                var noDealsHtml = '<div class="col-12" id="noDealsMessage">' +
+                                                    '<div class="alert alert-info" role="alert">' +
+                                                        'Nu ai postat încă niciun anunț. <a href="@Url.Action("Create", "Deal")" class="alert-link">Adaugă un anunț nou acum!</a>' +
+                                                    '</div>' +
+                                                  '</div>';
+                                $('#dealsContainer').append(noDealsHtml); // Adaugă mesajul în containerul de anunțuri
+                            }
+                        });
+                        displayAlert('success', response.message); // Afișează un mesaj de succes
+                    } else {
+                        // Dacă serverul a returnat succes: false (ex: anunțul nu a fost găsit sau permisiuni)
+                        displayAlert('danger', response.message || "A apărut o eroare la ștergerea anunțului.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Tratează erorile de rețea sau de server
+                    console.error("Eroare AJAX la ștergere:", status, error, xhr.responseText);
+                    displayAlert('danger', "Eroare de rețea sau server. Vă rugăm să reîncărcați pagina și să încercați din nou.");
+                }
+            });
+        }
+    </script>
+}
