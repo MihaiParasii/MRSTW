@@ -1,0 +1,200 @@
+﻿@using OtdamDarom.Domain.Models
+@model UserModel
+
+@{
+    ViewBag.Title = "Editează Utilizatorul (Admin)";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string defaultProfilePicPath = Url.Content("~/Content/Images/default-user.png");
+    string currentProfilePicUrl = Model.ProfilePictureUrl;
+
+    // Verificăm dacă imaginea de profil există fizic pe server
+    // ATENTIE: System.IO.File.Exists nu este recomandat în view-uri (logică de business în view)
+    // Calea de aici trebuie să corespundă cu cea din controller, adică să fie calea URL completă
+    // Aș vrea să eliminăm logica de File.Exists de aici, iar controllerul să decidă URL-ul final.
+    // Presupunând că Model.ProfilePictureUrl este deja calea URL corectă trimisă din controller.
+    if (string.IsNullOrEmpty(currentProfilePicUrl))
+    {
+        currentProfilePicUrl = defaultProfilePicPath;
+    }
+}
+
+<div class="container-fluid">
+
+    <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
+
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Detalii Utilizator</h6>
+                </div>
+                <div class="card-body">
+
+                    @using (Html.BeginForm("EditUser", "Admin", FormMethod.Post, new { enctype = "multipart/form-data", @class = "user" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+                        @Html.HiddenFor(model => model.Id)
+                        @Html.HiddenFor(model => model.ProfilePictureUrl)
+                        @Html.HiddenFor(model => model.CreationDate)
+                        @Html.HiddenFor(model => model.PasswordHash) @* Corectat: Folosește PasswordHash, nu Password *
+                                                                   * Adminul nu ar trebui să vadă/seteze parolele direct. Vom gestiona schimbarea parolei separat sau prin reset. *@
+                        @Html.HiddenFor(model => model.Email) @* Adaugat Email, in caz ca nu e editabil in UI, dar e important pentru UpdateUserAsync *
+                                                                  *Daca Email e editabil, atunci nu-l face HiddenFor, dar asigura-te ca e trimis corect.*@
+
+                        <div class="text-center mb-4">
+                            <img id="profilePicturePreview" class="img-profile rounded-circle mb-3"
+                                 src="@currentProfilePicUrl"
+                                 alt="Imagine de Profil"
+                                 style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #ddd;">
+
+                            <div class="form-group mt-3 mx-auto" style="max-width: 350px;">
+                                <label for="NewProfilePicture" class="sr-only">@Html.DisplayNameFor(model => model.ProfilePictureUrl)</label>
+                                <input type="file" name="imageFile" id="NewProfilePicture" class="form-control-file d-none" accept="image/*" />
+
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="fileNameDisplay" placeholder="Nicio imagine selectată" readonly>
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-primary" id="selectPictureButton">
+                                            <i class="fas fa-upload mr-2"></i> Selectează
+                                        </button>
+                                    </div>
+                                </div>
+                                @Html.ValidationMessage("imageFile", "", new { @class = "text-danger d-block mt-2" })
+                            </div>
+                            
+                            @* Adăugăm checkbox pentru ștergerea imaginii existente, similar cu EditDeal *@
+                            @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl) && !Model.ProfilePictureUrl.Contains("default-user.png"))
+                            {
+                                <div class="form-check mt-2">
+                                    @Html.CheckBox("DeleteExistingImage", false, new { @class = "form-check-input", id = "DeleteExistingImage" })
+                                    <label class="form-check-label" for="DeleteExistingImage">Șterge imaginea de profil curentă</label>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                <label for="Name">@Html.DisplayNameFor(model => model.Name)</label>
+                                @Html.TextBoxFor(model => model.Name, new { @class = "form-control form-control-user", @id = "Name", placeholder = Html.DisplayNameFor(model => model.Name) })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="Email">@Html.DisplayNameFor(model => model.Email)</label>
+                                @Html.TextBoxFor(model => model.Email, new { @class = "form-control form-control-user", @id = "Email", placeholder = Html.DisplayNameFor(model => model.Email), type = "email" })
+                                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="UserRole">@Html.DisplayNameFor(model => model.UserRole):</label>
+                            @Html.DropDownListFor(model => model.UserRole, new SelectList(new List<string> { "User", "Admin" }), "Selectează un rol", new { @class = "form-control", @id = "UserRole" })
+                            @Html.ValidationMessageFor(model => model.UserRole, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            <label>@Html.DisplayNameFor(model => model.CreationDate):</label>
+                            <input type="text" class="form-control" value="@Model.CreationDate.ToString("dd MMMM yyyy HH:mm")" readonly />
+                        </div>
+                        
+                        <div class="mt-4 text-center">
+                            <button type="submit" class="btn btn-primary mr-2">Salvează Modificările</button>
+                            <a href="@Url.Action("Users", "Admin")" class="btn btn-secondary">Anulează</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+@* Asigură-te că jquery și jqueryval sunt incluse în _Layout.cshtml sau aici *@
+@* @Scripts.Render("~/bundles/jqueryval") *@
+<script>
+    $(document).ready(function () {
+        var defaultProfilePicUrl = '@defaultProfilePicPath';
+        // Folosim direct Model.ProfilePictureUrl pentru initializare
+        var currentProfilePictureUrl = '@Html.Raw(Model.ProfilePictureUrl != null && Model.ProfilePictureUrl.Contains("default-user.png") ? defaultProfilePicPath : Model.ProfilePictureUrl)';
+
+        // Asigură-te că URL-ul este corect pentru previzualizare
+        if (!currentProfilePictureUrl || currentProfilePictureUrl.trim() === '') {
+             currentProfilePictureUrl = defaultProfilePicPath;
+        }
+
+        function setPreviewImage(src) {
+            $('#profilePicturePreview').attr('src', src);
+        }
+
+        // Setează numele fișierului inițial dacă există o imagine personalizată
+        if (currentProfilePictureUrl !== defaultProfilePicPath) {
+            var parts = currentProfilePictureUrl.split('/');
+            $('#fileNameDisplay').val(parts[parts.length - 1]);
+        } else {
+            $('#fileNameDisplay').val("Nicio imagine selectată");
+        }
+        
+        // Deschide dialogul de selectare a fișierului
+        $('#selectPictureButton').on('click', function () {
+            $('#NewProfilePicture').click();
+        });
+
+        // Previzualizare imagine la selecție
+        $('#NewProfilePicture').on('change', function () {
+            var input = this;
+            var fileName = $(input).val().split('\\').pop();
+
+            if (fileName) {
+                $('#fileNameDisplay').val(fileName);
+            } else {
+                $('#fileNameDisplay').val("Nicio imagine selectată");
+            }
+
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    setPreviewImage(e.target.result);
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                setPreviewImage(currentProfilePictureUrl);
+            }
+        });
+
+        // Fallback pentru imaginea de profil dacă cea curentă nu se încarcă
+        $('#profilePicturePreview').on('error', function() {
+            $(this).attr('src', defaultProfilePicPath); // Folosește direct defaultProfilePicPath
+        });
+
+        // Logica pentru checkbox-ul de ștergere imagine existentă
+        $('#DeleteExistingImage').change(function() {
+            if ($(this).is(':checked')) {
+                $('#NewProfilePicture').val(''); // Golește inputul de fișier
+                $('#fileNameDisplay').val("Imaginea va fi ștearsă"); // Mesaj specific
+                $('#NewProfilePicture').prop('disabled', true); // Dezactivează inputul de fișier
+                setPreviewImage(defaultProfilePicPath); // Afișează imaginea implicită în previzualizare
+            } else {
+                $('#NewProfilePicture').prop('disabled', false); // Activează inputul de fișier
+                // Restaurează previzualizarea la imaginea curentă
+                setPreviewImage(currentProfilePictureUrl);
+                // Restaurează numele fișierului
+                if (currentProfilePictureUrl !== defaultProfilePicPath) {
+                    var parts = currentProfilePictureUrl.split('/');
+                    $('#fileNameDisplay').val(parts[parts.length - 1]);
+                } else {
+                    $('#fileNameDisplay').val("Nicio imagine selectată");
+                }
+            }
+        });
+        // Setează starea inițială a inputului de fișier în funcție de checkbox, dacă e cazul (la reîncărcarea paginii cu erori)
+        if ($('#DeleteExistingImage').is(':checked')) {
+             $('#NewProfilePicture').prop('disabled', true);
+             $('#fileNameDisplay').val("Imaginea va fi ștearsă");
+        }
+    });
+</script>
+}

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Collections.Generic; // Adaugă acest using pentru ICollection
+using System.Collections.Generic;
 
 namespace OtdamDarom.Domain.Models
 {
@@ -17,10 +17,9 @@ namespace OtdamDarom.Domain.Models
         [Display(Name = "Nume")] 
         public string Name { get; set; }
         
-        // Proprietate pentru URL-ul imaginii de profil - ACEASTA ESTE NOUA SI ESTE FOARTE BINE CA AI ADAUGAT-O!
         [StringLength(500)] 
         [Display(Name = "Imagine de Profil URL")]
-        public string ProfilePictureUrl { get; set; } // Poate fi null dacă utilizatorul nu are o imagine setată
+        public string ProfilePictureUrl { get; set; } 
 
         [Required]
         [Display(Name = "Email")]
@@ -41,7 +40,18 @@ namespace OtdamDarom.Domain.Models
 
         public DateTime CreationDate { get; set; } = DateTime.UtcNow; 
 
-        // Proprietate de navigare pentru sesiuni (opțional, dar bun pentru EF)
         public virtual ICollection<UserSession> Sessions { get; set; }
+
+        // <<<<<<<<<<<<<<<<< ADAUGĂ ACEASTĂ LINIE >>>>>>>>>>>>>>>>>>>>>>
+        public virtual ICollection<DealModel> Deals { get; set; } // Un utilizator poate avea mai multe anunțuri
+        // <<<<<<<<<<<<<<<<< SFÂRȘIT ADĂUGARE >>>>>>>>>>>>>>>>>>>>>>
+
+        public UserModel()
+        {
+            // <<<<<<<<<<<<<<<<< INIȚIALIZEAZĂ ȘI ACEASTĂ COLECȚIE >>>>>>>>>>>>>>>>>>>>>>
+            Sessions = new HashSet<UserSession>();
+            Deals = new HashSet<DealModel>(); // Asigură-te că este inițializată
+            // <<<<<<<<<<<<<<<<< SFÂRȘIT INIȚIALIZARE >>>>>>>>>>>>>>>>>>>>>>
+        }
     }
 }

@@ -1,0 +1,258 @@
+﻿@{
+// Acest view va folosi layout-ul tău principal, care deja include structura SB Admin 2
+Layout = "~/Views/Shared/_Layout.cshtml";
+// ViewBag.Title este setat în controller ("Dashboard Admin"), dar putem seta aici un fallback
+if (ViewBag.Title == null) { ViewBag.Title = "Dashboard Admin Principal"; }
+}
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+</div>
+
+<div class="row">
+
+    <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Utilizatori Înregistrați
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.TotalUsers</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Anunțuri Postate
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.TotalDeals</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-bullhorn fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row mt-4">
+
+    <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card shadow h-100 py-2">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Utilizatori</h6>
+            </div>
+            <div class="card-body">
+                @* Zona pentru mesaje dinamice (succes/eroare) injectate de JavaScript - pentru utilizatori *@
+                <div id="dynamicAlertAreaUsers"></div>
+
+                @if (ViewBag.LatestUsers != null && ViewBag.LatestUsers.Count > 0)
+                {
+                <ul class="list-group list-group-flush" id="latestUsersList">
+                    @foreach (var user in ViewBag.LatestUsers)
+                    {
+                    <li class="list-group-item d-flex justify-content-between align-items-center" id="latestUserItem_@user.Id">
+                        <div>
+                            <strong>@user.Name</strong> (@user.Email) - <span class="badge badge-secondary">@user.UserRole</span>
+                        </div>
+                        <div>
+                            <a href="@Url.Action("EditUser", "Admin", new { id = user.Id })" class="btn btn-sm btn-info mr-1" title="Editează">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteUserModal_@user.Id" title="Șterge">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+
+                    @* MODALUL DE CONFIRMARE PENTRU ȘTERGEREA UTILIZATORILOR RECENȚI *@
+                    <div class="modal fade" id="deleteUserModal_@user.Id" tabindex="-1" role="dialog" aria-labelledby="deleteUserModalLabel_@user.Id" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteUserModalLabel_@user.Id">Confirmă Ștergerea Utilizatorului</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Ești sigur că vrei să ștergi utilizatorul "<strong>@user.Name</strong>" (@user.Email)? Această acțiune este ireversibilă.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Anulează</button>
+                                    <button type="button" class="btn btn-danger" onclick="deleteEntity('@Url.Action("DeleteUser", "Admin")', @user.Id, 'latestUserItem_@user.Id', 'user')">Șterge</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </ul>
+                }
+                else
+                {
+                <p class="text-center text-muted" id="noRecentUsersMessage">Nu există utilizatori recenți de afișat.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card shadow h-100 py-2">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Anunțuri</h6>
+            </div>
+            <div class="card-body">
+                @* Zona pentru mesaje dinamice (succes/eroare) injectate de JavaScript - pentru anunturi *@
+                <div id="dynamicAlertAreaDeals"></div>
+
+                @if (ViewBag.LatestDeals != null && ViewBag.LatestDeals.Count > 0)
+                {
+                <ul class="list-group list-group-flush" id="latestDealsList">
+                    @foreach (var deal in ViewBag.LatestDeals)
+                    {
+                    <li class="list-group-item d-flex justify-content-between align-items-center" id="latestDealItem_@deal.Id">
+                        <div>
+                            <strong>@deal.Name</strong> de la <em>
+                                @if (deal.User != null)
+                                {
+                                @deal.User.Name
+                                }
+                                else
+                                {
+                                @:N/A
+                                }
+                            </em>
+                            <small class="text-muted">(@deal.CreationDate.ToShortDateString())</small>
+                        </div>
+                        <div>
+                            <a href="@Url.Action("EditDeal", "Admin", new { id = deal.Id })" class="btn btn-sm btn-info mr-1" title="Editează">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteDealModal_@deal.Id" title="Șterge">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+
+                    @* MODALUL DE CONFIRMARE PENTRU ȘTERGEREA ANUNȚURILOR RECENȚI *@
+                    <div class="modal fade" id="deleteDealModal_@deal.Id" tabindex="-1" role="dialog" aria-labelledby="deleteDealModalLabel_@deal.Id" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteDealModalLabel_@deal.Id">Confirmă Ștergerea</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Ești sigur că vrei să ștergi anunțul "<strong>@deal.Name</strong>"? Această acțiune este ireversibilă.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Anulează</button>
+                                    <button type="button" class="btn btn-danger" onclick="deleteEntity('@Url.Action("DeleteDeal", "Admin")', @deal.Id, 'latestDealItem_@deal.Id', 'deal')">Șterge</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </ul>
+                }
+                else
+                {
+                <p class="text-center text-muted" id="noRecentDealsMessage">Nu există anunțuri recente de afișat.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+@Html.AntiForgeryToken()
+
+<script>
+    // Funcție ajutătoare pentru a afișa mesaje dinamice (succes/eroare)
+    // Acum primește și un parametru 'targetAreaId' pentru a ști unde să afișeze alerta
+    function displayAlert(type, message, targetAreaId) {
+        var alertHtml = '<div class="alert alert-' + type + ' alert-dismissible fade show mt-3" role="alert">' +
+            message +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+            '<span aria-hidden="true">&times;</span>' +
+            '</button>' +
+            '</div>';
+        $('#' + targetAreaId).empty().append(alertHtml);
+    }
+
+    // Funcția de ștergere generică cu AJAX
+    // Primește:
+    //   - deleteUrl: URL-ul acțiunii de ștergere (ex: '/Admin/DeleteDeal', '/Admin/DeleteUser')
+    //   - entityId: ID-ul entității de șters (deal.Id sau user.Id)
+    //   - listItemId: ID-ul elementului HTML (<li>) de șters din DOM (ex: 'latestDealItem_123', 'latestUserItem_456')
+    //   - entityType: "deal" sau "user" (pentru a adapta mesajele și ID-urile modalului)
+    function deleteEntity(deleteUrl, entityId, listItemId, entityType) {
+        // Închide modalul de confirmare corespunzător
+        if (entityType === 'deal') {
+            $('#deleteDealModal_' + entityId).modal('hide');
+        } else if (entityType === 'user') {
+            $('#deleteUserModal_' + entityId).modal('hide');
+        }
+
+
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: deleteUrl,
+            type: 'POST',
+            data: {
+                id: entityId,
+                __RequestVerificationToken: token
+            },
+            success: function (response) {
+                if (response.success) {
+                    // Șterge vizual elementul listei din DOM
+                    $('#' + listItemId).fadeOut(300, function() {
+                        $(this).remove(); // Elimină elementul din DOM după animație
+
+                        // Verifică dacă mai există entități în lista respectivă
+                        var listSelector = (entityType === 'deal') ? '#latestDealsList .list-group-item' : '#latestUsersList .list-group-item';
+                        var noEntitiesMessageId = (entityType === 'deal') ? 'noRecentDealsMessage' : 'noRecentUsersMessage'; // Fără #
+                        var listContainerId = (entityType === 'deal') ? '#latestDealsList' : '#latestUsersList';
+                        var messageText = (entityType === 'deal') ? 'Nu există anunțuri recente de afișat.' : 'Nu există utilizatori recenți de afișat.';
+                        var alertAreaId = (entityType === 'deal') ? 'dynamicAlertAreaDeals' : 'dynamicAlertAreaUsers';
+
+                        if ($(listSelector).length === 0) {
+                            // Dacă nu mai sunt entități, afișează mesajul "nu există..."
+                            if ($('#' + noEntitiesMessageId).length === 0) { // Adaugă mesajul doar dacă nu există deja
+                                $(listContainerId).append('<p class="text-center text-muted" id="' + noEntitiesMessageId + '">' + messageText + '</p>');
+                            } else {
+                                $('#' + noEntitiesMessageId).show(); // Afișează-l dacă era ascuns
+                            }
+                        }
+                    });
+                    displayAlert('success', response.message, (entityType === 'deal' ? 'dynamicAlertAreaDeals' : 'dynamicAlertAreaUsers'));
+                } else {
+                    displayAlert('danger', response.message || "A apărut o eroare la ștergerea " + (entityType === 'deal' ? "anunțului" : "utilizatorului") + ".", (entityType === 'deal' ? 'dynamicAlertAreaDeals' : 'dynamicAlertAreaUsers'));
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Eroare AJAX la ștergere:", status, error, xhr.responseText);
+                displayAlert('danger', "Eroare de rețea sau server. Vă rugăm să reîncărcați pagina și să încercați din nou.", (entityType === 'deal' ? 'dynamicAlertAreaDeals' : 'dynamicAlertAreaUsers'));
+            }
+        });
+    }
+</script>
+}

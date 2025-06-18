@@ -1,15 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System; // Adăugat pentru System.DateTime
+using System.ComponentModel.DataAnnotations;
 using System.Web; // Pentru HttpPostedFileBase
 
 namespace OtdamDarom.BusinessLogic.Dtos
 {
     public class DealDto
     {
-        [Required]
+        [Required] // Poate fi necesar, depinde dacă Id-ul este gestionat automat sau e o valoare existentă
         public int Id { get; set; } 
 
         [Required(ErrorMessage = "Numele anunțului este obligatoriu.")]
-        [StringLength(100, ErrorMessage = "Numele nu poate depășească 100 de caractere.")]
+        [StringLength(100, ErrorMessage = "Numele nu poate depășască 100 de caractere.")]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Descrierea anunțului este obligatorie.")]
@@ -25,14 +26,22 @@ namespace OtdamDarom.BusinessLogic.Dtos
         [Display(Name = "Șterge imaginea existentă")]
         public bool DeleteExistingImage { get; set; }
 
-        // <<<<<<<<<<<<<<<<< CORECTAT AICI >>>>>>>>>>>>>>>>>>>>>>
         [Required(ErrorMessage = "Selectați o categorie.")]
         [Display(Name = "Categorie")]
-        public int? SelectedCategoryId { get; set; } // ACUM ESTE int? (nullable int)
-        // <<<<<<<<<<<<<<<<< SFÂRȘIT CORECTAT >>>>>>>>>>>>>>>>>>>>>>
+        public int? SelectedCategoryId { get; set; } // int? pentru a permite "Selectează o categorie"
 
         [Required(ErrorMessage = "Selectați o subcategorie.")]
         [Display(Name = "Subcategorie")]
         public int SelectedSubcategoryId { get; set; } 
+        
+        // ************************************************************
+        // CORECTARE CRUCIALĂ: ADĂUGĂM UserId ȘI CreationDate ÎN DTO!
+        // FĂRĂ ACESTE PROPRIETĂȚI, ERAU EROARE "CANNOT RESOLVE SYMBOL".
+        // ************************************************************
+        public int UserId { get; set; }
+        public DateTime CreationDate { get; set; }
+
+        // Poți adăuga și alte proprietăți dacă sunt necesare în View/Controller, dar nu sunt modificate
+        // public int Views { get; set; } 
     }
 }
